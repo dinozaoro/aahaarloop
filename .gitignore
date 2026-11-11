@@ -1,7 +1,10 @@
 node_modules/
 .expo/
+.next/
+out/
 dist/
 web-build/
+coverage/
 *.log
 .env
 .env.local
