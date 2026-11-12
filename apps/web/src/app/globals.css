@@ -86,6 +86,19 @@
     0 8px 24px -12px oklch(0.2 0.02 155 / 18%);
   --shadow-lifted: 0 2px 4px oklch(0.2 0.02 155 / 8%),
     0 20px 40px -20px oklch(0.2 0.02 155 / 25%);
+
+  --animate-fade-up: fade-up 500ms ease-out both;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @layer base {
@@ -95,6 +108,7 @@
 
   html {
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
@@ -113,5 +127,19 @@
   ::selection {
     background-color: var(--accent);
     color: var(--accent-foreground);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
