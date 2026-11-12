@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import "./globals.css";
 
+import { PageChrome } from "@/components/page-chrome";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Toaster } from "@/components/ui/sonner";
@@ -31,13 +32,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-dvh bg-background text-foreground antialiased">
-        <div className="flex min-h-dvh flex-col">
+        <PageChrome>
           <SiteHeader />
-          <main id="main" className="flex-1">
+          <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
             {children}
           </main>
           <SiteFooter />
-        </div>
+        </PageChrome>
         <Toaster />
       </body>
     </html>
