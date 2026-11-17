@@ -45,6 +45,7 @@ export interface Organization {
   area: string;
   address: string;
   location: GeoPoint;
+  description?: string | undefined;
   verified: boolean;
   storage: StorageType;
   transportCapacityKg: number;
@@ -52,6 +53,7 @@ export interface Organization {
   dietaryConstraints: string[];
   contactName: string;
   contactPhone: string;
+  contactEmail?: string | undefined;
 }
 
 export type DonationEventType =
