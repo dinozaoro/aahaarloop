@@ -76,3 +76,27 @@ export function getNeedsForOrganization(
 export function getVolunteerProfile(): VolunteerProfile {
   return seed.volunteerProfile;
 }
+
+/** Demo write path: replaces the matching in-memory entry, or appends it. */
+export function upsertDonation(donation: Donation): void {
+  const index = donations.findIndex((item) => item.id === donation.id);
+  if (index === -1) donations.push(donation);
+  else donations[index] = donation;
+}
+
+export function upsertClaim(claim: Claim): void {
+  const index = claims.findIndex((item) => item.id === claim.id);
+  if (index === -1) claims.push(claim);
+  else claims[index] = claim;
+}
+
+export function findClaimByIdempotencyKey(key: string): Claim | undefined {
+  return claims.find((claim) => claim.idempotencyKey === key);
+}
+
+export function upsertOrganization(organization: Organization): void {
+  const index = organizations.findIndex((item) => item.id === organization.id);
+  if (index === -1) organizations.push(organization);
+  else organizations[index] = organization;
+}
+

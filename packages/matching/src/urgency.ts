@@ -16,7 +16,21 @@ export interface UrgencyInput {
   handlingTimeMinutes?: number;
   /** Safety and logistics buffer in minutes. Defaults to 15. */
   bufferMinutes?: number;
+  /** Level boundaries in hours. Defaults to 3/6/12 (critical/high/medium). */
+  thresholds?: UrgencyThresholds;
 }
+
+export interface UrgencyThresholds {
+  criticalHours: number;
+  highHours: number;
+  mediumHours: number;
+}
+
+export const DEFAULT_URGENCY_THRESHOLDS: UrgencyThresholds = {
+  criticalHours: 3,
+  highHours: 6,
+  mediumHours: 12,
+};
 
 export interface UrgencyResult {
   status: UrgencyStatus;
@@ -71,14 +85,17 @@ function toNonNegativeMinutes(
   return value;
 }
 
-function classify(remainingMs: number): UrgencyLevel {
-  if (remainingMs > 12 * HOUR_MS) {
+function classify(
+  remainingMs: number,
+  thresholds: UrgencyThresholds,
+): UrgencyLevel {
+  if (remainingMs > thresholds.mediumHours * HOUR_MS) {
     return "low";
   }
-  if (remainingMs >= 6 * HOUR_MS) {
+  if (remainingMs >= thresholds.highHours * HOUR_MS) {
     return "medium";
   }
-  if (remainingMs >= 3 * HOUR_MS) {
+  if (remainingMs >= thresholds.criticalHours * HOUR_MS) {
     return "high";
   }
   return "critical";
@@ -157,7 +174,7 @@ export function calculateUrgency(input: UrgencyInput): UrgencyResult {
 
   return {
     status: "active",
-    level: classify(remainingMs),
+    level: classify(remainingMs, input.thresholds ?? DEFAULT_URGENCY_THRESHOLDS),
     claimable: true,
     effectiveDeadlineAt,
     remainingMinutes,

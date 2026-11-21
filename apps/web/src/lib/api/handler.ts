@@ -11,6 +11,10 @@ import {
   type IdempotencyStore,
 } from "./idempotency.ts";
 import type { RateLimitHook } from "./rate-limit.ts";
+import {
+  isCrossOriginRequest,
+  isUnsafeMethod,
+} from "../security/csrf.ts";
 
 export interface ApiContext {
   requestId: string;
@@ -77,6 +81,13 @@ export function withApiHandler<TBody = unknown, TQuery = unknown>(
     };
 
     try {
+      if (isUnsafeMethod(request.method) && isCrossOriginRequest(request)) {
+        return finish(
+          errorResponse("forbidden", "Cross-origin request rejected", requestId),
+          "forbidden",
+        );
+      }
+
       if (options.rateLimit) {
         const client =
           request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
