@@ -1,6 +1,6 @@
 # Aahaarloop — ce qu'il reste à faire
 
-Runbook mis à jour le 2026-11-21. Cochez chaque étape au fur et à mesure.
+Runbook mis à jour le 2026-11-22. Cochez chaque étape au fur et à mesure.
 
 ## État actuel (déjà fait)
 
@@ -63,14 +63,14 @@ Aucun achat n'est nécessaire. Le compte Neon n'a pas de crédits AI Gateway : l
 
 À faire uniquement **si plus tard** vous obtenez des crédits : `available` passera à `true` et vous pourrez alors appeler `chatCompletion()` avec un modèle activé. Ce n'est **pas** un prérequis de la démo.
 
-## Étape 3 — Déployer sur Vercel (issue #74)
+## Étape 3 — Déployer sur Vercel (issue #74 — FAIT)
 
-- [ ] Créer le projet Vercel et importer `dinozaoro/aahaarloop`.
+- [x] Projet Vercel `aahaarloop` lié et déployé sur https://aahaarloop.vercel.app.
 - [ ] Framework : **Next.js**. Build command : `pnpm --filter @aahaarloop/web build`. Output : `apps/web/.next`. (Alternative : Root Directory `apps/web`.)
 - [ ] Node : `.nvmrc` (≥ 22.18), pnpm détecté via `packageManager` dans `package.json`.
-- [ ] Ajouter **toutes** les variables de l'étape 1 + celles de Neon dans **Production** et **Preview**, avec des valeurs distinctes.
-- [ ] Créer une **branche Neon par preview** (`neon checkout <nom> --create`) et lui donner ses propres `DATABASE_URL` / `DIRECT_URL` / `AUTH_SECRET`. Ne jamais partager la prod.
-- [ ] Déployer, puis vérifier :
+- [x] 11 variables Neon + AUTH_SECRET ajoutées en Production et Preview via `vercel env add`. **Manquant** : Google OAuth et Cloudinary (à ajouter dès que vous me les donnez ou via le dashboard).
+- [ ] **Important** : les previews pointent aujourd'hui vers la même branche Neon `production`. Créer une branche Neon par preview et lui donner ses propres `DATABASE_URL` / `DIRECT_URL` / `AUTH_SECRET`.
+- [x] Déployé puis vérifié : `/api/health/db` → `{"ok":true}`, `/api/ai/models` → `available:false`.
   ```sh
   curl https://aahaarloop.vercel.app/api/health/db    # {"ok":true}
   curl https://aahaarloop.vercel.app/api/ai/models    # count > 0
@@ -92,20 +92,21 @@ Aucun achat n'est nécessaire. Le compte Neon n'a pas de crédits AI Gateway : l
 
 ## Étape 5 — Review et merge des PR en attente
 
-- [ ] PR #144 — dashboard donateur (`feat/17-donor-dashboard`) → ferme #17
-- [ ] PR #145 — favoris destinataire (`feat/37-favorites`) → ferme #37
+- [x] PR #144 fermée (supplantée par le dashboard du redesign, issue #17 close).
+- [x] PR #145 mergée (favoris, issue #37 close).
+- [x] PR #155 mergée (correctif lint mobile qui bloquait toute la CI).
 
 Vérifier les deux trailers de co-auteur sur chaque commit avant merge.
 
 ---
 
-## Étape 6 — Issues restantes (22), ordre suggéré
+## Étape 6 — Issues restantes (15), ordre suggéré
 
 **P0 — avant la démo**
 
-- [ ] #72 données + script de démo
-- [ ] #74 Vercel (étape 3)
-- [ ] #77 checklist finale / mapping des critères de jugement
+- [x] #72 données + script de démo (PR #154, `docs/demo-script.md`).
+- [x] #74 Vercel (étape 3).
+- [x] #77 checklist finale / mapping des critères (PR #156, `docs/demo-checklist.md`).
 
 **Logistique**
 
