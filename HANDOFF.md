@@ -8,7 +8,7 @@ Runbook mis à jour le 2026-11-21. Cochez chaque étape au fur et à mesure.
 - [x] `neon init` + `neon deploy` : `neon.ts` commité (PR #151), services Postgres et AI Gateway actifs.
 - [x] 7 variables Neon récupérées dans `.env.local` (racine et `apps/web/`, gitignorés).
 - [x] Postgres : connexion vérifiée, migrations appliquées sur `production`.
-- [x] AI Gateway : câblé dans le code, route `/api/ai/models` opérationnelle.
+- [x] AI Gateway : câblé dans le code, route `/api/ai/models` opérationnelle en mode dégradé (aucun appel payant).
 - [x] Build complet `npm run build` : 6 tâches réussies.
 - [x] PWA (#53), service worker (#54), QR code (#69), audit perf (#73), offline web/mobile (#55/#56/#63/#64-logique) livrés.
 
@@ -42,31 +42,26 @@ Déjà disponibles, aucun geste nécessaire : `DATABASE_URL`, `DATABASE_URL_UNPO
 
 ---
 
-## Étape 2 — Débloquer l'AI Gateway
+## Étape 2 — AI Gateway sans achat (mode dégradé)
 
-Le gateway répond, mais tous les modèles sont désactivés :
+Aucun achat n'est nécessaire. Le compte Neon n'a pas de crédits AI Gateway : les 68 modèles du catalogue sont listés mais `enabled: false`, et tout appel de complétion renvoie `403 paid_plan_required`.
 
-```
-GET /api/ai/models → 200, count: 68, tous "enabled": false
-POST /v1/chat/completions → 403 paid_plan_required
-```
+**Comportement retenu : aucune dépense, aucune erreur cassante.**
 
-- [ ] Aller sur [Neon Billing](https://console.neon.tech/app/org-weathered-queen-10917366/billing), ajouter une carte et acheter des crédits AI Gateway (possible même sur le plan Free).
-- [ ] Vérifier :
-  ```sh
-  curl -s "$NEON_AI_GATEWAY_BASE_URL/v1/models" \
-    -H "Authorization: Bearer $NEON_AI_GATEWAY_TOKEN" | grep -o '"enabled":true' | head
+- [x] `GET /api/ai/models` est un contrôle **gratuit** : il ne fait que lister les modèles et renvoie désormais :
+  ```json
+  {
+    "ok": true,
+    "available": false,
+    "modelCount": 68,
+    "enabledCount": 0,
+    "reason": "paid_plan_required"
+  }
   ```
-  Au moins un `enabled:true` doit apparaître.
-- [ ] Tester une complétion :
-  ```sh
-  curl -s -X POST "$NEON_AI_GATEWAY_BASE_URL/v1/chat/completions" \
-    -H "Authorization: Bearer $NEON_AI_GATEWAY_TOKEN" \
-    -H 'Content-Type: application/json' \
-    -d '{"model":"claude-haiku-4-5","messages":[{"role":"user","content":"Say OK"}]}'
-  ```
+- [x] Le client `chatCompletion()` lève une erreur typée `GatewayUnavailableError` sur `403 paid_plan_required` — l'interface peut donc afficher « IA indisponible » sans tenter de retry ni planter.
+- [x] Aucun autre service ne dépend de l'IA : l'essentiel de l'application (dons, claims, matching, logistique, offline) fonctionne uniquement avec Postgres.
 
----
+À faire uniquement **si plus tard** vous obtenez des crédits : `available` passera à `true` et vous pourrez alors appeler `chatCompletion()` avec un modèle activé. Ce n'est **pas** un prérequis de la démo.
 
 ## Étape 3 — Déployer sur Vercel (issue #74)
 
@@ -147,7 +142,7 @@ Vérifier les deux trailers de co-auteur sur chaque commit avant merge.
 
 - [ ] Connexion Google réelle (sign-in → onboarding → rôle)
 - [ ] Upload d'image Cloudinary depuis le formulaire de don
-- [ ] Appel AI Gateway avec un vrai modèle après l'étape 2
+- [ ] Vérifier que l'UI affiche proprement l'indisponibilité de l'IA (`available:false`) sans erreur bloquante
 - [ ] Mode hors-ligne + prompt d'install PWA + mise à jour du service worker dans un navigateur
 - [ ] Build EAS et installation de l'APK sur un vrai Android, scan du QR #69 au stand
 - [ ] Parcours de conflit de bout en bout une fois #57/#64 faits

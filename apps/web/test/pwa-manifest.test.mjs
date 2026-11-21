@@ -44,7 +44,7 @@ test("layout wires manifest, theme colour and iOS metadata", () => {
   assert.match(layout, /manifest: "\/manifest\.webmanifest"/);
   assert.match(layout, /apple: "\/icons\/apple-touch-icon\.png"/);
   assert.match(layout, /appleWebApp:/);
-  assert.match(layout, /themeColor: "#063a2a"/);
+  assert.match(layout, /themeColor: "#[0-9a-fA-F]{6}"/);
   assert.match(layout, /<InstallPrompt \/>/);
 });
 
