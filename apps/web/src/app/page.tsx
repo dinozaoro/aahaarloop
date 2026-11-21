@@ -1,8 +1,9 @@
 import { resolveAndroidDownloadUrl } from "@/lib/links";
-import { ArrowDown, ArrowUpRight, Check } from "lucide-react";
+import { ArrowDown, ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import ImmersiveFoodScene from "@/components/immersive-food-scene";
 
 export const metadata: Metadata = {
   title: "Good food deserves another destination",
@@ -87,26 +88,23 @@ function AndroidAction({ inverse = false }: { inverse?: boolean }) {
 export default function HomePage() {
   return (
     <div className="landing-page">
-      <section id="hero" className="landing-hero" aria-labelledby="hero-title">
-        <div className="landing-hero-copy">
+      <section id="hero" className="landing-hero immersive-hero" aria-labelledby="hero-title">
+        <div className="immersive-grid" aria-hidden="true" />
+        <div className="landing-hero-copy immersive-copy">
           <p className="landing-eyebrow">
-            <span aria-hidden="true">●</span> A little less waste. A lot more
-            possibility.
+            <span aria-hidden="true">●</span> A little less waste. A lot more possibility.
           </p>
           <h1 id="hero-title" className="landing-title">
-            <span>Good food deserves</span>
-            <em>another destination.</em>
+            <span>Good food</span>
+            <span>deserves a</span>
+            <em>second life.</em>
           </h1>
           <p className="landing-intro">
-            Connect surplus food with the people and communities who need it.
-            Every donation can make a difference.
+            A living loop between kitchens with extra and communities ready to share. Explore the journey in 3D.
           </p>
-          <div className="landing-actions">
+          <div className="landing-actions immersive-actions">
             <AndroidAction />
-            <Link
-              className="landing-button landing-button-secondary"
-              href="/browse"
-            >
+            <Link className="landing-button landing-button-secondary" href="/browse">
               Explore Web App <ArrowUpRight aria-hidden="true" />
             </Link>
           </div>
@@ -115,60 +113,28 @@ export default function HomePage() {
               ? "Direct APK install · No Play Store needed"
               : "Direct APK download · URL pending"}
           </p>
-          <div className="landing-social-proof">
-            <span className="social-proof-dots" aria-hidden="true">
-              <i />
-              <i />
-              <i />
-            </span>
-            <span>Food shared, communities strengthened.</span>
+          <div className="immersive-proof">
+            <span className="immersive-proof-line" aria-hidden="true" />
+            <span>From kitchen to community, every meal matters.</span>
           </div>
         </div>
 
-        <figure className="food-story">
-          <Image
-            src="/images/indian-table-current.jpg"
-            alt="A shared Indian meal, ready to find its next table"
-            fill
-            priority
-            sizes="(max-width: 700px) calc(100vw - 40px), 92vw"
-            className="food-story-image"
-          />
-          <span className="food-story-label">Made to be shared</span>
-          <article
-            className="floating-donation"
-            aria-label="Illustrative donation"
-          >
-            <span className="availability">
-              <i /> Surplus available
-            </span>
-            <h2>A little extra. A lot of good.</h2>
-            <p>
-              Vegetarian thali <span>24 portions</span>
-            </p>
-            <span className="collection-time">
-              Collect by 8:30 PM <ArrowUpRight aria-hidden="true" />
-            </span>
-          </article>
-          <article
-            className="floating-delivery"
-            aria-label="Illustrative delivery status"
-          >
-            <span className="delivery-check">
-              <Check aria-hidden="true" />
-            </span>
-            <span>
-              <strong>A better destination.</strong>
-              <small>24 meals, shared with care</small>
-            </span>
-          </article>
-          <figcaption>
-            Kitchen <span aria-hidden="true">→</span> community
-          </figcaption>
-        </figure>
-        <div className="image-caption">
-          <span>Good food. New possibilities.</span>
-          <span>Illustrative donation journey / 01</span>
+        <div
+          className="immersive-stage"
+          role="img"
+          aria-label="Interactive 3D illustration of an Indian thali with rice, curry, flatbread and fresh herbs."
+        >
+          <ImmersiveFoodScene />
+          <div className="scene-orbit-label scene-orbit-label-top" aria-hidden="true">
+            <span className="scene-orbit-dot" /> Freshly made · 24 portions
+          </div>
+          <div className="scene-orbit-label scene-orbit-label-bottom" aria-hidden="true">
+            <span className="scene-orbit-check">↗</span> A better destination, nearby
+          </div>
+          <p className="scene-caption">A meal in motion <span>—</span> Bengaluru, India</p>
+        </div>
+        <div className="hero-scroll-cue" aria-hidden="true">
+          <span>Scroll to explore</span><i />
         </div>
       </section>
 

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 
 import "./globals.css";
 import "./landing.css";
+import "./immersive-hero.css";
 import "./workspace.css";
 import "./account.css";
 import "./readable-text.css";
