@@ -73,7 +73,7 @@ test("Zod validation failures return 400 with field paths and no values", async 
   );
   // Exclude request_id: a random UUID may legitimately contain the substring "-1".
   const text =
-    JSON.stringify(error.error.details) +
+    JSON.stringify(error.details) +
     JSON.stringify(logs.map(({ request_id: _id, ...entry }) => entry));
   assert.doesNotMatch(text, /do-not-log-me|not-an-email|-1/);
   assert.equal(logs[0].request_id, response.headers.get("x-request-id"));
