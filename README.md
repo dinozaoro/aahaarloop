@@ -9,6 +9,7 @@ Monorepo for the Aahaarloop surplus-food platform.
 - `packages/matching` — deterministic urgency and matching rules shared by the clients.
 - `docs/product-spec.md` — product specification, glossary and matching contract.
 - `docs/design-tokens.md` — design tokens and UI foundation.
+- `docs/accessibility.md` — accessibility baseline, audit status and known gaps.
 
 ## Getting started
 
