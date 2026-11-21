@@ -104,8 +104,11 @@ export default function VolunteerProfilePage() {
       }
       const saved = JSON.parse(raw) as VolunteerProfile;
       if (saved?.id === seedProfile.id) {
-        setProfile(saved);
-        setForm(formFromProfile(saved));
+        // Defer hydration so the effect does not trigger a synchronous render.
+        queueMicrotask(() => {
+          setProfile(saved);
+          setForm(formFromProfile(saved));
+        });
       }
     } catch {
       window.localStorage.removeItem(STORAGE_KEY);
