@@ -1,4 +1,5 @@
 import type { DonationDateValues } from "./dates.ts";
+import type { FoodCategory } from "../domain/types.ts";
 
 export const DONATION_DRAFT_KEY = "aahaarloop.donation-draft";
 
@@ -14,6 +15,12 @@ export interface DonationLocationValues {
 }
 
 export interface DonationDraft {
+  basics: {
+    foodName: string;
+    category: FoodCategory;
+    servings: number;
+    description: string;
+  } | null;
   dates: DonationDateValues | null;
   location: DonationLocationValues | null;
   status: "draft" | "published";
@@ -26,6 +33,7 @@ export interface DraftStorage {
 }
 
 export const emptyDraft: DonationDraft = {
+  basics: null,
   dates: null,
   location: null,
   status: "draft",
@@ -38,6 +46,7 @@ export function readDraft(storage: DraftStorage): DonationDraft {
     if (!raw) return emptyDraft;
     const parsed = JSON.parse(raw) as Partial<DonationDraft>;
     return {
+      basics: parsed.basics ?? null,
       dates: parsed.dates ?? null,
       location: parsed.location ?? null,
       status: parsed.status === "published" ? "published" : "draft",

@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import type { Metadata } from "next";
 
 import { DonationDatesForm } from "./donation-dates-form";
+import { WorkspaceShell } from "@/components/workspace-shell";
 
 export const metadata: Metadata = {
   title: "Donation dates and storage",
@@ -10,10 +11,7 @@ export const metadata: Metadata = {
 
 export default function DonationDatesPage() {
   return (
-    <main
-      id="main"
-      className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-16 sm:px-6"
-    >
+    <WorkspaceShell><div className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-10 sm:px-6">
       <div className="flex flex-col gap-2">
         <Badge variant="secondary" className="w-fit">
           Step 2 of 3
@@ -27,6 +25,6 @@ export default function DonationDatesPage() {
         </p>
       </div>
       <DonationDatesForm />
-    </main>
+    </div></WorkspaceShell>
   );
 }

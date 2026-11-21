@@ -1,139 +1,16 @@
-import { ClaimCancelButton } from "@/components/claim-cancel-button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { requireUser } from "@/lib/auth/guards";
-import {
-  getClaims,
-  getClaimsForDonor,
-  getClaimsForOrganization,
-} from "@/lib/data/store";
-import {
-  toClaimRow,
-  type ClaimActor,
-  type ProgressStep,
-} from "@/lib/claims/view-model";
-import { CLAIM_STATUS_LABELS } from "@/lib/domain/types";
 import type { Metadata } from "next";
+import { WorkspaceShell } from "@/components/workspace-shell";
+import { getClaimsForDonor, getDonation, getOrganization } from "@/lib/data/store";
+import { DEMO_DONOR_ORG_ID } from "@/lib/data/constants";
 
-export const metadata: Metadata = { title: "Claims" };
+export const metadata: Metadata = { title: "Pickups" };
+const STEPS = ["Posted", "Claimed", "Pickup scheduled", "Collected", "Delivered"];
+const EVENT_TYPES = ["created", "confirmed", "pickup_scheduled", "picked_up", "delivered"];
+const formatTime = (date: string) => new Intl.DateTimeFormat("en-IN", { hour: "numeric", minute: "2-digit" }).format(new Date(date));
 
-const STATE_STYLE: Record<ProgressStep["state"], string> = {
-  done: "bg-success text-success-foreground",
-  current: "bg-primary text-primary-foreground",
-  upcoming: "bg-secondary text-muted-foreground",
-  closed: "bg-destructive text-destructive-foreground",
-};
-
-function Progress({ steps }: { steps: ProgressStep[] }) {
-  return (
-    <ol className="flex flex-wrap gap-2" aria-label="Claim progress">
-      {steps.map((step, index) => (
-        <li
-          key={`${step.status}-${index}`}
-          className={`rounded-full px-2.5 py-1 text-xs font-medium ${STATE_STYLE[step.state]}`}
-          aria-current={step.state === "current" ? "step" : undefined}
-        >
-          {step.label}
-        </li>
-      ))}
-    </ol>
-  );
-}
-
-export default async function ClaimsPage() {
-  const user = await requireUser();
-  const organizationId = user.activeOrganizationId;
-  const actor: ClaimActor = { role: user.role, organizationId };
-
-  const claims =
-    user.role === "donor"
-      ? getClaimsForDonor(organizationId ?? "")
-      : user.role === "recipient"
-        ? getClaimsForOrganization(organizationId ?? "")
-        : user.role === "admin"
-          ? getClaims()
-          : [];
-  const rows = claims.map((claim) => toClaimRow(claim, actor));
-  const perspective = user.role === "donor" ? "donor" : "recipient";
-
-  return (
-    <main className="mx-auto max-w-6xl space-y-6 px-4 py-10 sm:px-6">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold">Claim tracking</h1>
-        <p className="text-sm text-muted-foreground">
-          {perspective === "donor"
-            ? "Claims against your donations and their pickup or delivery progress."
-            : "Your claims, their current status and the next action you need to take."}
-        </p>
-      </header>
-
-      {rows.length === 0 ? (
-        <Card>
-          <CardContent className="py-10 text-center text-sm text-muted-foreground">
-            No claims to show yet.
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {rows.map((row) => (
-            <Card key={row.id} className="flex flex-col">
-              <CardHeader>
-                <div className="flex items-start justify-between gap-2">
-                  <CardTitle className="text-base">{row.donationTitle}</CardTitle>
-                  <Badge variant={row.variant}>{row.statusLabel}</Badge>
-                </div>
-                <CardDescription>
-                  {row.servings} servings · {row.id.slice(0, 8)}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex-1 space-y-4">
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                    Next action
-                  </p>
-                  <p
-                    className={
-                      row.next.tone === "primary"
-                        ? "text-sm font-medium text-foreground"
-                        : "text-sm text-muted-foreground"
-                    }
-                  >
-                    {row.next.label}
-                  </p>
-                </div>
-                <Progress steps={row.progress} />
-                <details className="rounded-md border border-border p-3">
-                  <summary className="cursor-pointer text-sm font-medium">
-                    History ({row.history.length})
-                  </summary>
-                  <ol className="mt-2 space-y-1 text-sm text-muted-foreground">
-                    {row.history.map((event) => (
-                      <li key={event.id}>
-                        <span className="font-medium text-foreground">
-                          {CLAIM_STATUS_LABELS[event.type as keyof typeof CLAIM_STATUS_LABELS] ?? event.type}
-                        </span>{" "}
-                        · {new Date(event.at).toLocaleString()}
-                        {event.note ? ` · ${event.note}` : ""}
-                      </li>
-                    ))}
-                  </ol>
-                </details>
-              </CardContent>
-              {row.canCancel && (
-                <div className="border-t border-border p-4">
-                  <ClaimCancelButton claimId={row.id} />
-                </div>
-              )}
-            </Card>
-          ))}
-        </div>
-      )}
-    </main>
-  );
+export default function ClaimsPage() {
+  const claims = getClaimsForDonor(DEMO_DONOR_ORG_ID);
+  return <WorkspaceShell><div className="page-heading"><div><p className="page-kicker">Collection coordination</p><h1>Pickups</h1><p>Follow each handover and see what needs your attention.</p></div></div>
+    <section className="pickup-list">{claims.map((claim) => { const recipient = getOrganization(claim.recipientOrgId); const donation = getDonation(claim.donationId); const active = claim.status === "pickup_scheduled" ? 2 : claim.status === "picked_up" ? 3 : claim.status === "delivered" ? 4 : 1; const scheduled = claim.history.find((event) => event.type === "pickup_scheduled"); const pickupEvent = scheduled?.note ?? "Collection time to be confirmed"; return <article key={claim.id} className="pickup-card"><div className="pickup-head"><div><span className="food-category">{donation?.pickupArea ?? "Local pickup"} · {formatTime(claim.createdAt)}</span><h2>{claim.donationTitle}</h2><p>{claim.servings} servings · for {recipient?.name ?? claim.recipientName}</p></div><span className={`status status-${claim.status}`}>{claim.status.replaceAll("_", " ")}</span></div><div className="timeline">{STEPS.map((step, i) => { const event = claim.history.find((entry) => entry.type === EVENT_TYPES[i]); return <div key={step} className={`timeline-step${i < active ? " done" : i === active ? " current" : ""}`}><span className="timeline-dot">{i < active ? "✓" : ""}</span><strong>{step}</strong><small>{event ? formatTime(event.at) : i === active + 1 ? "Next" : ""}</small></div>; })}</div><div className="pickup-details"><div><span>Pickup window</span><strong>{pickupEvent}</strong></div><div><span>Pickup point</span><strong>{donation?.pickupAddress ?? "Address to be confirmed"}</strong></div><div><span>Volunteer</span><strong>{scheduled?.actor ?? "Not assigned yet"}</strong></div><button className="outline-action">Share pickup details</button></div></article>; })}</section><p className="sample-note">Preview workspace · pickup progress reflects seeded examples.</p>
+  </WorkspaceShell>;
 }

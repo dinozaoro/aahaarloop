@@ -1,43 +1,25 @@
-import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { ArrowRight, Construction } from "lucide-react";
 import Link from "next/link";
 
 export function ComingSoon({
   title,
   description,
-  issue,
 }: {
   title: string;
   description: string;
-  issue: number;
+  issue?: number;
 }) {
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-24 sm:px-6">
-      <Card className="reveal shadow-lifted press-scale">
-        <CardHeader>
-          <Badge variant="secondary" className="w-fit">
-            Issue #{issue}
-          </Badge>
-          <CardTitle className="text-2xl font-display">{title}</CardTitle>
-          <CardDescription>{description}</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-wrap gap-2">
-          <Link href="/design" className={cn(buttonVariants())}>
-            View the design system
-          </Link>
-          <Link href="/" className={cn(buttonVariants({ variant: "outline" }))}>
-            Back to home
-          </Link>
-        </CardContent>
-      </Card>
+    <div className="site-shell grid min-h-[55vh] place-items-center py-14">
+      <section className="w-full max-w-2xl border-t-2 border-primary pt-7">
+        <Construction aria-hidden="true" className="size-6 text-primary" />
+        <p className="eyebrow mt-6">Not available in this preview</p>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h1>
+        <p className="mt-4 max-w-xl text-base leading-7 text-muted-foreground">{description}</p>
+        <Link href="/" className={cn(buttonVariants({ variant: "outline" }), "mt-7")}>Explore AahaarLoop <ArrowRight aria-hidden="true" /></Link>
+      </section>
     </div>
   );
 }
