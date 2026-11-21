@@ -16,6 +16,7 @@ Monorepo for the Aahaarloop surplus-food platform.
 - `docs/accessibility.md` — accessibility baseline, audit status and known gaps.
 - `docs/development/environment.md` — environment variables, owners and Neon setup.
 - `docs/database/schema.md` — purpose of every table and column.
+- `docs/database/demo-data.md` — demo accounts, seed content and DB commands.
 
 Each app owns its UI: web never imports React Native UI, mobile never imports web UI. Both apps consume only platform-neutral TypeScript from `packages/shared` and `packages/matching`.
 
