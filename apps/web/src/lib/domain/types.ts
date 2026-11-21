@@ -123,6 +123,8 @@ export interface ClaimEvent {
 
 export interface Claim {
   id: string;
+  /** Client key retained for idempotent replays; never returned to other orgs. */
+  idempotencyKey?: string | undefined;
   donationId: string;
   donationTitle: string;
   donorOrganizationId: string;

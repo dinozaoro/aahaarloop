@@ -84,3 +84,13 @@ export function upsertDonation(donation: Donation): void {
   else donations[index] = donation;
 }
 
+export function upsertClaim(claim: Claim): void {
+  const index = claims.findIndex((item) => item.id === claim.id);
+  if (index === -1) claims.push(claim);
+  else claims[index] = claim;
+}
+
+export function findClaimByIdempotencyKey(key: string): Claim | undefined {
+  return claims.find((claim) => claim.idempotencyKey === key);
+}
+
