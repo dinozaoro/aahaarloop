@@ -1,5 +1,4 @@
 import { signIn } from "@/auth";
-import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
@@ -24,9 +23,7 @@ export default function SignInPage() {
   return (
     <div className="mx-auto flex w-full max-w-xl flex-col gap-6 px-4 py-16 sm:px-6">
       <div className="flex flex-col gap-2">
-        <Badge variant="secondary" className="w-fit">
-          Issue #8
-        </Badge>
+        <p className="eyebrow">Welcome to AahaarLoop</p>
         <h1 className="text-3xl font-semibold tracking-tight">Sign in</h1>
         <p className="text-muted-foreground">
           Sign in with Google to create your Aahaarloop identity and choose your
@@ -38,7 +35,7 @@ export default function SignInPage() {
         <CardHeader>
           <CardTitle>Continue with Google</CardTitle>
           <CardDescription>
-            New accounts continue to role and organization setup.
+            New accounts can choose a role and set up their organisation after signing in.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
@@ -57,7 +54,7 @@ export default function SignInPage() {
             <code>AUTH_GOOGLE_SECRET</code>. See the authentication docs.
           </p>
           <Link href="/dashboard" className={cn(buttonVariants(), "w-full")}>
-            Continue with the demo session
+            Explore the product preview
             <ArrowRight aria-hidden="true" />
           </Link>
           <p className="flex items-start gap-2 text-xs text-muted-foreground">
@@ -65,8 +62,7 @@ export default function SignInPage() {
               aria-hidden="true"
               className="mt-0.5 size-4 shrink-0"
             />
-            The demo session is seeded with sample data and is not a real
-            account. No credentials are stored.
+            This opens sample product data. It is not a signed-in account, and changes may only stay in this browser session.
           </p>
         </CardContent>
       </Card>

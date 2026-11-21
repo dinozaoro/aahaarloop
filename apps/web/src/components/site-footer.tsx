@@ -1,69 +1,34 @@
+"use client";
+
 import { Logo } from "@/components/logo";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export function SiteFooter() {
+  const pathname = usePathname();
+  if (["/dashboard", "/browse", "/donations", "/claims", "/impact", "/notifications", "/profile"].some((path) => pathname === path || pathname.startsWith(`${path}/`)) || pathname.startsWith("/donations/new")) return null;
   return (
-    <footer className="border-t border-border bg-secondary/60 backdrop-blur-sm">
-      <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr]">
-        <div className="flex flex-col gap-4">
-          <Logo className="opacity-90" />
-          <p className="max-w-sm text-sm text-muted-foreground leading-relaxed">
-            Aahaarloop routes surplus food to the organisations that can rescue
-            it before the deadline — deterministically explained, never decided
-            by an LLM.
+    <footer className="mt-20 border-t border-border bg-background">
+      <div className="site-shell grid gap-8 py-9 sm:grid-cols-[1fr_auto] sm:items-end">
+        <div className="flex flex-col gap-3">
+          <Logo />
+          <p className="max-w-xl text-sm leading-6 text-muted-foreground">
+            Surplus food, matched with nearby organisations that can collect it in time.
           </p>
-          <p className="max-w-sm text-xs text-muted-foreground">
-            Aahaarloop does not certify that food is safe to eat. Donors and
-            recipients remain responsible for food safety.
+          <p className="max-w-xl text-xs leading-5 text-muted-foreground">
+            AahaarLoop does not certify food safety. Donors and recipients are responsible for handling and allergen checks.
           </p>
         </div>
-
-        <nav aria-label="Product" className="flex flex-col gap-2 text-sm">
-          <p className="font-display font-semibold text-foreground tracking-tight uppercase text-xs">
-            Product
-          </p>
-          <Link
-            className="text-muted-foreground hover:text-foreground transition-colors press-scale"
-            href="/dashboard"
-          >
-            Donor dashboard
-          </Link>
-          <Link
-            className="text-muted-foreground hover:text-foreground transition-colors press-scale"
-            href="/browse"
-          >
-            Browse donations
-          </Link>
-          <Link
-            className="text-muted-foreground hover:text-foreground transition-colors press-scale"
-            href="/recipient"
-          >
-            Recipient workspace
-          </Link>
-        </nav>
-
-        <nav aria-label="Resources" className="flex flex-col gap-2 text-sm">
-          <p className="font-display font-semibold text-foreground tracking-tight uppercase text-xs">
-            Resources
-          </p>
-          <Link
-            className="text-muted-foreground hover:text-foreground transition-colors press-scale"
-            href="/design"
-          >
-            Design system
-          </Link>
-          <a
-            className="text-muted-foreground hover:text-foreground transition-colors press-scale"
-            href="https://github.com/dinozaoro/aahaarloop/blob/main/docs/product-spec.md"
-          >
-            Product specification
-          </a>
+        <nav aria-label="Footer" className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
+          <Link className="quiet-link" href="/browse">Find food</Link>
+          <Link className="quiet-link" href="/dashboard">Donors</Link>
+          <Link className="quiet-link" href="/recipient">Organisations</Link>
+          <Link className="quiet-link" href="/signin">Sign in</Link>
         </nav>
       </div>
-      <div className="border-t border-border/60">
-        <p className="mx-auto w-full max-w-6xl px-4 py-8 text-xs text-muted-foreground sm:px-6">
-          © {new Date().getFullYear()} Aahaarloop. Prototype — impact figures
-          shown in the app are demo data.
+      <div className="border-t border-border">
+        <p className="site-shell py-4 text-xs text-muted-foreground">
+          © {new Date().getFullYear()} AahaarLoop · Product preview
         </p>
       </div>
     </footer>
