@@ -8,13 +8,25 @@ import { createRateLimiter } from "@/lib/api/rate-limit";
 import { forbidUnlessRole } from "@/lib/auth/guards";
 import { getDb } from "@/lib/db";
 import { claimService } from "@/lib/claims/store-repository";
+import { z } from "zod";
 
 export const runtime = "nodejs";
 
 const createLimit = createRateLimiter({ maxRequests: 20, windowMs: 60_000 });
+const PartialClaimSchema = ClaimInputSchema.extend({
+  items: z
+    .array(
+      z.object({
+        donationItemId: z.string().uuid().optional(),
+        name: z.string().trim().min(1).max(120),
+        quantity: z.number().int().positive(),
+      }),
+    )
+    .optional(),
+});
 
 export const POST = withApiHandler(
-  { bodySchema: ClaimInputSchema, rateLimit: createLimit },
+  { bodySchema: PartialClaimSchema, rateLimit: createLimit },
   async ({ body }, { request }) => {
     const denied = await forbidUnlessRole(["recipient"]);
     if (denied) return denied;
@@ -33,6 +45,7 @@ export const POST = withApiHandler(
       ...(body.note ? { note: body.note } : {}),
       actorId: user.id,
       idempotencyKey: key,
+      ...(body.items ? { items: body.items } : {}),
     });
     try {
       await recordAudit(await getDb(), {
