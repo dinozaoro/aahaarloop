@@ -1,6 +1,6 @@
 # @aahaarloop/matching
 
-Deterministic business rules shared by the web and mobile apps: recipient needs from issue #27, the urgency calculator from issue #28, and the matching engine from issue #29.
+Deterministic business rules shared by the web and mobile apps: recipient needs from issue #27, the urgency calculator from issue #28, and the matching engine from issue #29. For the full derivation, configuration and a worked example, see [`docs/matching-algorithms.md`](../../docs/matching-algorithms.md).
 
 ## Urgency calculation
 

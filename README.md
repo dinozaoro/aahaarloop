@@ -10,6 +10,7 @@ Monorepo for the Aahaarloop surplus-food platform.
 - `packages/matching` — deterministic urgency and matching rules shared by the clients.
 - `packages/config` — shared tsconfig presets.
 - `docs/product-spec.md` — product specification, glossary and matching contract.
+- `docs/matching-algorithms.md` — urgency formula, hard filters, weights and a worked example.
 - `docs/design-tokens.md` — design tokens and UI foundation.
 - `docs/accessibility.md` — accessibility baseline, audit status and known gaps.
 - `docs/development/environment.md` — environment variables, owners and Neon setup.

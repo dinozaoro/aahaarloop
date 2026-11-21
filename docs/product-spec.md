@@ -129,7 +129,8 @@ minutes. Levels (`remaining_minutes`):
 | no hard deadline                   | `unknown`    |
 
 `expired`, `infeasible` and `unknown` are not normally claimable. The full
-contract lives in `packages/matching/README.md`.
+contract lives in `packages/matching/README.md`, with the worked derivation in
+`docs/matching-algorithms.md`.
 
 ## Matching formula
 
@@ -147,7 +148,7 @@ weights (defaults):
 | Urgency      | 0.30   | critical 100, high 75, medium 50, low 25           |
 | Distance     | 0.25   | linear, 100 at 0 km to 0 at max distance           |
 | Quantity     | 0.15   | claimable servings / required servings             |
-| Needs        | 0.15   | matched needs / listed needs, 100 when none listed |
+| Needs        | 0.15   | matched categories / active needs, 100 when none active |
 | Availability | 0.10   | 100 when a volunteer window contains now, else 0   |
 | Logistics    | 0.05   | claimed weight / transport capacity                |
 

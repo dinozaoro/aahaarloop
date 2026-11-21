@@ -437,6 +437,52 @@ describe("ordering and determinism", () => {
   });
 });
 
+describe("documented worked example", () => {
+  it("reproduces the score in docs/matching-algorithms.md", () => {
+    const recipientRequest: RecipientRequest = {
+      id: "recipient-1",
+      location: { latitude: 12.9716, longitude: 77.5946 },
+      needs: ["produce"],
+      requiredServings: 80,
+      storage: "chilled",
+      transportCapacityKg: 50,
+      volunteerAvailability: [
+        { start: "2026-11-21T09:00:00Z", end: "2026-11-21T12:00:00Z" },
+      ],
+    };
+    const donationCandidate: DonationCandidate = {
+      id: "donation-1",
+      location: { latitude: 13.0216, longitude: 77.5946 },
+      categories: ["produce"],
+      storage: "ambient",
+      totalServings: 100,
+      availableServings: 80,
+      totalWeightKg: 40,
+      pickupDeadlineAt: "2026-11-21T18:00:00Z",
+    };
+
+    const result = matchDonationsForRecipient(
+      recipientRequest,
+      [donationCandidate],
+      { now: "2026-11-21T10:00:00Z" },
+    );
+
+    assert.equal(result.excluded.length, 0);
+    const best = result.matches[0];
+    assert.ok(best);
+    assert.equal(best.explanation.distance.distanceKm, 5.56);
+    assert.equal(best.explanation.urgency.level, "medium");
+    assert.equal(best.explanation.urgency.remainingMinutes, 441.66);
+    assert.equal(best.explanation.distance.score, 77.76);
+    assert.equal(best.explanation.quantity.score, 100);
+    assert.equal(best.explanation.needs.score, 100);
+    assert.equal(best.explanation.availability.score, 100);
+    assert.equal(best.explanation.logistics.claimedWeightKg, 32);
+    assert.equal(best.explanation.logistics.score, 64);
+    assert.equal(best.totalScore, 77.64);
+  });
+});
+
 describe("input validation", () => {
   it("rejects weights that are all zero", () => {
     assert.throws(
