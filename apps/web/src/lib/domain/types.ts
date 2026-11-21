@@ -141,6 +141,9 @@ export interface Claim {
   servings: number;
   weightKg: number;
   status: ClaimStatus;
+  expiresAt?: string | undefined;
+  cancelledAt?: string | undefined;
+  cancelReason?: string | undefined;
   createdAt: string;
   updatedAt: string;
   history: ClaimEvent[];
