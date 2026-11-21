@@ -7,7 +7,14 @@
     ".": "./src/index.ts"
   },
   "scripts": {
+    "build": "echo 'no build: source consumed directly'",
+    "lint": "echo 'lint: nothing yet'",
+    "typecheck": "tsc --noEmit",
     "test": "node --test src/*.test.ts"
+  },
+  "devDependencies": {
+    "@aahaarloop/config": "workspace:*",
+    "typescript": "~6.0.3"
   },
   "engines": {
     "node": ">=22.18.0"

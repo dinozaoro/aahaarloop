@@ -8,7 +8,7 @@ import {
   type RecipientRequest,
 } from "@aahaarloop/matching";
 
-import { Badge } from "@/components/ui/badge";
+import { Badge, type BadgeVariant } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
@@ -30,9 +30,9 @@ const emptyRecipient: RecipientRequest = {
   id: "recipient-1",
   location: { latitude: 0, longitude: 0 },
   needs: [],
-  requiredServings: 0,
+  requiredServings: 40,
   storage: "ambient",
-  transportCapacityKg: 0,
+  transportCapacityKg: 50,
   volunteerAvailability: [],
 };
 
@@ -83,11 +83,11 @@ const demoDonations: readonly DonationCandidate[] = [
 const NOW = "2026-11-21T10:00:00Z";
 
 function urgencyBadge(level: string) {
-  const variants: Record<string, string> = {
-    critical: "badge-destructive",
-    high: "badge-warning",
-    medium: "badge-secondary",
-    low: "badge-outline",
+  const variants: Record<string, BadgeVariant> = {
+    critical: "destructive",
+    high: "warning",
+    medium: "secondary",
+    low: "outline",
   };
   const labels: Record<string, string> = {
     critical: "Critical",
@@ -96,7 +96,7 @@ function urgencyBadge(level: string) {
     low: "Low",
   };
   return (
-    <Badge variant={variants[level] as any} className="capitalize press-scale">
+    <Badge variant={variants[level]} className="capitalize press-scale">
       {labels[level]}
     </Badge>
   );

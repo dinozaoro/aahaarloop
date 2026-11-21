@@ -16,10 +16,11 @@ import {
 import { cn } from "@/lib/utils";
 import { formatDateTime } from "@/lib/format";
 import { CLAIM_STATUS_LABELS, DONATION_STATUS_LABELS } from "@/lib/domain/types";
+import { DEMO_DONOR_ORG_ID } from "@/lib/data/constants";
 import { getClaimsForDonor, getOrganization } from "@/lib/data/store";
 
 export default function RecipientProfilePage() {
-  const organization = getOrganization("DEMO_DONOR_ORG_ID");
+  const organization = getOrganization(DEMO_DONOR_ORG_ID);
   const [openModal, setOpenModal] = useState(false);
 
   return (
