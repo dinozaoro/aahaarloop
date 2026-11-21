@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { createClaimService } from "../src/lib/claims/transaction.ts";
+import { createDeliveryService } from "../src/lib/delivery/service.ts";
 import { createDonationService } from "../src/lib/donations/service.ts";
 import { createPickupService } from "../src/lib/pickups/tasks.ts";
 
@@ -16,6 +17,7 @@ function setup() {
     tasks: [],
     assignments: [],
     events: [],
+    impacts: [],
   };
   const donationRepo = {
     all: () => state.donations,
@@ -64,16 +66,36 @@ function setup() {
       state.events.push({ taskId, action, actorId }),
   };
 
+  const deliveryRepo = {
+    findTask: (id) => state.tasks.find((task) => task.id === id),
+    findAssignment: (taskId, volunteerId) =>
+      state.assignments.find(
+        (item) => item.taskId === taskId && item.volunteerId === volunteerId,
+      ),
+    findClaim: (id) => state.claims.find((claim) => claim.id === id),
+    findDonation: (id) => state.donations.find((item) => item.id === id),
+    saveTask: pickupRepo.saveTask,
+    saveAssignment: pickupRepo.saveAssignment,
+    saveClaim: (claim) => {
+      const index = state.claims.findIndex((item) => item.id === claim.id);
+      if (index === -1) state.claims.push(claim);
+      else state.claims[index] = claim;
+    },
+    saveDonation: donationRepo.save,
+    saveImpact: (record) => state.impacts.push(record),
+  };
+
   return {
     state,
     donations: createDonationService(donationRepo, () => NOW),
     claims: createClaimService(claimRepo, () => NOW),
     pickups: createPickupService(pickupRepo, () => NOW),
+    delivery: createDeliveryService(deliveryRepo, () => NOW),
   };
 }
 
 test("a donation travels from draft to a completed volunteer pickup without losing quantity", async () => {
-  const { state, donations, claims, pickups } = setup();
+  const { state, donations, claims, pickups, delivery } = setup();
 
   const draft = donations.create(
     {
@@ -127,20 +149,24 @@ test("a donation travels from draft to a completed volunteer pickup without losi
   pickups.assign(task.id, "v1", "user-admin");
   assert.equal(state.tasks[0].status, "assigned");
 
-  const completed = pickups.complete(task.id, "v1");
-  assert.equal(completed.status, "completed");
+  const delivered = delivery.confirm({
+    taskId: task.id,
+    volunteerId: "v1",
+    proof: { type: "signature", value: "recipient signature" },
+    deliveredQuantity: claim.servings,
+  });
+  assert.equal(delivered.claim.status, "delivered");
+  assert.equal(delivered.donation.status, "delivered");
+  assert.equal(state.impacts.length, 1);
+  assert.equal(state.impacts[0].value, claim.servings);
   assert.equal(state.assignments[0].status, "completed");
+  assert.equal(delivered.task.status, "completed");
   assert.deepEqual(
     state.events.map((event) => event.type ?? event.action).filter(Boolean),
-    [
-      "claimed",
-      "pickup.task.created",
-      "pickup.task.assigned",
-      "pickup.task.completed",
-    ],
+    ["claimed", "pickup.task.created", "pickup.task.assigned"],
   );
   assert.deepEqual(
     state.donations[0].events.map((event) => event.type),
-    ["created", "published"],
+    ["created", "published", "delivered"],
   );
 });
