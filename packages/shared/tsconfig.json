@@ -1,0 +1,1 @@
+{ "extends": "@aahaarloop/config/tsconfig.base.json", "include": ["src"] }
