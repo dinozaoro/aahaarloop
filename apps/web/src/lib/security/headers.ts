@@ -20,6 +20,22 @@ export function securityHeaders(production: boolean): SecurityHeader[] {
       key: "Strict-Transport-Security",
       value: "max-age=31536000; includeSubDomains",
     });
+    // Report-only first: Next.js needs inline scripts/styles, so enforcing
+    // requires a nonce-based policy and a reporting endpoint.
+    headers.push({
+      key: "Content-Security-Policy-Report-Only",
+      value: [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+        "style-src 'self' 'unsafe-inline'",
+        "img-src 'self' data: blob: https:",
+        "font-src 'self' data:",
+        "connect-src 'self' https:",
+        "frame-ancestors 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
+      ].join("; "),
+    });
   }
   return headers;
 }
