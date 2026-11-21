@@ -13,6 +13,7 @@ import type {
   MatchingWeights,
   RecipientRequest,
 } from "./matching.ts";
+import type { Need } from "./needs.ts";
 
 const HOUR_MS = 3_600_000;
 const MINUTE_MS = 60_000;
@@ -38,13 +39,27 @@ function donation(
   };
 }
 
+function need(category: string, overrides: Partial<Need> = {}): Need {
+  return {
+    id: `need-${category}`,
+    category,
+    quantity: 100,
+    deadlineAt: null,
+    priority: "medium",
+    notes: "",
+    status: "active",
+    createdAt: NOW,
+    ...overrides,
+  };
+}
+
 function recipient(
   overrides: Partial<RecipientRequest> = {},
 ): RecipientRequest {
   return {
     id: "recipient-1",
     location: { latitude: 0, longitude: 0 },
-    needs: ["produce"],
+    needs: [need("produce")],
     requiredServings: 100,
     storage: "ambient",
     transportCapacityKg: 1000,
@@ -180,7 +195,7 @@ describe("matching components", () => {
   it("scores category coverage against recipient needs", () => {
     const result = match([donation({ categories: ["produce", "dairy"] })], {
       config: only("needs"),
-      recipient: { needs: ["produce", "bakery"] },
+      recipient: { needs: [need("produce"), need("bakery")] },
     });
     const best = result.matches[0];
 
@@ -353,6 +368,22 @@ describe("hard filters", () => {
 
     assert.equal(result.matches.length, 0);
     assert.deepEqual(reasonsFor(result), ["needs"]);
+  });
+
+  it("ignores fulfilled, expired and overdue needs", () => {
+    const pastNeeds = [
+      need("produce", { status: "fulfilled" }),
+      need("bakery", { status: "expired" }),
+      need("pantry", { deadlineAt: at(-HOUR_MS) }),
+    ];
+    const result = match([donation({ categories: ["dairy"] })], {
+      config: only("needs"),
+      recipient: { needs: pastNeeds },
+    });
+
+    assert.equal(result.excluded.length, 0);
+    assert.equal(result.matches[0]?.totalScore, 100);
+    assert.deepEqual(result.matches[0]?.explanation.needs.matchedCategories, []);
   });
 
   it("excludes donations heavier than the transport capacity", () => {

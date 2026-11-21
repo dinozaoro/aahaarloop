@@ -1,6 +1,6 @@
 # @aahaarloop/matching
 
-Deterministic business rules shared by the web and mobile apps: the urgency calculator from issue #28 and the matching engine from issue #29.
+Deterministic business rules shared by the web and mobile apps: recipient needs from issue #27, the urgency calculator from issue #28, and the matching engine from issue #29.
 
 ## Urgency calculation
 
@@ -78,6 +78,21 @@ const result = calculateUrgency({
 - A missing deadline is not treated as low urgency; it is `unknown`.
 - The function does not schedule reminders or expire donations in the database.
 
+## Recipient needs
+
+A `Need` records a food category, a quantity, an optional deadline, a priority, notes and a lifecycle status (`active`, `fulfilled` or `expired`). `createNeed(input, now)` and `editNeed(need, input, now)` validate the input and return `{ need, errors }`; `errors` is empty on success. `closeNeed(need)` (also exported as `fulfillNeed`) marks a need fulfilled.
+
+Validation rules:
+
+- `category` must not be blank.
+- `quantity` must be a positive finite number.
+- `deadlineAt`, when supplied, must be in the future. `null` means no deadline; passing `null` to `editNeed` clears it.
+- `priority` must be `low`, `medium` or `high` and defaults to `medium`.
+
+`getActiveNeeds(needs, now)` returns only needs whose status is `active` and whose deadline has not passed. `refreshNeedStatuses(needs, now)` recomputes expired statuses. The matching engine calls `getActiveNeeds` for both the needs hard filter and the needs score, so closed and expired needs never affect a match.
+
+Needs are held in memory by the caller for now; this package does not persist them.
+
 ## Matching engine
 
 `matchDonationsForRecipient(recipient, donations, { now, config })` filters and ranks donations for one recipient. It is pure and deterministic, and it does not use an LLM.
@@ -86,14 +101,14 @@ const result = calculateUrgency({
 
 A donation is excluded when any of these fail:
 
-| Filter           | Rule                                                                                                               |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Time feasibility | The urgency calculation must return `active`.                                                                      |
-| Distance         | Haversine distance must not exceed `maxDistanceKm` (default 25 km).                                                |
-| Storage          | The donation's required storage must not exceed what the recipient can provide (`ambient` < `chilled` < `frozen`). |
-| Quantity         | `availableServings` must be positive. With `allowPartialClaims: false`, it must also cover `requiredServings`.     |
-| Needs            | If the recipient lists needs, at least one donation category must match. An empty needs list accepts anything.     |
-| Transport        | The claimed weight must fit `transportCapacityKg`.                                                                 |
+| Filter           | Rule                                                                                                                |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Time feasibility | The urgency calculation must return `active`.                                                                       |
+| Distance         | Haversine distance must not exceed `maxDistanceKm` (default 25 km).                                                 |
+| Storage          | The donation's required storage must not exceed what the recipient can provide (`ambient` < `chilled` < `frozen`).  |
+| Quantity         | `availableServings` must be positive. With `allowPartialClaims: false`, it must also cover `requiredServings`.      |
+| Needs            | If the recipient has active needs, at least one donation category must match. Fulfilled and expired needs are ignored; an empty active list accepts anything. |
+| Transport        | The claimed weight must fit `transportCapacityKg`.                                                                  |
 
 Excluded entries list every failed reason, so a caller can explain the rejection.
 
@@ -106,7 +121,7 @@ Every eligible match is scored 0–100 per component, then combined with normali
 | Urgency      | 0.30           | `critical` 100, `high` 75, `medium` 50, `low` 25                                   |
 | Distance     | 0.25           | Linear from 100 at 0 km to 0 at `maxDistanceKm`                                    |
 | Quantity     | 0.15           | `claimableServings / requiredServings`                                             |
-| Needs        | 0.15           | Matched needs divided by listed needs; 100 when no needs are listed                |
+| Needs        | 0.15           | Matched categories divided by active needs; 100 when no active needs are listed    |
 | Availability | 0.10           | 100 when a volunteer window contains `now`, otherwise 0                            |
 | Logistics    | 0.05           | Claimed weight divided by transport capacity (right-sized transport scores higher) |
 
@@ -129,7 +144,18 @@ const result = matchDonationsForRecipient(
   {
     id: "recipient-1",
     location: { latitude: -18.8792, longitude: 47.5079 },
-    needs: ["produce", "bakery"],
+    needs: [
+      {
+        id: "need-1",
+        category: "produce",
+        quantity: 80,
+        deadlineAt: "2026-11-22T10:00:00Z",
+        priority: "medium",
+        notes: "",
+        status: "active",
+        createdAt: "2026-11-20T10:00:00Z",
+      },
+    ],
     requiredServings: 80,
     storage: "chilled",
     transportCapacityKg: 50,
@@ -159,7 +185,7 @@ const result = matchDonationsForRecipient(
 
 ### Assumptions and limits
 
-- Domain types are local to this package until the Drizzle schema (#4) and recipient needs (#27) define their database shapes.
+- Domain types are local to this package until the Drizzle schema (#4) defines their database shapes.
 - Food categories are opaque strings; the matching engine does not own the taxonomy.
 - Availability checks whether a volunteer is available at `now`. It does not schedule a pickup or search future windows.
 - The logistics score rewards using a larger share of the available capacity; it is not a cost calculation.

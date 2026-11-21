@@ -4,6 +4,8 @@ import {
   toEpochMs,
 } from "./urgency.ts";
 import type { Instant, UrgencyLevel } from "./urgency.ts";
+import type { Need } from "./needs.ts";
+import { getActiveNeeds } from "./needs.ts";
 
 export const STORAGE_RANK = {
   ambient: 0,
@@ -40,8 +42,8 @@ export interface DonationCandidate {
 export interface RecipientRequest {
   id: string;
   location: GeoPoint;
-  /** Accepted food categories. Empty means no category preference. */
-  needs: readonly string[];
+  /** Accepted food needs. Empty means no category preference. */
+  needs: readonly Need[];
   requiredServings: number;
   /** Best storage the recipient can provide. */
   storage: StorageType;
@@ -341,8 +343,8 @@ export function matchDonationsForRecipient(
     "recipient.transportCapacityKg",
   );
   const availability = parseWindows(recipient.volunteerAvailability);
-  const needs = [...new Set(recipient.needs)];
-  const needsSet = new Set(needs);
+  const activeNeeds = getActiveNeeds(recipient.needs, options.now);
+  const needsSet = new Set(activeNeeds.map((need) => need.category));
 
   const matches: EligibleMatch[] = [];
   const excluded: ExcludedMatch[] = [];
@@ -397,7 +399,7 @@ export function matchDonationsForRecipient(
         donation.categories.filter((category) => needsSet.has(category)),
       ),
     ];
-    if (needs.length > 0 && matchedCategories.length === 0) {
+    if (activeNeeds.length > 0 && matchedCategories.length === 0) {
       reasons.push("needs");
     }
 
@@ -464,9 +466,9 @@ export function matchDonationsForRecipient(
       },
       needs: {
         ...score(
-          needs.length === 0
+          activeNeeds.length === 0
             ? 100
-            : (matchedCategories.length / needs.length) * 100,
+            : (matchedCategories.length / activeNeeds.length) * 100,
           config.weights.needs,
         ),
         matchedCategories,
