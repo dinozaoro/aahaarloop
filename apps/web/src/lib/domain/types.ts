@@ -121,10 +121,18 @@ export interface ClaimEvent {
   note?: string;
 }
 
+export interface ClaimItemPortion {
+  donationItemId?: string;
+  name: string;
+  quantity: number;
+}
+
 export interface Claim {
   id: string;
   /** Client key retained for idempotent replays; never returned to other orgs. */
   idempotencyKey?: string | undefined;
+  /** Exact item breakdown of a partial or full claim. */
+  items?: ClaimItemPortion[] | undefined;
   donationId: string;
   donationTitle: string;
   donorOrganizationId: string;
