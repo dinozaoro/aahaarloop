@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 
 import "./globals.css";
 
+import { InstallPrompt } from "@/components/install-prompt";
 import { PageChrome } from "@/components/page-chrome";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -19,6 +20,16 @@ export const metadata: Metadata = {
   },
   description:
     "Match surplus food with the organisations that can rescue it before the deadline.",
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: "/icons/icon-192.png",
+    apple: "/icons/apple-touch-icon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    title: "AahaarLoop",
+    statusBarStyle: "black-translucent",
+  },
   openGraph: {
     title: "AahaarLoop — Good food should find a table",
     description:
@@ -29,7 +40,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f5f4f0",
+  themeColor: "#063a2a",
   viewportFit: "cover",
 };
 
@@ -52,6 +63,7 @@ export default function RootLayout({
           <SiteFooter />
         </PageChrome>
         <Toaster />
+        <InstallPrompt />
       </body>
     </html>
   );
