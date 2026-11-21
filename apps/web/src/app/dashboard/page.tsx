@@ -2,27 +2,46 @@ import type { Metadata } from "next";
 
 import {
   matchDonationsForRecipient,
+  type DonationCandidate,
   type EligibleMatch,
-  type UrgencyStatus,
+  type RecipientRequest,
 } from "@aahaarloop/matching";
 
 export const metadata: Metadata = {
   title: "Donor dashboard",
 };
 
+const emptyRecipient: RecipientRequest = {
+  id: "recipient-1",
+  location: { latitude: 0, longitude: 0 },
+  needs: [],
+  requiredServings: 0,
+  storage: "ambient",
+  transportCapacityKg: 0,
+  volunteerAvailability: [],
+};
+
+const emptyDonations: readonly DonationCandidate[] = [];
+
 export default function DashboardPage() {
-  const recipientRequests = matchDonationsForRecipient(
-    {} as Parameters<typeof matchDonationsForRecipient>[0]
+  const { matches } = matchDonationsForRecipient(
+    emptyRecipient,
+    emptyDonations,
+    { now: "2026-11-21T10:00:00Z" }
   );
 
-  const activeDonations = recipientRequests.filter(
-    (req): req is EligibleMatch => req.status === "active"
+  const activeDonations = matches.filter(
+    (match: EligibleMatch): match is EligibleMatch =>
+      match.explanation.urgency.level === "critical" ||
+      match.explanation.urgency.level === "high"
   );
-  const expiringDonations = recipientRequests.filter(
-    (req): req is EligibleMatch => req.status === "expiring"
+  const expiringDonations = matches.filter(
+    (match: EligibleMatch): match is EligibleMatch =>
+      match.explanation.urgency.level === "medium"
   );
-  const historyDonations = recipientRequests.filter(
-    (req): req is EligibleMatch => req.status === "history"
+  const historyDonations = matches.filter(
+    (match: EligibleMatch): match is EligibleMatch =>
+      match.explanation.urgency.level === "low"
   );
 
   return (
@@ -31,8 +50,8 @@ export default function DashboardPage() {
       <h2>Active Donations</h2>
       <ul>
         {activeDonations.map((match) => (
-          <li key={match.id}>
-            {match.donorName}: {match.amount} - Status: {match.status}
+          <li key={match.donationId}>
+            Donation {match.donationId} - Score: {match.totalScore}
           </li>
         ))}
       </ul>
@@ -40,8 +59,8 @@ export default function DashboardPage() {
       <h2>Expiring Soon</h2>
       <ul>
         {expiringDonations.map((match) => (
-          <li key={match.id}>
-            {match.donorName}: {match.amount} - Status: {match.status}
+          <li key={match.donationId}>
+            Donation {match.donationId} - Score: {match.totalScore}
           </li>
         ))}
       </ul>
@@ -49,8 +68,8 @@ export default function DashboardPage() {
       <h2>History</h2>
       <ul>
         {historyDonations.map((match) => (
-          <li key={match.id}>
-            {match.donorName}: {match.amount} - Status: {match.status}
+          <li key={match.donationId}>
+            Donation {match.donationId} - Score: {match.totalScore}
           </li>
         ))}
       </ul>
