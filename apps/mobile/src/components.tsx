@@ -1,18 +1,25 @@
 import { Link } from "expo-router";
-import { useEffect, useRef } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { useEffect, useState } from "react";
 import { Animated, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type TextInputProps, type ViewProps } from "react-native";
 import { useApp } from "@/context/app-context";
 import type { ApiDonation } from "@/lib/api";
 import { formatDeadline } from "@/lib/api";
-import { colors, fonts, radii, spacing } from "@/theme";
+import { colors, fonts, radii, spacing, typeScale } from "@/theme";
 
 export function Screen({ children, scroll = true, ...props }: ViewProps & { scroll?: boolean }) {
   const content = <View {...props} style={[styles.screen, props.style]}>{children}</View>;
   return scroll ? <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">{content}</ScrollView> : content;
 }
 
+export type IconName = keyof typeof Ionicons.glyphMap;
+
+export function AppIcon({ name, size = 22, color = colors.ink }: { name: IconName; size?: number; color?: string }) {
+  return <Ionicons name={name} size={size} color={color} accessibilityLabel={name} />;
+}
+
 export function Heading({ children, size = 30 }: { children: React.ReactNode; size?: number }) {
-  return <Text style={[styles.heading, { fontSize: size, lineHeight: size + 5 }]}>{children}</Text>;
+  return <Text style={[styles.heading, { fontSize: size, lineHeight: size + 7 }]}>{children}</Text>;
 }
 
 export function SectionTitle({ children, action }: { children: React.ReactNode; action?: React.ReactNode }) {
@@ -39,7 +46,7 @@ export function DonationCard({ donation }: { donation: ApiDonation }) {
   const image = donation.photoName;
   return <Link href={{ pathname: "/donations/[id]", params: { id: donation.id } }} asChild>
     <Pressable accessibilityRole="button" style={({ pressed }) => [styles.donationCard, pressed && styles.pressed]}>
-      {image ? <Image source={{ uri: image }} style={styles.donationImage} /> : <View style={[styles.donationImage, styles.imagePlaceholder]}><Text style={styles.placeholderMark}>食</Text></View>}
+      {image ? <Image source={{ uri: image }} style={styles.donationImage} /> : <View style={[styles.donationImage, styles.imagePlaceholder]}><AppIcon name="restaurant" size={42} color={colors.action} /></View>}
       <View style={styles.donationBody}>
         <Text style={styles.donationTitle} numberOfLines={1}>{donation.title}</Text>
         <Text style={styles.donationMeta} numberOfLines={1}>{donation.category ?? "Food surplus"}{donation.pickupArea ? ` · ${donation.pickupArea}` : ""}</Text>
@@ -52,7 +59,7 @@ export function DonationCard({ donation }: { donation: ApiDonation }) {
 }
 
 export function LoadingCards() {
-  const opacity = useRef(new Animated.Value(0.55)).current;
+  const [opacity] = useState(() => new Animated.Value(0.55));
   useEffect(() => {
     const animation = Animated.loop(Animated.sequence([
       Animated.timing(opacity, { toValue: 1, duration: 750, useNativeDriver: true }),
@@ -75,39 +82,38 @@ export function OfflineBanner() {
 }
 
 export const styles = StyleSheet.create({
-  screen: { flex: 1, padding: spacing.xl, gap: spacing.xl, backgroundColor: colors.page },
+  screen: { flex: 1, padding: spacing.xl, gap: spacing.xxl, backgroundColor: colors.page },
   scrollContent: { flexGrow: 1 },
-  heading: { color: colors.ink, fontFamily: fonts.heading, fontWeight: "700" },
+  heading: { color: colors.ink, fontFamily: fonts.heading, fontWeight: "400", letterSpacing: -0.4 },
   sectionTitle: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  sectionText: { color: colors.ink, fontSize: 16, fontWeight: "800", letterSpacing: 0.2 },
-  body: { color: colors.muted, fontSize: 15, lineHeight: 22 },
-  button: { minHeight: 52, borderRadius: radii.md, paddingHorizontal: 22, paddingVertical: 14, alignItems: "center", justifyContent: "center" },
+  sectionText: { color: colors.ink, fontFamily: fonts.ui, fontSize: typeScale.section.fontSize, lineHeight: typeScale.section.lineHeight, fontWeight: "700", letterSpacing: -0.1 },
+  body: { color: colors.muted, fontFamily: fonts.ui, fontSize: typeScale.body.fontSize, lineHeight: typeScale.body.lineHeight },
+  button: { minHeight: 56, borderRadius: radii.md, paddingHorizontal: 22, paddingVertical: 14, alignItems: "center", justifyContent: "center" },
   button_primary: { backgroundColor: colors.action },
   button_secondary: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   button_text: { backgroundColor: "transparent", minHeight: 40 },
-  buttonText: { fontSize: 14, fontWeight: "800" },
+  buttonText: { fontFamily: fonts.ui, fontSize: 15, fontWeight: "700" },
   buttonTextPrimary: { color: colors.surface },
   buttonTextSecondary: { color: colors.ink },
   pressed: { opacity: 0.78, transform: [{ scale: 0.99 }] },
   disabled: { opacity: 0.45 },
-  card: { gap: spacing.sm, padding: spacing.lg, borderRadius: radii.lg, backgroundColor: colors.surface },
+  card: { gap: spacing.sm, padding: spacing.lg, borderRadius: radii.lg, backgroundColor: colors.surface, shadowColor: colors.ink, shadowOpacity: 0.05, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 2 },
   field: { gap: spacing.sm },
-  fieldLabel: { color: colors.ink, fontSize: 13, fontWeight: "800" },
-  input: { minHeight: 50, paddingHorizontal: 14, borderRadius: radii.md, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, color: colors.ink, fontSize: 15 },
+  fieldLabel: { color: colors.ink, fontFamily: fonts.ui, fontSize: typeScale.label.fontSize, lineHeight: typeScale.label.lineHeight, fontWeight: "700" },
+  input: { minHeight: 56, paddingHorizontal: 16, borderRadius: radii.md, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, color: colors.ink, fontFamily: fonts.ui, fontSize: typeScale.body.fontSize },
   multiline: { minHeight: 100, paddingTop: 14, textAlignVertical: "top" },
   pill: { borderRadius: 20, borderWidth: 1, borderColor: colors.border, paddingHorizontal: 13, paddingVertical: 9, backgroundColor: colors.surface },
   pillActive: { backgroundColor: colors.ink, borderColor: colors.ink },
-  pillText: { color: colors.muted, fontSize: 12, fontWeight: "700" },
+  pillText: { color: colors.muted, fontFamily: fonts.ui, fontSize: typeScale.caption.fontSize, lineHeight: typeScale.caption.lineHeight, fontWeight: "700" },
   pillTextActive: { color: colors.surface },
   donationCard: { overflow: "hidden", borderRadius: radii.xl, backgroundColor: colors.surface },
   donationImage: { width: "100%", height: 170 },
   imagePlaceholder: { alignItems: "center", justifyContent: "center", backgroundColor: colors.soft },
-  placeholderMark: { color: colors.action, fontSize: 42, fontWeight: "800" },
   donationBody: { gap: spacing.sm, padding: 18 },
-  donationTitle: { color: colors.ink, fontSize: 18, fontWeight: "800" },
-  donationMeta: { color: colors.muted, fontSize: 12 },
-  donationQuantity: { color: colors.ink, fontSize: 13, fontWeight: "700" },
-  deadline: { color: colors.action, fontSize: 12, fontWeight: "800" },
+  donationTitle: { color: colors.ink, fontFamily: fonts.ui, fontSize: 20, lineHeight: 25, fontWeight: "700" },
+  donationMeta: { color: colors.muted, fontFamily: fonts.ui, fontSize: 14, lineHeight: 20 },
+  donationQuantity: { color: colors.ink, fontFamily: fonts.ui, fontSize: 15, lineHeight: 20, fontWeight: "700" },
+  deadline: { color: colors.action, fontFamily: fonts.ui, fontSize: 13, lineHeight: 18, fontWeight: "700" },
   reason: { padding: spacing.sm, backgroundColor: colors.page },
   reasonText: { color: colors.muted, fontSize: 11 },
   empty: { flex: 1, gap: spacing.lg, justifyContent: "center" },

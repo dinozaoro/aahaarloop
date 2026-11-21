@@ -24,7 +24,16 @@ export const spacing = {
   xxl: 24,
 } as const;
 
-export const radii = { sm: 5, md: 8, lg: 10, xl: 12 } as const;
+export const radii = { sm: 6, md: 10, lg: 14, xl: 18 } as const;
+
+export const typeScale = {
+  display: { fontSize: 36, lineHeight: 40 },
+  title: { fontSize: 30, lineHeight: 36 },
+  section: { fontSize: 19, lineHeight: 26 },
+  body: { fontSize: 16, lineHeight: 24 },
+  label: { fontSize: 13, lineHeight: 18 },
+  caption: { fontSize: 12, lineHeight: 17 },
+} as const;
 
 export const fonts = {
   ui: Platform.select({ ios: "System", android: "sans-serif", default: "sans-serif" }),
