@@ -1,0 +1,19 @@
+{
+  "name": "aahaarloop",
+  "version": "0.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "mobile": "npm run start --workspace @aahaarloop/mobile",
+    "android": "npm run android --workspace @aahaarloop/mobile",
+    "lint": "npm run lint --workspace @aahaarloop/mobile",
+    "typecheck": "npm run typecheck --workspace @aahaarloop/mobile",
+    "test": "npm test --workspace @aahaarloop/matching"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}
