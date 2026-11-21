@@ -1,3 +1,4 @@
+// Algorithm and worked example: ../../../docs/matching-algorithms.md
 export type UrgencyLevel = "low" | "medium" | "high" | "critical";
 export type UrgencyStatus = "active" | "expired" | "infeasible" | "unknown";
 export type Instant = Date | string;

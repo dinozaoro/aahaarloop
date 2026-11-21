@@ -1,3 +1,4 @@
+// Algorithm and worked example: ../../../docs/matching-algorithms.md
 import {
   calculateUrgency,
   DEFAULT_SAFETY_BUFFER_MINUTES,
