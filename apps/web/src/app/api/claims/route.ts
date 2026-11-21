@@ -8,6 +8,7 @@ import { createRateLimiter } from "@/lib/api/rate-limit";
 import { forbidUnlessRole } from "@/lib/auth/guards";
 import { getDb } from "@/lib/db";
 import { claimService } from "@/lib/claims/store-repository";
+import { telemetry } from "@/lib/telemetry/store-repository";
 import { z } from "zod";
 
 export const runtime = "nodejs";
@@ -47,6 +48,14 @@ export const POST = withApiHandler(
       idempotencyKey: key,
       ...(body.items ? { items: body.items } : {}),
     });
+    void telemetry.track(
+      "donation_claimed",
+      {
+        servings: claim.servings,
+        isPartial: Boolean(claim.items && claim.items.length > 0),
+      },
+      { eventId: `donation_claimed:${claim.id}` },
+    );
     try {
       await recordAudit(await getDb(), {
         actorType: "recipient",
