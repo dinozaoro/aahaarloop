@@ -4,6 +4,7 @@ import { ApiError } from "@/lib/api/errors";
 import { withApiHandler } from "@/lib/api/handler";
 import { getDb } from "@/lib/db";
 import { donationService } from "@/lib/donations/store-repository";
+import { analyzeDonationImage } from "@/lib/uploads/authenticity";
 
 export const runtime = "nodejs";
 
@@ -19,6 +20,10 @@ export const POST = withApiHandler({}, async (_input, { request }) => {
     session.user.activeOrganizationId ?? "",
     session.user.id,
   );
+  if (donation.photoName) {
+    // Fire-and-forget: image authenticity is a signal, never a publish blocker.
+    void analyzeDonationImage(donation.id, donation.photoName).catch(() => {});
+  }
   try {
     await recordAudit(await getDb(), {
       actorType: session.user.role === "admin" ? "admin" : "donor",
