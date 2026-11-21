@@ -15,8 +15,8 @@ export function ComingSoon({
   issue: number;
 }) {
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-16 sm:px-6">
-      <Card>
+    <div className="mx-auto w-full max-w-3xl px-4 py-20 sm:px-6">
+      <Card className="reveal shadow-lifted press-scale">
         <CardHeader>
           <Badge variant="secondary" className="w-fit">
             Issue #{issue}

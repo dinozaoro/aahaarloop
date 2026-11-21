@@ -2,53 +2,114 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ============================================================================
+   Design tokens — Aahaarloop
+   Subject: food rescue / surplus redistribution
+   Palette: saffron (urgency/rescue), leaf green (freshness/produce),
+            deep indigo (trust/deadline), warm cream (surface)
+   ============================================================================ */
+
 :root {
-  --background: oklch(0.985 0.008 95);
-  --foreground: oklch(0.235 0.02 155);
+  /* Brand */
+  --primary: oklch(0.61 0.135 45);
+  --primary-foreground: oklch(1 0 0);
+  --primary-hover: oklch(0.56 0.13 45);
+  --primary-active: oklch(0.5 0.12 45);
+
+  /* Secondary — fresh produce green */
+  --secondary: oklch(0.965 0.015 95);
+  --secondary-foreground: oklch(0.3 0.04 155);
+  --secondary-hover: oklch(0.92 0.02 95);
+
+  /* Accent — deep indigo trust */
+  --accent: oklch(0.44 0.095 280);
+  --accent-foreground: oklch(1 0 0);
+  --accent-hover: oklch(0.39 0.09 280);
+
+  /* Surface */
+  --background: oklch(0.99 0.005 95);
+  --foreground: oklch(0.21 0.015 155);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.235 0.02 155);
+  --card-foreground: oklch(0.21 0.015 155);
+  --card-hover: oklch(0.995 0.006 95);
+
+  /* Popover */
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.235 0.02 155);
-  --primary: oklch(0.47 0.11 155);
-  --primary-foreground: oklch(0.985 0.01 95);
-  --secondary: oklch(0.955 0.02 95);
-  --secondary-foreground: oklch(0.32 0.04 155);
-  --muted: oklch(0.955 0.012 100);
-  --muted-foreground: oklch(0.5 0.02 150);
-  --accent: oklch(0.94 0.06 80);
-  --accent-foreground: oklch(0.35 0.06 60);
+  --popover-foreground: oklch(0.21 0.015 155);
+
+  /* Muted */
+  --muted: oklch(0.955 0.01 100);
+  --muted-foreground: oklch(0.52 0.02 150);
+
+  /* Borders & inputs */
+  --border: oklch(0.91 0.01 120);
+  --input: oklch(0.94 0.012 120);
+  --ring: oklch(0.61 0.135 45);
+
+  /* Semantic */
+  --success: oklch(0.56 0.115 152);
+  --success-foreground: oklch(0.96 0.01 95);
+  --warning: oklch(0.7 0.125 55);
+  --warning-foreground: oklch(0.96 0.01 95);
   --destructive: oklch(0.55 0.19 27);
   --destructive-foreground: oklch(0.99 0.01 95);
-  --success: oklch(0.48 0.12 155);
-  --warning: oklch(0.62 0.13 70);
-  --border: oklch(0.9 0.012 120);
-  --input: oklch(0.88 0.014 120);
-  --ring: oklch(0.55 0.12 155);
-  --radius: 0.75rem;
+
+  /* Radius */
+  --radius: 0.85rem;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 6px);
+
+  /* Shadows — elevation without fake borders */
+  --shadow-soft: 0 1px 2px oklch(0.2 0.02 155 / 5%),
+    0 8px 24px -12px oklch(0.2 0.02 155 / 12%);
+  --shadow-lifted: 0 2px 4px oklch(0.2 0.02 155 / 6%),
+    0 20px 40px -20px oklch(0.2 0.02 155 / 18%);
+  --shadow-glow: 0 0 40px oklch(0.61 0.135 45 / 15%);
+
+  /* Easing — strong curves, never ease-in on UI */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Durations — UI stays under 300ms */
+  --duration-press: 140ms;
+  --duration-ui: 220ms;
+  --duration-modal: 400ms;
+
+  /* Fonts */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+
+  /* Animations */
+  --animate-fade-up: fade-up 500ms var(--ease-out) both;
+  --animate-slide-up: slide-up 600ms var(--ease-out) both;
+  --animate-scale-in: scale-in 450ms var(--ease-out) both;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-shimmer: shimmer 3s linear infinite;
+  --animate-pulse-glow: pulse-glow 3s ease-in-out infinite;
 }
 
 .dark {
-  --background: oklch(0.19 0.015 155);
+  --background: oklch(0.17 0.015 155);
   --foreground: oklch(0.97 0.008 95);
-  --card: oklch(0.23 0.018 155);
+  --card: oklch(0.21 0.018 155);
   --card-foreground: oklch(0.97 0.008 95);
-  --popover: oklch(0.23 0.018 155);
+  --card-hover: oklch(0.24 0.02 155);
+  --popover: oklch(0.21 0.018 155);
   --popover-foreground: oklch(0.97 0.008 95);
-  --primary: oklch(0.72 0.12 155);
-  --primary-foreground: oklch(0.18 0.02 155);
-  --secondary: oklch(0.28 0.02 155);
-  --secondary-foreground: oklch(0.96 0.01 95);
+  --secondary: oklch(0.27 0.02 155);
+  --secondary-foreground: oklch(0.94 0.01 95);
+  --secondary-hover: oklch(0.3 0.02 155);
   --muted: oklch(0.27 0.018 155);
-  --muted-foreground: oklch(0.72 0.02 120);
-  --accent: oklch(0.36 0.06 70);
-  --accent-foreground: oklch(0.96 0.02 85);
-  --destructive: oklch(0.62 0.19 27);
-  --destructive-foreground: oklch(0.98 0.01 95);
-  --success: oklch(0.72 0.12 155);
-  --warning: oklch(0.78 0.13 75);
+  --muted-foreground: oklch(0.7 0.02 120);
   --border: oklch(1 0 0 / 14%);
   --input: oklch(1 0 0 / 20%);
-  --ring: oklch(0.72 0.12 155);
+  --shadow-soft: 0 1px 2px oklch(0 0 0 / 30%),
+    0 8px 24px -12px oklch(0 0 0 / 35%);
+  --shadow-lifted: 0 2px 4px oklch(0 0 0 / 35%),
+    0 20px 40px -20px oklch(0 0 0 / 45%);
 }
 
 @theme inline {
@@ -69,37 +130,116 @@
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
+  --font-sans: var(--font-sans);
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
 
-  --shadow-soft: 0 1px 2px oklch(0.2 0.02 155 / 6%),
-    0 8px 24px -12px oklch(0.2 0.02 155 / 18%);
-  --shadow-lifted: 0 2px 4px oklch(0.2 0.02 155 / 8%),
-    0 20px 40px -20px oklch(0.2 0.02 155 / 25%);
+  --shadow-soft: var(--shadow-soft);
+  --shadow-lifted: var(--shadow-lifted);
+  --shadow-glow: var(--shadow-glow);
 
-  --animate-fade-up: fade-up 500ms ease-out both;
+  --ease-out: var(--ease-out);
+  --ease-in-out: var(--ease-in-out);
+  --ease-drawer: var(--ease-drawer);
+
+  --animate-fade-up: var(--animate-fade-up);
+  --animate-slide-up: var(--animate-slide-up);
+  --animate-scale-in: var(--animate-scale-in);
+  --animate-float: var(--animate-float);
+  --animate-shimmer: var(--animate-shimmer);
+  --animate-pulse-glow: var(--animate-pulse-glow);
 }
+
+/* ============================================================================
+   Keyframes
+   ============================================================================ */
 
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* ============================================================================
+   Base
+   ============================================================================ */
 
 @layer base {
   * {
@@ -109,14 +249,15 @@
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+    font-feature-settings: "cv01", "cv02", "cv03";
   }
 
   body {
     background-color: var(--background);
     color: var(--foreground);
-    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-      "Helvetica Neue", Arial, sans-serif;
+    font-family: var(--font-sans);
     text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
   }
 
   :focus-visible {
@@ -125,11 +266,17 @@
   }
 
   ::selection {
-    background-color: var(--accent);
-    color: var(--accent-foreground);
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  /* Tabular numbers for stable readouts */
+  [data-tabular] {
+    font-variant-numeric: tabular-nums;
   }
 }
 
+/* Respect reduced motion — gentler, never zero */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -141,5 +288,105 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Hover motion only on fine pointers */
+@media (hover: hover) and (pointer: fine) {
+  .hover-lift:hover {
+    transform: translateY(-4px);
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.02);
+  }
+
+  .press-scale:active {
+    transform: scale(0.97);
+  }
+}
+
+/* ============================================================================
+   Component utilities (applied via className)
+   ============================================================================ */
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  .glass {
+    background: oklch(1 0 0 / 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid oklch(0 0 0 / 0.08);
+  }
+
+  .glass-dark {
+    background: oklch(0.21 0.018 155 / 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid oklch(1 0 0 / 0.1);
+  }
+
+  .image-outline {
+    outline: 1px solid oklch(0 0 0 / 0.08);
+    outline-offset: -1px;
+  }
+
+  .dark .image-outline {
+    outline-color: oklch(1 0 0 / 0.1);
+  }
+
+  .marquee-content {
+    display: flex;
+    gap: 3rem;
+    animation: marquee 20s linear infinite;
+  }
+
+  .mesh-blob {
+    filter: blur(64px);
+    position: absolute;
+    z-index: -1;
+    opacity: 0.6;
+    animation: float 8s ease-in-out infinite;
+  }
+}
+
+/* ============================================================================
+   Staggered reveals — orchestrated, not scattered
+   ============================================================================ */
+
+.reveal > * {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: fade-up 500ms var(--ease-out) forwards;
+}
+
+.reveal > *:nth-child(1) {
+  animation-delay: 60ms;
+}
+.reveal > *:nth-child(2) {
+  animation-delay: 140ms;
+}
+.reveal > *:nth-child(3) {
+  animation-delay: 220ms;
+}
+.reveal > *:nth-child(4) {
+  animation-delay: 300ms;
+}
+.reveal > *:nth-child(5) {
+  animation-delay: 380ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal > * {
+    opacity: 1;
+    transform: none;
+    animation: none;
   }
 }
