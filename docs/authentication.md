@@ -42,7 +42,8 @@ trusted proxy and set `NEXT_PUBLIC_APP_URL` to the canonical URL.
 
 The admin role exists in the schema and in stored sessions but is **never**
 offered in onboarding: `parseOnboardingRole` rejects it. Admin assignment is an
-existing-admin action, not a self-service choice.
+maintainer action, not a self-service choice; see [RBAC](rbac.md) for the
+auditable bootstrap command.
 
 New users are stored with the non-admin `donor` role until onboarding completes;
 joining or creating an organization is what marks the account as set up.

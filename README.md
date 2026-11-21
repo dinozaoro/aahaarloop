@@ -18,6 +18,7 @@ Monorepo for the Aahaarloop surplus-food platform.
 - `docs/database/schema.md` — purpose of every table and column.
 - `docs/database/demo-data.md` — demo accounts, seed content and DB commands.
 - `docs/authentication.md` — Google sign-in, onboarding and protected routes.
+- `docs/rbac.md` — server-side role checks, IDOR protection and admin bootstrap.
 
 Each app owns its UI: web never imports React Native UI, mobile never imports web UI. Both apps consume only platform-neutral TypeScript from `packages/shared` and `packages/matching`.
 

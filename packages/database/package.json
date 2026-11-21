@@ -14,7 +14,8 @@
     "generate": "drizzle-kit generate",
     "migrate": "node scripts/migrate.mjs",
     "seed": "node scripts/seed.mjs",
-    "reset": "node scripts/reset.mjs"
+    "reset": "node scripts/reset.mjs",
+    "bootstrap-admin": "node scripts/bootstrap-admin.mjs"
   },
   "dependencies": {
     "@aahaarloop/shared": "workspace:*",
