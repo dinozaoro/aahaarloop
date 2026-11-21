@@ -25,6 +25,8 @@ export interface Confirmation {
   name: string;
   confirmedAt: string;
 }
+export interface ImageAuthenticitySignal { provider: "sightengine"; score: number; signals: Record<string, number>; }
+export type ImageAuthenticityStatus = "clean" | "suspicious" | "unavailable";
 export interface AiAnalysis {
   id: string;
   donationId: string;
@@ -36,4 +38,5 @@ export interface AiAnalysis {
   confirmedByDonor: boolean;
   createdAt: string;
   confirmation: Confirmation | null;
+  imageAuthenticity?: { status: ImageAuthenticityStatus; signal: ImageAuthenticitySignal | null };
 }
