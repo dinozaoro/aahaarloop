@@ -3,48 +3,48 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ============================================================================
-   Aahaarloop — Indian aesthetic redesign
+   Aahaarloop — logo-derived design tokens
    Subject: food rescue / surplus redistribution (India)
-   Palette: saffron, burnt sienna, gold, cream, ivory, deep indigo
+   Palette: logo cream, leaf green, terracotta clay and mint
    Animation: scroll reveals, parallax, morph, shimmer, float, pulse
    ============================================================================ */
 
 :root {
-  /* Brand — Indian saffron & gold */
-  --primary: oklch(0.68 0.145 45);
-  --primary-foreground: oklch(1 0 0);
-  --primary-hover: oklch(0.62 0.14 45);
-  --primary-active: oklch(0.56 0.13 45);
+  /* Brand — logo terracotta clay */
+  --primary: oklch(0.55 0.1037 53.4);
+  --primary-foreground: oklch(0.9874 0.0189 93.7);
+  --primary-hover: oklch(0.5018 0.0984 52.4);
+  --primary-active: oklch(0.4434 0.0888 53);
 
-  /* Secondary — burnt sienna / Indian red */
-  --secondary: oklch(0.52 0.16 35);
-  --secondary-foreground: oklch(1 0 0);
-  --secondary-hover: oklch(0.47 0.15 35);
+  /* Secondary — leaf green */
+  --secondary: oklch(0.4719 0.0923 160.9);
+  --secondary-foreground: oklch(0.9874 0.0189 93.7);
+  --secondary-hover: oklch(0.4051 0.0786 162.3);
 
-  /* Accent — deep indigo / Indian night */
-  --accent: oklch(0.38 0.085 285);
-  --accent-foreground: oklch(1 0 0);
-  --accent-hover: oklch(0.33 0.08 285);
+  /* Accent — deep forest green */
+  --accent: oklch(0.3111 0.0598 166.9);
+  --accent-foreground: oklch(0.9874 0.0189 93.7);
+  --accent-hover: oklch(0.2369 0.044 166.9);
 
-  /* Surface — cream / ivory */
-  --background: oklch(0.992 0.004 85);
-  --foreground: oklch(0.24 0.018 155);
+  /* Surface — logo cream */
+  --background: oklch(0.9874 0.0189 93.7);
+  --foreground: oklch(0.2369 0.044 166.9);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.24 0.018 155);
-  --card-hover: oklch(0.995 0.005 85);
+  --card-foreground: oklch(0.2369 0.044 166.9);
+  --card-hover: oklch(0.992 0.006 100);
 
   /* Popover */
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.24 0.018 155);
+  --popover-foreground: oklch(0.2369 0.044 166.9);
 
   /* Muted */
-  --muted: oklch(0.96 0.01 95);
-  --muted-foreground: oklch(0.55 0.02 150);
+  --muted: oklch(0.955 0.012 130);
+  --muted-foreground: oklch(0.45 0.03 165);
 
   /* Borders & inputs */
-  --border: oklch(0.9 0.01 110);
-  --input: oklch(0.93 0.012 115);
-  --ring: oklch(0.68 0.145 45);
+  --border: oklch(0.89 0.015 130);
+  --input: oklch(0.93 0.015 125);
+  --ring: oklch(0.55 0.1037 53.4);
 
   /* Semantic */
   --success: oklch(0.58 0.12 152);
@@ -64,13 +64,13 @@
 
   /* Shadows — layered, no fake borders */
   --shadow-soft:
-    0 1px 2px oklch(0.2 0.02 155 / 5%),
-    0 8px 24px -12px oklch(0.2 0.02 155 / 12%);
+    0 1px 2px oklch(0.24 0.04 166 / 5%),
+    0 8px 24px -12px oklch(0.24 0.04 166 / 12%);
   --shadow-lifted:
-    0 4px 12px oklch(0.2 0.02 155 / 8%),
-    0 24px 48px -24px oklch(0.2 0.02 155 / 20%);
-  --shadow-glow: 0 0 60px oklch(0.68 0.145 45 / 18%);
-  --shadow-indian: 0 0 40px oklch(0.52 0.16 35 / 25%);
+    0 4px 12px oklch(0.24 0.04 166 / 8%),
+    0 24px 48px -24px oklch(0.24 0.04 166 / 20%);
+  --shadow-glow: 0 0 60px oklch(0.55 0.1037 53.4 / 18%);
+  --shadow-indian: 0 0 40px oklch(0.4719 0.0923 160.9 / 25%);
 
   /* Easing — strong curves, Emil style */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -98,17 +98,17 @@
 }
 
 .dark {
-  --background: oklch(0.16 0.015 155);
-  --foreground: oklch(0.97 0.008 95);
-  --card: oklch(0.2 0.018 155);
-  --card-foreground: oklch(0.97 0.008 95);
-  --card-hover: oklch(0.23 0.02 155);
-  --popover: oklch(0.2 0.018 155);
-  --popover-foreground: oklch(0.97 0.008 95);
-  --secondary: oklch(0.58 0.15 35);
-  --secondary-foreground: oklch(0.94 0.01 95);
-  --muted: oklch(0.27 0.018 155);
-  --muted-foreground: oklch(0.72 0.02 120);
+  --background: oklch(0.2369 0.044 166.9);
+  --foreground: oklch(0.9874 0.0189 93.7);
+  --card: oklch(0.3111 0.0598 166.9);
+  --card-foreground: oklch(0.9874 0.0189 93.7);
+  --card-hover: oklch(0.3448 0.0683 163.4);
+  --popover: oklch(0.3111 0.0598 166.9);
+  --popover-foreground: oklch(0.9874 0.0189 93.7);
+  --secondary: oklch(0.4719 0.0923 160.9);
+  --secondary-foreground: oklch(0.9874 0.0189 93.7);
+  --muted: oklch(0.3111 0.0598 166.9);
+  --muted-foreground: oklch(0.82 0.03 150);
   --border: oklch(1 0 0 / 14%);
   --input: oklch(1 0 0 / 20%);
   --shadow-soft:
