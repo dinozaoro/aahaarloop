@@ -20,7 +20,8 @@
     "db:check": "node scripts/check-db.mjs",
     "db:migrate": "pnpm --filter @aahaarloop/database migrate",
     "db:seed": "pnpm --filter @aahaarloop/database seed",
-    "db:reset": "pnpm --filter @aahaarloop/database reset"
+    "db:reset": "pnpm --filter @aahaarloop/database reset",
+    "db:bootstrap-admin": "pnpm --filter @aahaarloop/database bootstrap-admin"
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
