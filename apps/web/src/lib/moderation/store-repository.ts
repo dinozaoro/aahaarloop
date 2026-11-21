@@ -1,3 +1,5 @@
+import { getAuthenticity } from "@/lib/uploads/authenticity";
+
 import {
   createModerationService,
   type AiAnalysis,
@@ -22,6 +24,22 @@ const repository: ModerationRepository = {
 // Production replaces this with the stored Sightengine analysis for the image.
 function demoSignal(targetType: string, targetId: string): AiAnalysis | undefined {
   if (targetType !== "donation") return undefined;
+  const measured = getAuthenticity(targetId);
+  if (measured?.signal) {
+    return {
+      id: `ai-${targetId}`,
+      donationId: targetId,
+      status: "suggested",
+      provider: measured.signal.provider,
+      model: "genai",
+      suggestions: [],
+      source: "ai",
+      confirmedByDonor: false,
+      createdAt: new Date(0).toISOString(),
+      confirmation: null,
+      imageAuthenticity: measured,
+    };
+  }
   return {
     id: `ai-${targetId}`,
     donationId: targetId,
