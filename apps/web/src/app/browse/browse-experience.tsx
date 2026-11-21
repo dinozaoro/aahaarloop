@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { Utensils } from "lucide-react";
@@ -9,6 +10,11 @@ import type { Donation } from "@/lib/domain/types";
 import { CATEGORY_LABELS } from "@/lib/domain/types";
 import { SchematicMap } from "@/components/schematic-map";
 import { FavoriteButton } from "@/components/favorite-button";
+
+const DonationMap = dynamic(
+  () => import("@/components/donation-map").then((module) => module.DonationMap),
+  { ssr: false, loading: () => <div className="map-loading">Loading map…</div> },
+);
 
 type Location = Donation["location"];
 type Offer = { donation: Donation; donorName: string; distanceKm: number | null; donorLocation: Location | null };
@@ -33,6 +39,7 @@ export function BrowseExperience({ offers, recipientLocation }: { offers: Offer[
   const [storage, setStorage] = useState("all");
   const [noAllergens, setNoAllergens] = useState(false);
   const [sort, setSort] = useState("deadline");
+  const [view, setView] = useState<"list" | "map">("list");
 
   const visibleOffers = useMemo(() => {
     const search = query.trim().toLocaleLowerCase("en-IN");
@@ -55,6 +62,11 @@ export function BrowseExperience({ offers, recipientLocation }: { offers: Offer[
   }, [offers, query, category, vegetarianOnly, radius, portionLimit, pickupToday, storage, noAllergens, sort]);
 
   const selected = visibleOffers[0];
+  const mapOffers = visibleOffers.flatMap(({ donation, donorName, donorLocation, distanceKm }) =>
+    donorLocation
+      ? [{ id: donation.id, title: donation.title, donorName, location: donorLocation, distanceKm }]
+      : [],
+  );
   return <>
     <form className="discover-search" onSubmit={(event) => event.preventDefault()}>
       <label htmlFor="discover-query">Search food or donor</label>
@@ -72,8 +84,8 @@ export function BrowseExperience({ offers, recipientLocation }: { offers: Offer[
       <label className="filter-pill"><span>Sort</span><select aria-label="Sort donations" value={sort} onChange={(event) => setSort(event.target.value)}><option value="deadline">Pickup deadline</option><option value="nearest">Nearest</option><option value="recent">Recently added</option></select></label>
     </div>
 
-    <div className="discover-results-heading"><span>{visibleOffers.length} nearby {visibleOffers.length === 1 ? "donation" : "donations"} · Bengaluru demo</span><span>List / Map</span></div>
-    <div className="discover-layout">
+    <div className="discover-results-heading"><span>{visibleOffers.length} nearby {visibleOffers.length === 1 ? "donation" : "donations"} · Bengaluru demo</span><span className="discover-view-switch" role="group" aria-label="View mode"><button type="button" className={view === "list" ? "selected" : ""} aria-pressed={view === "list"} onClick={() => setView("list")}>List</button><button type="button" className={view === "map" ? "selected" : ""} aria-pressed={view === "map"} onClick={() => setView("map")}>Map</button></span></div>
+    {view === "list" ? (<div className="discover-layout">
       <section className="offer-list discover-offer-list" aria-label="Available donations">
         {visibleOffers.length ? visibleOffers.map(({ donation, donorName, distanceKm }) => {
           const image = foodPhoto(donation.title);
@@ -88,5 +100,8 @@ export function BrowseExperience({ offers, recipientLocation }: { offers: Offer[
 
       <SchematicMap from={selected?.donorLocation ?? null} to={recipientLocation} fromLabel={selected?.donation.pickupArea ?? "Food donor"} toLabel="Community kitchen" href={selected ? `/browse/${selected.donation.id}` : "/browse"} />
     </div>
+    ) : (
+      <DonationMap offers={mapOffers} recipientLocation={recipientLocation} />
+    )}
   </>;
 }

@@ -308,6 +308,12 @@
 .filter-pill-check.selected { background: #F5C4D3; }
 .discover-results-heading { display: flex; justify-content: space-between; margin: 18px 0 10px; color: #70605D; font-size: 10px; }
 .discover-results-heading span:last-child { color: #E12620; }
+.discover-view-switch { display: inline-flex; gap: 4px; }
+.discover-view-switch button { border: 1px solid #E6DAD5; background: transparent; color: #70605D; font-size: 10px; padding: 3px 10px; border-radius: 999px; cursor: pointer; }
+.discover-view-switch button.selected { background: #063A2A; border-color: #063A2A; color: #FFF7F0; }
+.donation-map { border-radius: 18px; overflow: hidden; border: 1px solid #E6DAD5; }
+.donation-map .leaflet-container { font: inherit; }
+.map-loading { display: grid; place-items: center; min-height: 220px; color: #70605D; }
 .discover-layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr); align-items: start; gap: 18px; }
 .discover-offer-list { gap: 14px; }
 .discover-offer-card { display: block; overflow: hidden; border: 0; border-radius: 9px; background: #fff; }
@@ -442,3 +448,12 @@
 .conflict-actions { display: inline-flex; gap: 6px; }
 .conflict-actions button { border: 1px solid #063A2A; background: transparent; color: #063A2A; border-radius: 999px; padding: 6px 12px; font-size: 11px; cursor: pointer; }
 .conflict-actions button:hover { background: #063A2A; color: #FFF7F0; }
+.impact-charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 18px 0; }
+.impact-chart { border: 1px solid #E6DAD5; border-radius: 18px; padding: 18px; background: #FFFDF9; }
+.impact-chart h2 { font-size: 14px; margin: 0 0 12px; }
+.impact-bars { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.impact-bars li { display: grid; grid-template-columns: 64px 1fr 44px; align-items: center; gap: 8px; font-size: 11px; }
+.impact-bar-label { color: #70605D; }
+.impact-bar-track { display: block; height: 8px; border-radius: 999px; background: #F0E8E2; overflow: hidden; }
+.impact-bar-track > span { display: block; height: 100%; border-radius: 999px; background: #A05F32; }
+.impact-bars strong { text-align: right; }
