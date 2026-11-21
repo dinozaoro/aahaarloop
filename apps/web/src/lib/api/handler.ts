@@ -1,5 +1,7 @@
 import { ZodError, type ZodType } from "zod";
 
+import { logStructured } from "../monitoring/log.ts";
+import { isCrossOriginRequest, isUnsafeMethod } from "../security/csrf.ts";
 import {
   ApiError,
   errorResponse,
@@ -11,10 +13,6 @@ import {
   type IdempotencyStore,
 } from "./idempotency.ts";
 import type { RateLimitHook } from "./rate-limit.ts";
-import {
-  isCrossOriginRequest,
-  isUnsafeMethod,
-} from "../security/csrf.ts";
 
 export interface ApiContext {
   requestId: string;
@@ -41,7 +39,7 @@ export interface HandlerOptions<TBody, TQuery> {
 }
 
 const defaultLog = (entry: Record<string, unknown>) => {
-  console.info(JSON.stringify(entry));
+  logStructured("api_request", entry);
 };
 
 export function withApiHandler<TBody = unknown, TQuery = unknown>(
@@ -83,7 +81,11 @@ export function withApiHandler<TBody = unknown, TQuery = unknown>(
     try {
       if (isUnsafeMethod(request.method) && isCrossOriginRequest(request)) {
         return finish(
-          errorResponse("forbidden", "Cross-origin request rejected", requestId),
+          errorResponse(
+            "forbidden",
+            "Cross-origin request rejected",
+            requestId,
+          ),
           "forbidden",
         );
       }
@@ -165,6 +167,14 @@ export function withApiHandler<TBody = unknown, TQuery = unknown>(
       }
       return finish(response);
     } catch (error) {
+      if (!(error instanceof ApiError) && !(error instanceof ZodError)) {
+        logStructured("api_error", {
+          request_id: requestId,
+          method: request.method,
+          path: pathname,
+          message: error instanceof Error ? error.message : String(error),
+        });
+      }
       const errorCode =
         error instanceof ApiError
           ? error.code
