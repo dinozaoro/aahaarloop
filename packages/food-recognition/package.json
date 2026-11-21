@@ -1,0 +1,21 @@
+{
+  "name": "@aahaarloop/food-recognition",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "echo 'no build: source consumed directly'",
+    "lint": "echo 'lint: nothing yet'",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test src/*.test.ts"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.3"
+  }
+}
