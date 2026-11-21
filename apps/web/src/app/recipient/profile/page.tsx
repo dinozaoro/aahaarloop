@@ -4,12 +4,13 @@ import { DEMO_RECIPIENT_ORG_ID } from "@/lib/data/constants";
 import { getOrganization } from "@/lib/data/store";
 import { MapPin, Phone } from "lucide-react";
 import Link from "next/link";
+import { WorkspaceShell } from "@/components/workspace-shell";
 
 export default function RecipientProfilePage() {
   const organization = getOrganization(DEMO_RECIPIENT_ORG_ID);
 
   return (
-    <div className="site-shell flex flex-col gap-7 py-10 sm:py-14">
+    <WorkspaceShell><div className="site-shell flex flex-col gap-7 py-10 sm:py-14">
       <Breadcrumbs items={[{ label: "Recipient" }, { label: "Organisation" }]} />
       <PageHeader
         title="Organisation details"
@@ -36,6 +37,6 @@ export default function RecipientProfilePage() {
           </CardContent>
         </Card>
       ) : <p className="text-sm text-muted-foreground">No organisation is available in this preview.</p>}
-    </div>
+    </div></WorkspaceShell>
   );
 }

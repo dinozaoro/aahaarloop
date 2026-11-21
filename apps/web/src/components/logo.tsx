@@ -1,16 +1,12 @@
 import { cn } from "@/lib/utils";
-import { Papicon } from "@/components/papicon";
 
 export function LogoMark({ className }: { className?: string }) {
   return (
     <span
       aria-hidden="true"
-      className={cn(
-        "inline-flex size-8 items-center justify-center rounded-lg bg-foreground text-background",
-        className,
-      )}
+      className={cn("inline-flex size-8 items-center justify-center text-primary", className)}
     >
-      <Papicon name="cutlery" className="size-4 brightness-0 invert" />
+      <span className="font-normal text-[2rem] leading-none">↻</span>
     </span>
   );
 }
@@ -19,8 +15,8 @@ export function Logo({ className }: { className?: string }) {
   return (
     <span className={cn("inline-flex items-center gap-2.5", className)}>
       <LogoMark />
-      <span className="font-semibold tracking-[-0.04em] text-[1.05rem]">
-        AahaarLoop
+      <span className="font-semibold tracking-[-0.055em] text-[1.05rem]">
+        aahaarloop
       </span>
     </span>
   );

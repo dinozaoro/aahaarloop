@@ -1,31 +1,24 @@
 "use client";
 
+import Link from "next/link";
+import { ImagePlus, Utensils } from "lucide-react";
+import { useEffect, useState, type FormEvent } from "react";
+
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { CATEGORY_LABELS, type FoodCategory } from "@/lib/domain/types";
 import { readDraft, writeDraft } from "@/lib/donations/draft";
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
-import { useEffect, useState, type FormEvent } from "react";
 
 const categories = Object.keys(CATEGORY_LABELS) as FoodCategory[];
 
 export function DonationBasicsForm() {
   const [saved, setSaved] = useState(false);
-  const [initial, setInitial] = useState<{
-    foodName: string;
-    category: FoodCategory;
-    servings: number;
-    description: string;
-  } | null>(null);
+  const [initial, setInitial] = useState<{ foodName: string; category: FoodCategory; servings: number; unit?: "portions" | "kg" | "containers"; description: string } | null>(null);
 
-  useEffect(() => {
-    queueMicrotask(() => setInitial(readDraft(sessionStorage).basics));
-  }, []);
+  useEffect(() => { queueMicrotask(() => setInitial(readDraft(sessionStorage).basics)); }, []);
 
   function saveBasics(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -37,57 +30,27 @@ export function DonationBasicsForm() {
         foodName: String(data.get("foodName") ?? "").trim(),
         category: String(data.get("category") ?? "prepared") as FoodCategory,
         servings: Number(data.get("servings")),
+        unit: String(data.get("unit") ?? "portions") as "portions" | "kg" | "containers",
         description: String(data.get("description") ?? "").trim(),
       },
     });
     setSaved(true);
   }
 
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>What is available?</CardTitle>
-        <CardDescription>Start with the details a nearby kitchen needs to decide.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={saveBasics} className="flex flex-col gap-5">
-          <Field>
-            <FieldLabel htmlFor="foodName">Food name</FieldLabel>
-            <Input id="foodName" name="foodName" placeholder="Vegetable biryani" maxLength={120} required defaultValue={initial?.foodName} />
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="foodPhoto">Food photo <span className="text-muted-foreground">(optional)</span></FieldLabel>
-            <Input id="foodPhoto" name="foodPhoto" type="file" accept="image/jpeg,image/png,image/webp" />
-            <FieldDescription>A clear photo helps nearby kitchens recognise the offer.</FieldDescription>
-          </Field>
-          <div className="grid gap-5 sm:grid-cols-[1fr_11rem]">
-            <Field>
-              <FieldLabel htmlFor="category">Food type</FieldLabel>
-              <Select id="category" name="category" defaultValue={initial?.category ?? "prepared"}>
-                {categories.map((category) => <option key={category} value={category}>{CATEGORY_LABELS[category]}</option>)}
-              </Select>
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="servings">Approx. servings</FieldLabel>
-              <Input id="servings" name="servings" type="number" inputMode="numeric" min="1" max="100000" defaultValue={initial?.servings} required />
-              <FieldDescription>Estimate is fine.</FieldDescription>
-            </Field>
-          </div>
-          <Field>
-            <FieldLabel htmlFor="description">Preparation or source details</FieldLabel>
-            <Textarea id="description" name="description" maxLength={500} placeholder="Prepared this afternoon; packed in covered trays." defaultValue={initial?.description} />
-          </Field>
-          <p className="text-xs leading-5 text-muted-foreground">Your draft stays in this browser tab. AahaarLoop does not certify food safety.</p>
-          {saved ? (
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
-              <p role="status" className="text-sm text-success">Details saved for this draft.</p>
-              <Link href="/donations/new/dates" className="inline-flex h-10 items-center gap-2 rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground">Add pickup timing <ArrowRight aria-hidden="true" className="size-4" /></Link>
-            </div>
-          ) : (
-            <Button type="submit" className="w-fit">Continue to pickup timing <ArrowRight aria-hidden="true" /></Button>
-          )}
-        </form>
-      </CardContent>
-    </Card>
-  );
+  return <div className="donation-basics-grid">
+    <aside className="donation-photo-column">
+      <div className="donation-photo-placeholder"><Utensils aria-hidden="true" /><strong>Food worth sharing</strong><span>Add a clear photo of the surplus.</span></div>
+      <Field className="donation-photo-field"><FieldLabel htmlFor="foodPhoto">Food photo <span>(optional)</span></FieldLabel><Input id="foodPhoto" name="foodPhoto" type="file" accept="image/jpeg,image/png,image/webp" /><FieldDescription>Use JPEG, PNG or WebP.</FieldDescription></Field>
+      <p className="donation-safety-note">Food and handling details are provided by the donor. AahaarLoop does not certify food safety.</p>
+    </aside>
+
+    <form onSubmit={saveBasics} className="donation-food-form">
+      <Field><FieldLabel htmlFor="foodName">Food name</FieldLabel><Input id="foodName" name="foodName" placeholder="Vegetable biryani" maxLength={120} required defaultValue={initial?.foodName} /></Field>
+      <Field><FieldLabel htmlFor="category">Category</FieldLabel><Select id="category" name="category" defaultValue={initial?.category ?? "prepared"}>{categories.map((category) => <option key={category} value={category}>{CATEGORY_LABELS[category]}</option>)}</Select></Field>
+      <div className="donation-quantity-row"><Field><FieldLabel htmlFor="servings">Quantity</FieldLabel><Input id="servings" name="servings" type="number" inputMode="numeric" min="1" max="100000" defaultValue={initial?.servings} required /></Field><Field><FieldLabel htmlFor="unit">Unit</FieldLabel><Select id="unit" name="unit" defaultValue={initial?.unit ?? "portions"}><option value="portions">Portions</option><option value="kg">Kilograms</option><option value="containers">Containers</option></Select></Field></div>
+      <Field><FieldLabel htmlFor="description">Description</FieldLabel><Textarea id="description" name="description" maxLength={500} placeholder="Prepared this afternoon; packed in covered trays." defaultValue={initial?.description} /></Field>
+      <p className="donation-draft-note">Your draft stays in this browser tab.</p>
+      {saved ? <div className="donation-form-actions"><p role="status">Details saved for this draft.</p><Link href="/donations/new/dates" className="primary-action">Continue to pickup <ImagePlus aria-hidden="true" /></Link></div> : <Button type="submit" className="donation-continue">Continue to pickup <ImagePlus aria-hidden="true" /></Button>}
+    </form>
+  </div>;
 }

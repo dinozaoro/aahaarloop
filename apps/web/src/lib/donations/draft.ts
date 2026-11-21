@@ -19,6 +19,7 @@ export interface DonationDraft {
     foodName: string;
     category: FoodCategory;
     servings: number;
+    unit?: "portions" | "kg" | "containers";
     description: string;
   } | null;
   dates: DonationDateValues | null;

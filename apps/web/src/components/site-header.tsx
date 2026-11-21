@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { Menu } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { resolveAndroidDownloadUrl } from "@/lib/links";
 
 const NAV_ITEMS = [
   { href: "/browse", label: "Find food" },
@@ -26,12 +27,42 @@ const NAV_ITEMS = [
 export function SiteHeader() {
   const pathname = usePathname();
 
-  if (["/dashboard", "/browse", "/donations", "/claims", "/impact", "/notifications", "/profile"].some((path) => pathname === path || pathname.startsWith(`${path}/`)) || pathname.startsWith("/donations/new")) return null;
+  if (pathname === "/") {
+    const androidUrl = resolveAndroidDownloadUrl(process.env.NEXT_PUBLIC_ANDROID_APK_URL);
+    return (
+      <header className="landing-header">
+        <div className="landing-nav-inner">
+          <Link href="/#hero" aria-label="AahaarLoop home" className="landing-wordmark">
+            <span aria-hidden="true" className="landing-wordmark-mark">↻</span>
+            <span>aahaarloop</span>
+          </Link>
+          <nav className="landing-nav-main" aria-label="Main">
+            <Link href="#how-it-works">How it works</Link>
+            <Link href="#impact">Our impact</Link>
+            <Link href="#community">About</Link>
+            <Link className="landing-nav-app" href="/browse">Open Web App <span aria-hidden="true">↗</span></Link>
+            {androidUrl ? (
+              <a className="landing-nav-android" href={androidUrl}>Download Android</a>
+            ) : (
+              <span className="landing-nav-android is-unavailable" aria-disabled="true" title="Android download URL is not configured">Download Android</span>
+            )}
+          </nav>
+        </div>
+        <nav className="landing-nav-links" aria-label="Public sections">
+          <Link href="#how-it-works">How it works</Link>
+          <Link href="#impact">Our impact</Link>
+          {androidUrl ? <a href={androidUrl}>Download Android</a> : <span aria-disabled="true">Download Android</span>}
+        </nav>
+      </header>
+    );
+  }
+
+  if (["/dashboard", "/browse", "/donations", "/claims", "/impact", "/notifications", "/profile", "/settings", "/recipient", "/volunteer", "/signin", "/register", "/recover", "/onboarding", "/install"].some((path) => pathname === path || pathname.startsWith(`${path}/`)) || pathname.startsWith("/donations/new")) return null;
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-background/95">
       <div className="site-shell flex h-[4.25rem] items-center gap-8">
-        <Link href="/" aria-label="AahaarLoop home" className="shrink-0 rounded-sm">
+        <Link href="/#hero" aria-label="AahaarLoop home" className="shrink-0 rounded-sm">
           <Logo />
         </Link>
         <nav aria-label="Main" className="hidden flex-1 items-center gap-7 md:flex">
