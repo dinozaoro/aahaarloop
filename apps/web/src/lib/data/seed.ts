@@ -1,11 +1,6 @@
-import { DEMO_DONOR_ORG_ID, DEMO_RECIPIENT_ORG_ID } from "./constants";
+import type { Claim, Donation, Need, Organization } from "@/lib/domain/types";
 
-import type {
-  Claim,
-  Donation,
-  Need,
-  Organization,
-} from "@/lib/domain/types";
+import { DEMO_DONOR_ORG_ID, DEMO_RECIPIENT_ORG_ID } from "./constants";
 
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
@@ -58,7 +53,7 @@ export function createSeedData(now = new Date()): SeedData {
       kind: "recipient",
       area: "Jayanagar",
       address: "44, 4th Block, Jayanagar, Bengaluru 560011",
-      location: { latitude: 12.9250, longitude: 77.5938 },
+      location: { latitude: 12.925, longitude: 77.5938 },
       verified: false,
       storage: "ambient",
       transportCapacityKg: 25,
@@ -256,7 +251,8 @@ export function createSeedData(now = new Date()): SeedData {
       id: "don-yoghurt",
       organizationId: DEMO_DONOR_ORG_ID,
       title: "Yoghurt tubs",
-      description: "Chilled tubs from yesterday's service; missed the pickup window.",
+      description:
+        "Chilled tubs from yesterday's service; missed the pickup window.",
       category: "dairy",
       storage: "chilled",
       servingsTotal: 30,
@@ -290,7 +286,8 @@ export function createSeedData(now = new Date()): SeedData {
       id: "don-rice-dal",
       organizationId: DEMO_DONOR_ORG_ID,
       title: "Rice and dal",
-      description: "Delivered to Sunrise Community Kitchen after the evening service.",
+      description:
+        "Delivered to Sunrise Community Kitchen after the evening service.",
       category: "pantry",
       storage: "ambient",
       servingsTotal: 200,
@@ -311,7 +308,12 @@ export function createSeedData(now = new Date()): SeedData {
       events: [
         { id: "ev-19", at: at(-60), type: "created", actor: "Meera Rao" },
         { id: "ev-20", at: at(-59), type: "published", actor: "Meera Rao" },
-        { id: "ev-21", at: at(-50), type: "claimed", actor: "Sunrise Community Kitchen" },
+        {
+          id: "ev-21",
+          at: at(-50),
+          type: "claimed",
+          actor: "Sunrise Community Kitchen",
+        },
         {
           id: "ev-22",
           at: at(-44),
@@ -325,7 +327,8 @@ export function createSeedData(now = new Date()): SeedData {
       id: "don-breakfast",
       organizationId: DEMO_DONOR_ORG_ID,
       title: "Leftover breakfast",
-      description: "Idli and chutney from the morning service. Draft, not published.",
+      description:
+        "Idli and chutney from the morning service. Draft, not published.",
       category: "prepared",
       storage: "ambient",
       servingsTotal: 25,
@@ -343,7 +346,9 @@ export function createSeedData(now = new Date()): SeedData {
       status: "draft",
       createdAt: at(-12),
       updatedAt: at(-12),
-      events: [{ id: "ev-23", at: at(-12), type: "created", actor: "Meera Rao" }],
+      events: [
+        { id: "ev-23", at: at(-12), type: "created", actor: "Meera Rao" },
+      ],
     },
     {
       id: "don-cancelled",
@@ -412,7 +417,12 @@ export function createSeedData(now = new Date()): SeedData {
       createdAt: at(-0.6),
       updatedAt: at(-0.6),
       history: [
-        { id: "cev-3", at: at(-0.6), type: "created", actor: "Sunrise Community Kitchen" },
+        {
+          id: "cev-3",
+          at: at(-0.6),
+          type: "created",
+          actor: "Sunrise Community Kitchen",
+        },
       ],
     },
     {
@@ -452,9 +462,19 @@ export function createSeedData(now = new Date()): SeedData {
       createdAt: at(-50),
       updatedAt: at(-44),
       history: [
-        { id: "cev-7", at: at(-50), type: "created", actor: "Sunrise Community Kitchen" },
+        {
+          id: "cev-7",
+          at: at(-50),
+          type: "created",
+          actor: "Sunrise Community Kitchen",
+        },
         { id: "cev-8", at: at(-49), type: "confirmed", actor: "Meera Rao" },
-        { id: "cev-9", at: at(-44), type: "delivered", actor: "Demo volunteer" },
+        {
+          id: "cev-9",
+          at: at(-44),
+          type: "delivered",
+          actor: "Demo volunteer",
+        },
       ],
     },
   ];

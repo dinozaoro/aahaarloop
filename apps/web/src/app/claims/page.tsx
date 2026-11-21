@@ -1,6 +1,5 @@
-import type { Metadata } from "next";
-
 import { ComingSoon } from "@/components/coming-soon";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Claims" };
 

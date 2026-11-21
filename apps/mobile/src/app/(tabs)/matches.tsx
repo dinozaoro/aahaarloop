@@ -1,7 +1,7 @@
-import { StyleSheet, Text, View } from "react-native";
-
 import { calculateUrgency } from "@aahaarloop/matching";
 import type { DonationCandidate } from "@aahaarloop/matching";
+
+import { StyleSheet, Text, View } from "react-native";
 
 const HOUR_MS = 60 * 60 * 1000;
 

@@ -5,9 +5,8 @@ import {
   type UrgencyStatus,
 } from "@aahaarloop/matching";
 
-import type { Donation } from "@/lib/domain/types";
-
 import type { BadgeVariant } from "@/components/ui/badge";
+import type { Donation } from "@/lib/domain/types";
 
 export const URGENCY_LABELS: Record<UrgencyLevel, string> = {
   low: "Low urgency",
@@ -29,7 +28,7 @@ export const URGENCY_STATUS_LABELS: Record<UrgencyStatus, string> = {
  */
 export function donationUrgency(
   donation: Donation,
-  now: Date = new Date()
+  now: Date = new Date(),
 ): UrgencyResult {
   return calculateUrgency({
     now,

@@ -1,18 +1,5 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import {
-  ArrowRight,
-  Clock,
-  HeartHandshake,
-  MapPin,
-  PackageCheck,
-  ShieldCheck,
-  Sprout,
-  Store,
-  UtensilsCrossed,
-  Users,
-} from "lucide-react";
-
+import { AnimatedCounter } from "@/components/animated-counter";
+import { ScrollReveal, StaggerScrollReveal } from "@/components/scroll-reveal";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -22,9 +9,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { AnimatedCounter } from "@/components/animated-counter";
-import { ScrollReveal, StaggerScrollReveal } from "@/components/scroll-reveal";
 import { cn } from "@/lib/utils";
+import {
+  ArrowRight,
+  Clock,
+  HeartHandshake,
+  MapPin,
+  PackageCheck,
+  ShieldCheck,
+  Sprout,
+  Store,
+  Users,
+  UtensilsCrossed,
+} from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Every surplus has a destination",
@@ -148,7 +147,7 @@ function FloatingSpice({
       aria-hidden="true"
       className={cn(
         "absolute rounded-full blur-[64px] animate-float blob-morph",
-        color
+        color,
       )}
       style={{
         animationDelay: delay,
@@ -161,7 +160,13 @@ function FloatingSpice({
   );
 }
 
-function OrganicLeaf({ className, style }: { className?: string; style?: React.CSSProperties }) {
+function OrganicLeaf({
+  className,
+  style,
+}: {
+  className?: string;
+  style?: React.CSSProperties;
+}) {
   return (
     <svg
       viewBox="0 0 200 200"
@@ -210,9 +215,30 @@ export default function HomePage() {
       />
 
       {/* Floating spice accents */}
-      <FloatingSpice delay="0s" width="220px" height="220px" top="15%" left="12%" color="warning/25" />
-      <FloatingSpice delay="-2s" width="280px" height="280px" top="80%" left="5%" color="secondary/20" />
-      <FloatingSpice delay="-4s" width="180px" height="180px" top="45%" left="10%" color="primary/30" />
+      <FloatingSpice
+        delay="0s"
+        width="220px"
+        height="220px"
+        top="15%"
+        left="12%"
+        color="warning/25"
+      />
+      <FloatingSpice
+        delay="-2s"
+        width="280px"
+        height="280px"
+        top="80%"
+        left="5%"
+        color="secondary/20"
+      />
+      <FloatingSpice
+        delay="-4s"
+        width="180px"
+        height="180px"
+        top="45%"
+        left="10%"
+        color="primary/30"
+      />
 
       <section
         aria-labelledby="hero-title"
@@ -221,7 +247,10 @@ export default function HomePage() {
         <div className="relative mx-auto grid w-full max-w-7xl gap-10 px-4 py-28 sm:px-6 lg:grid-cols-1.15fr lg:py-40">
           <div className="flex flex-col gap-6 lg:pr-14">
             <ScrollReveal once threshold={0.1}>
-              <Badge variant="secondary" className="w-fit gap-2 hover-lift press-scale">
+              <Badge
+                variant="secondary"
+                className="w-fit gap-2 hover-lift press-scale"
+              >
                 <Sprout aria-hidden="true" className="size-3.5" />
                 Bengaluru food rescue
               </Badge>
@@ -233,12 +262,16 @@ export default function HomePage() {
                 className="reveal scale-in font-display text-5xl font-bold tracking-tight text-balance sm:text-7xl lg:text-8xl"
                 style={{ animationDelay: "60ms" }}
               >
-                Every surplus<span className="text-primary"> has a destination.</span>
+                Every surplus
+                <span className="text-primary"> has a destination.</span>
               </h1>
             </ScrollReveal>
 
             <ScrollReveal once threshold={0.12}>
-              <p className="reveal max-w-lg text-lg text-muted-foreground text-pretty leading-relaxed" style={{ animationDelay: "140ms" }}>
+              <p
+                className="reveal max-w-lg text-lg text-muted-foreground text-pretty leading-relaxed"
+                style={{ animationDelay: "140ms" }}
+              >
                 Aahaarloop connects kitchens with surplus to the shelters and
                 community kitchens that can collect it in time. Publish, match,
                 collect — with the deadline visible at every step.
@@ -246,10 +279,16 @@ export default function HomePage() {
             </ScrollReveal>
 
             <ScrollReveal once threshold={0.12}>
-              <div className="flex flex-wrap gap-3" style={{ animationDelay: "220ms" }}>
+              <div
+                className="flex flex-wrap gap-3"
+                style={{ animationDelay: "220ms" }}
+              >
                 <Link
                   href="/donations/new"
-                  className={cn(buttonVariants({ size: "lg" }), "group press-scale shadow-glow")}
+                  className={cn(
+                    buttonVariants({ size: "lg" }),
+                    "group press-scale shadow-glow",
+                  )}
                 >
                   Donate surplus
                   <ArrowRight
@@ -261,14 +300,17 @@ export default function HomePage() {
                   href="/browse"
                   className={cn(
                     buttonVariants({ variant: "outline", size: "lg" }),
-                    "press-scale"
+                    "press-scale",
                   )}
                 >
                   Find food to rescue
                 </Link>
                 <Link
                   href="/signin"
-                  className={cn(buttonVariants({ variant: "ghost", size: "lg" }), "press-scale")}
+                  className={cn(
+                    buttonVariants({ variant: "ghost", size: "lg" }),
+                    "press-scale",
+                  )}
                 >
                   Sign in
                 </Link>
@@ -276,33 +318,50 @@ export default function HomePage() {
             </ScrollReveal>
 
             <ScrollReveal once threshold={0.12}>
-              <p className="reveal flex items-center gap-2 text-sm text-muted-foreground" style={{ animationDelay: "300ms" }}>
-                <ShieldCheck aria-hidden="true" className="size-4 text-primary" />
+              <p
+                className="reveal flex items-center gap-2 text-sm text-muted-foreground"
+                style={{ animationDelay: "300ms" }}
+              >
+                <ShieldCheck
+                  aria-hidden="true"
+                  className="size-4 text-primary"
+                />
                 Deterministic matching. No LLM decides who eats.
               </p>
             </ScrollReveal>
           </div>
 
-          <div className="reveal flex flex-col gap-8" style={{ animationDelay: "380ms" }}>
+          <div
+            className="reveal flex flex-col gap-8"
+            style={{ animationDelay: "380ms" }}
+          >
             {/* Hero match card — glassmorphism + organic leaf */}
             <Card className="relative overflow-hidden rounded-[2.5rem] border border-border bg-card shadow-lifted image-outline hover-lift press-scale group">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 group-hover:from-primary/20 group-hover:to-secondary/20 transition-colors duration-700" />
               <div className="absolute -right-6 -bottom-6 size-48 opacity-20 group-hover:opacity-35 transition-opacity duration-700">
-                <OrganicLeaf className="size-full animate-float" style={{ animationDelay: "-1s" }} />
+                <OrganicLeaf
+                  className="size-full animate-float"
+                  style={{ animationDelay: "-1s" }}
+                />
               </div>
               <div className="absolute top-8 left-8 size-12 rounded-full bg-warning/20 flex items-center justify-center">
                 <Sprout className="size-5 text-warning" aria-hidden="true" />
               </div>
               <CardHeader className="pt-8 gap-2 z-10 relative">
                 <div className="flex items-center justify-between gap-2 z-10 relative">
-                  <Badge variant="warning" className="z-10 relative animate-pulse-glow">
+                  <Badge
+                    variant="warning"
+                    className="z-10 relative animate-pulse-glow"
+                  >
                     Critical urgency
                   </Badge>
                   <span className="z-10 relative text-xs text-muted-foreground">
                     Example match
                   </span>
                 </div>
-                <CardTitle className="text-xl font-display z-10 relative">Vegetable biryani</CardTitle>
+                <CardTitle className="text-xl font-display z-10 relative">
+                  Vegetable biryani
+                </CardTitle>
                 <CardDescription className="z-10 relative">
                   40 servings · prepared meal · Indiranagar
                 </CardDescription>
@@ -344,11 +403,17 @@ export default function HomePage() {
       </section>
 
       {/* Marquee — moving city names, Indian feel */}
-      <section aria-hidden="true" className="border-b border-border bg-secondary/30">
+      <section
+        aria-hidden="true"
+        className="border-b border-border bg-secondary/30"
+      >
         <div className="px-4 py-6 sm:px-6 overflow-hidden">
           <div className="flex w-full items-center overflow-x-hidden">
             {MARQUEE_ITEMS.map((items, i) => (
-              <div key={i} className="marquee-content whitespace-nowrap text-xs text-muted-foreground uppercase tracking-widest">
+              <div
+                key={i}
+                className="marquee-content whitespace-nowrap text-xs text-muted-foreground uppercase tracking-widest"
+              >
                 {items}
               </div>
             ))}
@@ -364,17 +429,27 @@ export default function HomePage() {
         <div className="relative z-10 mx-auto grid w-full max-w-7xl gap-14 px-4 py-28 sm:px-6 lg:grid-cols-1.1fr lg:py-36">
           <div className="flex flex-col gap-5 lg:pr-10">
             <ScrollReveal once threshold={0.1}>
-              <p className="reveal text-sm font-semibold tracking-wide text-primary uppercase" style={{ animationDelay: "60ms" }}>
+              <p
+                className="reveal text-sm font-semibold tracking-wide text-primary uppercase"
+                style={{ animationDelay: "60ms" }}
+              >
                 The gap
               </p>
             </ScrollReveal>
             <ScrollReveal once threshold={0.12}>
-              <h2 id="gap-title" className="reveal text-3xl font-display font-bold tracking-tight text-balance sm:text-4xl" style={{ animationDelay: "80ms" }}>
+              <h2
+                id="gap-title"
+                className="reveal text-3xl font-display font-bold tracking-tight text-balance sm:text-4xl"
+                style={{ animationDelay: "80ms" }}
+              >
                 Good food is thrown away while people nearby go hungry.
               </h2>
             </ScrollReveal>
             <ScrollReveal once threshold={0.12}>
-              <p className="reveal text-lg text-pretty leading-relaxed text-muted-foreground" style={{ animationDelay: "160ms" }}>
+              <p
+                className="reveal text-lg text-pretty leading-relaxed text-muted-foreground"
+                style={{ animationDelay: "160ms" }}
+              >
                 Surplus is rarely a lack of goodwill. Kitchens cannot tell, in
                 time, who can collect the food before it is unsafe, and
                 recipient organisations cannot tell what is available within
@@ -382,7 +457,10 @@ export default function HomePage() {
               </p>
             </ScrollReveal>
           </div>
-          <div className="flex flex-col gap-5 reveal" style={{ animationDelay: "240ms" }}>
+          <div
+            className="flex flex-col gap-5 reveal"
+            style={{ animationDelay: "240ms" }}
+          >
             <ul className="grid gap-5 text-sm sm:grid-cols-3">
               {[
                 {
@@ -417,13 +495,22 @@ export default function HomePage() {
       </section>
 
       {/* How it works */}
-      <section aria-labelledby="flow-title" className="border-b border-border relative overflow-hidden">
+      <section
+        aria-labelledby="flow-title"
+        className="border-b border-border relative overflow-hidden"
+      >
         <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-28 sm:px-6 lg:py-36">
-          <div className="flex flex-col gap-5 reveal" style={{ animationDelay: "60ms" }}>
+          <div
+            className="flex flex-col gap-5 reveal"
+            style={{ animationDelay: "60ms" }}
+          >
             <p className="text-sm font-semibold tracking-wide text-primary uppercase">
               How it works
             </p>
-            <h2 id="flow-title" className="max-w-2xl text-3xl font-display font-bold tracking-tight text-balance sm:text-4xl">
+            <h2
+              id="flow-title"
+              className="max-w-2xl text-3xl font-display font-bold tracking-tight text-balance sm:text-4xl"
+            >
               Three steps from surplus to a shared meal.
             </h2>
           </div>
@@ -437,7 +524,7 @@ export default function HomePage() {
                         <span
                           aria-hidden="true"
                           className={cn(
-                            "grid size-11 place-items-center rounded-[1.5rem] bg-primary/10 text-lg font-display font-bold text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300 press-scale"
+                            "grid size-11 place-items-center rounded-[1.5rem] bg-primary/10 text-lg font-display font-bold text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300 press-scale",
                           )}
                         >
                           {index + 1}
@@ -459,10 +546,19 @@ export default function HomePage() {
       </section>
 
       {/* Impact */}
-      <section aria-labelledby="impact-title" className="border-b border-border bg-primary text-primary-foreground relative overflow-hidden">
+      <section
+        aria-labelledby="impact-title"
+        className="border-b border-border bg-primary text-primary-foreground relative overflow-hidden"
+      >
         <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-20 sm:px-6">
-          <div className="flex flex-col gap-4 reveal" style={{ animationDelay: "80ms" }}>
-            <h2 id="impact-title" className="text-2xl font-display font-bold tracking-tight">
+          <div
+            className="flex flex-col gap-4 reveal"
+            style={{ animationDelay: "80ms" }}
+          >
+            <h2
+              id="impact-title"
+              className="text-2xl font-display font-bold tracking-tight"
+            >
               What rescue looks like
             </h2>
             <p className="max-w-2xl text-sm text-primary-foreground/80 text-pretty">
@@ -487,24 +583,38 @@ export default function HomePage() {
       </section>
 
       {/* Roles */}
-      <section aria-labelledby="roles-title" className="border-b border-border relative overflow-hidden">
+      <section
+        aria-labelledby="roles-title"
+        className="border-b border-border relative overflow-hidden"
+      >
         <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-28 sm:px-6 lg:py-36">
-          <div className="flex flex-col gap-5 reveal" style={{ animationDelay: "60ms" }}>
+          <div
+            className="flex flex-col gap-5 reveal"
+            style={{ animationDelay: "60ms" }}
+          >
             <p className="text-sm font-semibold tracking-wide text-primary uppercase">
               Built for every side of the handover
             </p>
-            <h2 id="roles-title" className="max-w-2xl text-3xl font-display font-bold tracking-tight text-balance sm:text-4xl">
+            <h2
+              id="roles-title"
+              className="max-w-2xl text-3xl font-display font-bold tracking-tight text-balance sm:text-4xl"
+            >
               One workspace per role, one shared deadline.
             </h2>
           </div>
           <StaggerScrollReveal once threshold={0.12}>
             <div className="mt-16 grid gap-10 lg:grid-cols-3">
               {ROLES.map((role) => (
-                <Card key={role.name} className="flex-1 flex flex-col justify-between p-7 shadow-soft hover-lift press-scale">
+                <Card
+                  key={role.name}
+                  className="flex-1 flex flex-col justify-between p-7 shadow-soft hover-lift press-scale"
+                >
                   <CardHeader className="gap-3">
-                    <span className={cn(
-                      "grid size-11 place-items-center rounded-[1.5rem] bg-secondary text-primary press-scale"
-                    )}>
+                    <span
+                      className={cn(
+                        "grid size-11 place-items-center rounded-[1.5rem] bg-secondary text-primary press-scale",
+                      )}
+                    >
                       <role.icon aria-hidden="true" className="size-5" />
                     </span>
                     <CardTitle>{role.name}</CardTitle>
@@ -540,9 +650,15 @@ export default function HomePage() {
       {/* CTA */}
       <section aria-labelledby="cta-title" className="relative overflow-hidden">
         <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-28 sm:px-6 lg:py-36">
-          <div className="flex flex-col gap-8 reveal rounded-[3rem] border border-border bg-primary/10 px-8 py-20 sm:px-12 lg:flex-row lg:items-center lg:justify-between" style={{ animationDelay: "100ms" }}>
+          <div
+            className="flex flex-col gap-8 reveal rounded-[3rem] border border-border bg-primary/10 px-8 py-20 sm:px-12 lg:flex-row lg:items-center lg:justify-between"
+            style={{ animationDelay: "100ms" }}
+          >
             <div className="flex max-w-2xl flex-col gap-3">
-              <h2 id="cta-title" className="text-3xl font-display font-bold tracking-tight text-balance">
+              <h2
+                id="cta-title"
+                className="text-3xl font-display font-bold tracking-tight text-balance"
+              >
                 Rescue tonight&apos;s surplus instead of binning it.
               </h2>
               <p className="text-muted-foreground text-pretty leading-relaxed">
@@ -550,21 +666,36 @@ export default function HomePage() {
                 when the pickup details are ready.
               </p>
             </div>
-            <div className="flex flex-wrap gap-3 reveal" style={{ animationDelay: "180ms" }}>
-              <Link href="/donations/new" className={cn(buttonVariants({ size: "lg" }), "press-scale shadow-glow")}>
+            <div
+              className="flex flex-wrap gap-3 reveal"
+              style={{ animationDelay: "180ms" }}
+            >
+              <Link
+                href="/donations/new"
+                className={cn(
+                  buttonVariants({ size: "lg" }),
+                  "press-scale shadow-glow",
+                )}
+              >
                 Create a donation
               </Link>
               <Link
                 href="/signin"
-                className={cn(buttonVariants({ variant: "outline", size: "lg" }), "press-scale")}
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "lg" }),
+                  "press-scale",
+                )}
               >
                 Sign in
               </Link>
             </div>
           </div>
-          <p className="mt-10 text-xs text-muted-foreground reveal" style={{ animationDelay: "260ms" }}>
-            Aahaarloop helps route surplus food; it does not certify that food is
-            safe to eat. Donors and recipients remain responsible for food
+          <p
+            className="mt-10 text-xs text-muted-foreground reveal"
+            style={{ animationDelay: "260ms" }}
+          >
+            Aahaarloop helps route surplus food; it does not certify that food
+            is safe to eat. Donors and recipients remain responsible for food
             safety. Diet and allergen filters are preferences, not guarantees.
           </p>
         </div>

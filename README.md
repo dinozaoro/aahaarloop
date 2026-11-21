@@ -29,15 +29,20 @@ pnpm dev
 
 ## Commands
 
-| Command          | What it does                                           |
-| ---------------- | ------------------------------------------------------ |
-| `pnpm web`       | Starts only the web app.                               |
-| `pnpm mobile`    | Starts only Expo.                                      |
-| `pnpm dev`       | Starts the web and mobile dev servers.                 |
-| `pnpm build`     | Builds the web app (mobile builds use EAS).            |
-| `pnpm lint`      | Lints every workspace package.                         |
-| `pnpm typecheck` | Type-checks every workspace package.                   |
-| `pnpm test`      | Runs package tests plus the workspace boundary checks. |
-| `pnpm format`    | Formats the repository with Prettier.                  |
+| Command             | What it does                                              |
+| ------------------- | --------------------------------------------------------- |
+| `pnpm web`          | Starts only the web app.                                  |
+| `pnpm mobile`       | Starts only Expo.                                         |
+| `pnpm dev`          | Starts the web and mobile dev servers.                    |
+| `pnpm build`        | Builds the web app (mobile builds use EAS).               |
+| `pnpm lint`         | Lints every workspace package.                            |
+| `pnpm typecheck`    | Type-checks every workspace package.                      |
+| `pnpm test`         | Runs package tests plus the workspace boundary checks.    |
+| `pnpm format`       | Formats the repository with Prettier (and sorts imports). |
+| `pnpm format:check` | Fails when a file is not formatted.                       |
 
-These root commands are the CI entry points: a workflow can run `pnpm install --frozen-lockfile` followed by `pnpm build`, `pnpm lint`, `pnpm typecheck` and `pnpm test` without per-app steps.
+TypeScript is strict in every app and package. ESLint uses flat configs; `packages/config` holds the shared ignores and tsconfig presets. Prettier owns formatting and import order, so `pnpm format:check` is the CI gate.
+
+Environment variables are validated with `parseEnv(schema, env)` from `@aahaarloop/shared`. It throws a single error naming every missing or invalid variable instead of failing later at runtime.
+
+These root commands are the CI entry points: a workflow can run `pnpm install --frozen-lockfile` followed by `pnpm build`, `pnpm lint`, `pnpm typecheck`, `pnpm format:check` and `pnpm test` without per-app steps.

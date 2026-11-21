@@ -1,6 +1,3 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-
 import {
   matchDonationsForRecipient,
   type DonationCandidate,
@@ -8,6 +5,7 @@ import {
   type RecipientRequest,
 } from "@aahaarloop/matching";
 
+import { ScrollReveal, StaggerScrollReveal } from "@/components/scroll-reveal";
 import { Badge, type BadgeVariant } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -18,9 +16,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ArrowRight, Clock, PackageCheck, ShieldCheck } from "lucide-react";
-import { ScrollReveal, StaggerScrollReveal } from "@/components/scroll-reveal";
 import { cn } from "@/lib/utils";
+import { ArrowRight, Clock, PackageCheck, ShieldCheck } from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Donor dashboard",
@@ -106,18 +105,18 @@ export default function DashboardPage() {
   const { matches } = matchDonationsForRecipient(
     emptyRecipient,
     demoDonations,
-    { now: NOW }
+    { now: NOW },
   );
 
   const active = matches.filter(
-    (m) => m.explanation.urgency.level === "critical" || m.explanation.urgency.level === "high"
+    (m) =>
+      m.explanation.urgency.level === "critical" ||
+      m.explanation.urgency.level === "high",
   );
   const expiring = matches.filter(
-    (m) => m.explanation.urgency.level === "medium"
+    (m) => m.explanation.urgency.level === "medium",
   );
-  const history = matches.filter(
-    (m) => m.explanation.urgency.level === "low"
-  );
+  const history = matches.filter((m) => m.explanation.urgency.level === "low");
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
@@ -188,7 +187,11 @@ export default function DashboardPage() {
           <StaggerScrollReveal once threshold={0.12}>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {active.map((match) => (
-                <DonationCard key={match.donationId} match={match} variant="critical" />
+                <DonationCard
+                  key={match.donationId}
+                  match={match}
+                  variant="critical"
+                />
               ))}
             </div>
           </StaggerScrollReveal>
@@ -209,7 +212,11 @@ export default function DashboardPage() {
           <StaggerScrollReveal once threshold={0.12}>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {expiring.map((match) => (
-                <DonationCard key={match.donationId} match={match} variant="high" />
+                <DonationCard
+                  key={match.donationId}
+                  match={match}
+                  variant="high"
+                />
               ))}
             </div>
           </StaggerScrollReveal>
@@ -230,7 +237,11 @@ export default function DashboardPage() {
           <StaggerScrollReveal once threshold={0.12}>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {history.map((match) => (
-                <DonationCard key={match.donationId} match={match} variant="low" />
+                <DonationCard
+                  key={match.donationId}
+                  match={match}
+                  variant="low"
+                />
               ))}
             </div>
           </StaggerScrollReveal>
@@ -257,9 +268,16 @@ export default function DashboardPage() {
   );
 }
 
-function DonationCard({ match, variant }: { match: EligibleMatch; variant: string }) {
+function DonationCard({
+  match,
+  variant,
+}: {
+  match: EligibleMatch;
+  variant: string;
+}) {
   const { explanation } = match;
-  const { urgency, distance, quantity, needs, availability, logistics } = explanation;
+  const { urgency, distance, quantity, needs, availability, logistics } =
+    explanation;
 
   return (
     <Card
@@ -269,21 +287,28 @@ function DonationCard({ match, variant }: { match: EligibleMatch; variant: strin
           ? "border-destructive/50 bg-destructive/5"
           : variant === "high"
             ? "border-warning/50 bg-warning/5"
-            : "border-border"
+            : "border-border",
       )}
     >
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <PackageCheck className="size-4 text-muted-foreground" aria-hidden="true" />
+            <PackageCheck
+              className="size-4 text-muted-foreground"
+              aria-hidden="true"
+            />
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               Donation {match.donationId.slice(-4)}
             </span>
           </div>
           {urgencyBadge(urgency.level)}
         </div>
-        <CardTitle className="text-lg">{match.claimableServings} servings</CardTitle>
-        <CardDescription>{urgency.remainingMinutes} min remaining</CardDescription>
+        <CardTitle className="text-lg">
+          {match.claimableServings} servings
+        </CardTitle>
+        <CardDescription>
+          {urgency.remainingMinutes} min remaining
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="grid gap-2 text-sm">
@@ -293,11 +318,15 @@ function DonationCard({ match, variant }: { match: EligibleMatch; variant: strin
           </div>
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Distance</span>
-            <span className="font-medium data-[tabular]">{distance.distanceKm} km</span>
+            <span className="font-medium data-[tabular]">
+              {distance.distanceKm} km
+            </span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Quantity fit</span>
-            <span className="font-medium data-[tabular]">{quantity.claimableServings} servings</span>
+            <span className="font-medium data-[tabular]">
+              {quantity.claimableServings} servings
+            </span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Needs match</span>

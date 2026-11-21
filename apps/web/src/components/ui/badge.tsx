@@ -1,7 +1,6 @@
-import type * as React from "react";
-import { cva, type VariantProps } from "class-variance-authority";
-
 import { cn } from "@/lib/utils";
+import { cva, type VariantProps } from "class-variance-authority";
+import type * as React from "react";
 
 const badgeVariants = cva(
   "inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium whitespace-nowrap",
@@ -13,14 +12,13 @@ const badgeVariants = cva(
         outline: "border-border text-foreground",
         success: "border-success/30 bg-success/10 text-success",
         warning: "border-warning/40 bg-warning/15 text-accent-foreground",
-        destructive:
-          "border-destructive/30 bg-destructive/10 text-destructive",
+        destructive: "border-destructive/30 bg-destructive/10 text-destructive",
       },
     },
     defaultVariants: {
       variant: "default",
     },
-  }
+  },
 );
 
 function Badge({

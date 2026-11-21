@@ -1,6 +1,6 @@
 import {
-  DEFAULT_SAFETY_BUFFER_MINUTES,
   calculateUrgency,
+  DEFAULT_SAFETY_BUFFER_MINUTES,
   toEpochMs,
 } from "./urgency.ts";
 import type { Instant, UrgencyLevel } from "./urgency.ts";
@@ -219,7 +219,7 @@ function assertStorage(value: StorageType, field: string): void {
 }
 
 function resolveWeights(
-  overrides: Partial<MatchingWeights> | undefined
+  overrides: Partial<MatchingWeights> | undefined,
 ): MatchingWeights {
   const merged = { ...DEFAULT_MATCHING_WEIGHTS, ...overrides };
   let total = 0;
@@ -227,7 +227,9 @@ function resolveWeights(
   for (const key of WEIGHT_KEYS) {
     const value = merged[key];
     if (!Number.isFinite(value) || value < 0) {
-      throw new TypeError(`weights.${key} must be a non-negative finite number`);
+      throw new TypeError(
+        `weights.${key} must be a non-negative finite number`,
+      );
     }
     total += value;
   }
@@ -247,48 +249,42 @@ function resolveConfig(config: MatchingConfig | undefined): ResolvedConfig {
   const input = config ?? {};
   return {
     weights: resolveWeights(input.weights),
-    maxDistanceKm: assertPositive(
-      input.maxDistanceKm ?? 25,
-      "maxDistanceKm"
-    ),
+    maxDistanceKm: assertPositive(input.maxDistanceKm ?? 25, "maxDistanceKm"),
     averageSpeedKmh: assertPositive(
       input.averageSpeedKmh ?? 25,
-      "averageSpeedKmh"
+      "averageSpeedKmh",
     ),
     handlingTimeMinutes: assertNonNegative(
       input.handlingTimeMinutes ?? 10,
-      "handlingTimeMinutes"
+      "handlingTimeMinutes",
     ),
     bufferMinutes: assertNonNegative(
       input.bufferMinutes ?? DEFAULT_SAFETY_BUFFER_MINUTES,
-      "bufferMinutes"
+      "bufferMinutes",
     ),
     allowPartialClaims: input.allowPartialClaims ?? true,
   };
 }
 
 function parseWindows(
-  windows: readonly TimeWindow[]
+  windows: readonly TimeWindow[],
 ): Array<{ start: number; end: number }> {
   return windows.map((window, index) => {
     const start = toEpochMs(
       window.start,
-      `volunteerAvailability[${index}].start`
+      `volunteerAvailability[${index}].start`,
     );
     const end = toEpochMs(window.end, `volunteerAvailability[${index}].end`);
     if (end <= start) {
       throw new TypeError(
-        `volunteerAvailability[${index}] must end after it starts`
+        `volunteerAvailability[${index}] must end after it starts`,
       );
     }
     return { start, end };
   });
 }
 
-function score(
-  value: number,
-  weight: number
-): ComponentScore {
+function score(value: number, weight: number): ComponentScore {
   const normalizedScore = round2(clamp(value));
   return {
     score: normalizedScore,
@@ -297,10 +293,7 @@ function score(
   };
 }
 
-function componentScore(
-  explanation: MatchExplanation,
-  key: WeightKey
-): number {
+function componentScore(explanation: MatchExplanation, key: WeightKey): number {
   return explanation[key].contribution;
 }
 
@@ -332,7 +325,7 @@ export function haversineDistanceKm(a: GeoPoint, b: GeoPoint): number {
 export function matchDonationsForRecipient(
   recipient: RecipientRequest,
   donations: readonly DonationCandidate[],
-  options: { now: Instant; config?: MatchingConfig }
+  options: { now: Instant; config?: MatchingConfig },
 ): MatchResult {
   const config = resolveConfig(options.config);
   const nowMs = toEpochMs(options.now, "now");
@@ -341,11 +334,11 @@ export function matchDonationsForRecipient(
   assertStorage(recipient.storage, "recipient.storage");
   const requiredServings = assertPositive(
     recipient.requiredServings,
-    "recipient.requiredServings"
+    "recipient.requiredServings",
   );
   const transportCapacityKg = assertNonNegative(
     recipient.transportCapacityKg,
-    "recipient.transportCapacityKg"
+    "recipient.transportCapacityKg",
   );
   const availability = parseWindows(recipient.volunteerAvailability);
   const needs = [...new Set(recipient.needs)];
@@ -359,35 +352,33 @@ export function matchDonationsForRecipient(
     assertStorage(donation.storage, `donation ${donation.id} storage`);
     const totalServings = assertPositive(
       donation.totalServings,
-      `donation ${donation.id} totalServings`
+      `donation ${donation.id} totalServings`,
     );
     const availableServings = assertNonNegative(
       donation.availableServings,
-      `donation ${donation.id} availableServings`
+      `donation ${donation.id} availableServings`,
     );
     if (availableServings > totalServings) {
       throw new TypeError(
-        `donation ${donation.id} availableServings cannot exceed totalServings`
+        `donation ${donation.id} availableServings cannot exceed totalServings`,
       );
     }
     const totalWeightKg = assertPositive(
       donation.totalWeightKg,
-      `donation ${donation.id} totalWeightKg`
+      `donation ${donation.id} totalWeightKg`,
     );
 
     const reasons: ExclusionReason[] = [];
 
     const distanceKm = haversineDistanceKm(
       recipient.location,
-      donation.location
+      donation.location,
     );
     if (distanceKm > config.maxDistanceKm) {
       reasons.push("distance");
     }
 
-    if (
-      STORAGE_RANK[donation.storage] > STORAGE_RANK[recipient.storage]
-    ) {
+    if (STORAGE_RANK[donation.storage] > STORAGE_RANK[recipient.storage]) {
       reasons.push("storage");
     }
 
@@ -402,7 +393,9 @@ export function matchDonationsForRecipient(
     }
 
     const matchedCategories = [
-      ...new Set(donation.categories.filter((category) => needsSet.has(category))),
+      ...new Set(
+        donation.categories.filter((category) => needsSet.has(category)),
+      ),
     ];
     if (needs.length > 0 && matchedCategories.length === 0) {
       reasons.push("needs");
@@ -426,8 +419,7 @@ export function matchDonationsForRecipient(
       reasons.push("unknown-deadline");
     }
 
-    const claimedWeightKg =
-      (totalWeightKg * claimableServings) / totalServings;
+    const claimedWeightKg = (totalWeightKg * claimableServings) / totalServings;
     if (claimedWeightKg > transportCapacityKg) {
       reasons.push("transport-capacity");
     }
@@ -443,14 +435,14 @@ export function matchDonationsForRecipient(
     }
 
     const availableNow = availability.some(
-      (window) => nowMs >= window.start && nowMs <= window.end
+      (window) => nowMs >= window.start && nowMs <= window.end,
     );
 
     const explanation: MatchExplanation = {
       urgency: {
         ...score(
           URGENCY_SCORE[urgency.level ?? "critical"],
-          config.weights.urgency
+          config.weights.urgency,
         ),
         level: urgency.level ?? "critical",
         remainingMinutes: round2(urgency.remainingMinutes ?? 0),
@@ -459,14 +451,14 @@ export function matchDonationsForRecipient(
       distance: {
         ...score(
           (1 - distanceKm / config.maxDistanceKm) * 100,
-          config.weights.distance
+          config.weights.distance,
         ),
         distanceKm: round2(distanceKm),
       },
       quantity: {
         ...score(
           (claimableServings / requiredServings) * 100,
-          config.weights.quantity
+          config.weights.quantity,
         ),
         claimableServings,
       },
@@ -475,7 +467,7 @@ export function matchDonationsForRecipient(
           needs.length === 0
             ? 100
             : (matchedCategories.length / needs.length) * 100,
-          config.weights.needs
+          config.weights.needs,
         ),
         matchedCategories,
       },
@@ -488,7 +480,7 @@ export function matchDonationsForRecipient(
           transportCapacityKg === 0
             ? 0
             : (claimedWeightKg / transportCapacityKg) * 100,
-          config.weights.logistics
+          config.weights.logistics,
         ),
         claimedWeightKg: round2(claimedWeightKg),
         transportCapacityKg,
@@ -498,8 +490,8 @@ export function matchDonationsForRecipient(
     const totalScore = round2(
       WEIGHT_KEYS.reduce(
         (sum, key) => sum + componentScore(explanation, key),
-        0
-      )
+        0,
+      ),
     );
 
     matches.push({

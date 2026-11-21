@@ -1,7 +1,3 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { ArrowRight, ShieldCheck } from "lucide-react";
-
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -12,6 +8,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { ArrowRight, ShieldCheck } from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Sign in",
@@ -51,7 +50,10 @@ export default function SignInPage() {
           >
             Continue with Google
           </button>
-          <p id="google-disabled-reason" className="text-sm text-muted-foreground">
+          <p
+            id="google-disabled-reason"
+            className="text-sm text-muted-foreground"
+          >
             Google sign-in is not configured yet. Use the demo session below to
             review the screens.
           </p>
@@ -60,7 +62,10 @@ export default function SignInPage() {
             <ArrowRight aria-hidden="true" />
           </Link>
           <p className="flex items-start gap-2 text-xs text-muted-foreground">
-            <ShieldCheck aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+            <ShieldCheck
+              aria-hidden="true"
+              className="mt-0.5 size-4 shrink-0"
+            />
             The demo session is seeded with sample data and is not a real
             account. No credentials are stored.
           </p>

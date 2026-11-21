@@ -1,6 +1,5 @@
-import { StyleSheet, Text, View } from "react-native";
-
 import { env } from "@/config/env";
+import { StyleSheet, Text, View } from "react-native";
 
 export default function HomeScreen() {
   return (

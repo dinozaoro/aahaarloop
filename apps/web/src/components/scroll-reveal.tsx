@@ -43,7 +43,7 @@ export function ScrollReveal({
           setVisible(false);
         }
       },
-      { threshold, rootMargin }
+      { threshold, rootMargin },
     );
 
     observer.observe(el);
@@ -93,7 +93,7 @@ export function StaggerScrollReveal({
           setVisible(false);
         }
       },
-      { threshold, rootMargin }
+      { threshold, rootMargin },
     );
 
     observer.observe(el);

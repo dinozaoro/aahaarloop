@@ -1,9 +1,8 @@
 "use client";
 
-import type * as React from "react";
-import { Tabs as TabsPrimitive } from "radix-ui";
-
 import { cn } from "@/lib/utils";
+import { Tabs as TabsPrimitive } from "radix-ui";
+import type * as React from "react";
 
 function Tabs({
   className,
@@ -27,7 +26,7 @@ function TabsList({
       data-slot="tabs-list"
       className={cn(
         "inline-flex w-fit items-center gap-1 rounded-lg bg-muted p-1 text-muted-foreground",
-        className
+        className,
       )}
       {...props}
     />
@@ -47,7 +46,7 @@ function TabsTrigger({
         "data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-xs",
         "focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
         "disabled:pointer-events-none disabled:opacity-50",
-        className
+        className,
       )}
       {...props}
     />

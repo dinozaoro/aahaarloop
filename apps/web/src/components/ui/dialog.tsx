@@ -1,23 +1,22 @@
 "use client";
 
-import type * as React from "react";
-import { Dialog as DialogPrimitive } from "radix-ui";
-import { X } from "lucide-react";
-
 import { cn } from "@/lib/utils";
+import { X } from "lucide-react";
+import { Dialog as DialogPrimitive } from "radix-ui";
+import type * as React from "react";
 
 function Dialog(props: React.ComponentProps<typeof DialogPrimitive.Root>) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />;
 }
 
 function DialogTrigger(
-  props: React.ComponentProps<typeof DialogPrimitive.Trigger>
+  props: React.ComponentProps<typeof DialogPrimitive.Trigger>,
 ) {
   return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />;
 }
 
 function DialogClose(
-  props: React.ComponentProps<typeof DialogPrimitive.Close>
+  props: React.ComponentProps<typeof DialogPrimitive.Close>,
 ) {
   return <DialogPrimitive.Close data-slot="dialog-close" {...props} />;
 }
@@ -40,7 +39,7 @@ function DialogContent({
         data-slot="dialog-content"
         className={cn(
           "fixed top-1/2 left-1/2 z-50 grid w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl border border-border bg-card p-6 text-card-foreground shadow-lifted",
-          className
+          className,
         )}
         {...props}
       >
@@ -74,7 +73,7 @@ function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="dialog-footer"
       className={cn(
         "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
-        className
+        className,
       )}
       {...props}
     />

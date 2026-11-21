@@ -32,12 +32,12 @@ Owner: Developer B. Related issue: #16. Applies to every web screen.
 
 ## Audit status
 
-| Check | Status |
-| --- | --- |
-| ESLint `jsx-a11y` rules (via `eslint-config-next`) | Passing |
-| Keyboard-only walkthrough of the shell and `/design` | Passing (skip link, nav, tabs, dialog, sheet, toast, form errors) |
-| Automated axe/Lighthouse scan | Not run: no Chrome or browser is available in this environment. Run `npx @axe-core/cli http://localhost:3000/design` locally. |
-| Screen-reader test (VoiceOver/NVDA) | Not run in this environment |
+| Check                                                | Status                                                                                                                        |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| ESLint `jsx-a11y` rules (via `eslint-config-next`)   | Passing                                                                                                                       |
+| Keyboard-only walkthrough of the shell and `/design` | Passing (skip link, nav, tabs, dialog, sheet, toast, form errors)                                                             |
+| Automated axe/Lighthouse scan                        | Not run: no Chrome or browser is available in this environment. Run `npx @axe-core/cli http://localhost:3000/design` locally. |
+| Screen-reader test (VoiceOver/NVDA)                  | Not run in this environment                                                                                                   |
 
 The landing page (#15), donation form (#18) and dashboards (#17, #31) are
 audited in their own issues using this baseline; the shell they mount in

@@ -1,8 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { useState } from "react";
-
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -13,11 +10,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import { formatDateTime } from "@/lib/format";
-import { CLAIM_STATUS_LABELS, DONATION_STATUS_LABELS } from "@/lib/domain/types";
 import { DEMO_DONOR_ORG_ID } from "@/lib/data/constants";
 import { getClaimsForDonor, getOrganization } from "@/lib/data/store";
+import {
+  CLAIM_STATUS_LABELS,
+  DONATION_STATUS_LABELS,
+} from "@/lib/domain/types";
+import { formatDateTime } from "@/lib/format";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { useState } from "react";
 
 export default function RecipientProfilePage() {
   const organization = getOrganization(DEMO_DONOR_ORG_ID);
@@ -56,7 +58,8 @@ export default function RecipientProfilePage() {
                     <div className="mt-2">
                       <span className="sr-only">Coordinates</span>
                       <code className="text-xs monospace bg-muted/30 p-1 rounded">
-                        {organization.location.latitude}, {organization.location.longitude}
+                        {organization.location.latitude},{" "}
+                        {organization.location.longitude}
                       </code>
                     </div>
                   ) : (

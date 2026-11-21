@@ -7,15 +7,11 @@ export interface Claim {
   confirmedAt?: Date;
 }
 
-export function getPendingClaims(
-  claims: Claim[]
-): Claim[] {
+export function getPendingClaims(claims: Claim[]): Claim[] {
   return claims.filter((claim) => claim.status === "pending");
 }
 
-export function getClaimStatusColor(
-  status: Claim["status"]
-): string {
+export function getClaimStatusColor(status: Claim["status"]): string {
   switch (status) {
     case "pending":
       return "yellow";

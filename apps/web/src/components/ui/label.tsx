@@ -1,6 +1,5 @@
-import type * as React from "react";
-
 import { cn } from "@/lib/utils";
+import type * as React from "react";
 
 function Label({ className, ...props }: React.ComponentProps<"label">) {
   return (
@@ -8,7 +7,7 @@ function Label({ className, ...props }: React.ComponentProps<"label">) {
       data-slot="label"
       className={cn(
         "text-sm leading-none font-medium text-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
-        className
+        className,
       )}
       {...props}
     />
