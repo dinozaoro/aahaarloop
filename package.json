@@ -16,10 +16,12 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test && node --test scripts/*.test.mjs",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "db:check": "node scripts/check-db.mjs"
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
+    "pg": "^8.23.1",
     "prettier": "^3",
     "turbo": "^2",
     "typescript": "~6.0.3"
