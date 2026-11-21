@@ -19,6 +19,11 @@ team secret manager, never through Git.
 | `AUTH_SECRET`         | yes      | Developer A                      | Auth.js                     | Encrypts session JWTs. Generate with `openssl rand -base64 32`. |
 | `AUTH_GOOGLE_ID`      | yes      | Developer A (Google Cloud owner) | Auth.js Google provider     | OAuth client id.                                                |
 | `AUTH_GOOGLE_SECRET`  | yes      | Developer A (Google Cloud owner) | Auth.js Google provider     | OAuth client secret.                                            |
+| `CLOUDINARY_CLOUD_NAME` | yes    | Developer A                      | web upload signing          | Cloudinary cloud name.                                          |
+| `CLOUDINARY_API_KEY`  | yes      | Developer A                      | web upload signing          | Cloudinary API key (server-only).                               |
+| `CLOUDINARY_API_SECRET` | yes    | Developer A                      | web upload signing          | Cloudinary API secret (server-only).                            |
+| `SIGHTENGINE_API_USER` | no      | Developer A                      | image authenticity          | Optional; absence degrades to `unavailable`.                    |
+| `SIGHTENGINE_API_SECRET` | no    | Developer A                      | image authenticity          | Optional; never sent to the client.                             |
 
 \* Required in preview and production where migrations are applied.
 
