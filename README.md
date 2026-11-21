@@ -17,6 +17,7 @@ Monorepo for the Aahaarloop surplus-food platform.
 - `docs/development/environment.md` — environment variables, owners and Neon setup.
 - `docs/database/schema.md` — purpose of every table and column.
 - `docs/database/demo-data.md` — demo accounts, seed content and DB commands.
+- `docs/authentication.md` — Google sign-in, onboarding and protected routes.
 
 Each app owns its UI: web never imports React Native UI, mobile never imports web UI. Both apps consume only platform-neutral TypeScript from `packages/shared` and `packages/matching`.
 

@@ -10,14 +10,21 @@ team secret manager, never through Git.
 
 ## Variables
 
-| Variable              | Required | Owner                            | Consumed by                 | Purpose                                       |
-| --------------------- | -------- | -------------------------------- | --------------------------- | --------------------------------------------- |
-| `DATABASE_URL`        | yes      | Developer A (Neon project admin) | web server, `pnpm db:check` | Pooled connection string for runtime queries. |
-| `DIRECT_URL`          | no\*     | Developer A (Neon project admin) | migration tooling           | Direct connection string for DDL/migrations.  |
-| `NEXT_PUBLIC_APP_URL` | yes      | Developer A                      | web app                     | Canonical URL and OAuth callback base.        |
-| `EXPO_PUBLIC_API_URL` | yes      | Developer A                      | mobile app                  | Base URL for API requests.                    |
+| Variable              | Required | Owner                            | Consumed by                 | Purpose                                                         |
+| --------------------- | -------- | -------------------------------- | --------------------------- | --------------------------------------------------------------- |
+| `DATABASE_URL`        | yes      | Developer A (Neon project admin) | web server, `pnpm db:check` | Pooled connection string for runtime queries.                   |
+| `DIRECT_URL`          | no\*     | Developer A (Neon project admin) | migration tooling           | Direct connection string for DDL/migrations.                    |
+| `NEXT_PUBLIC_APP_URL` | yes      | Developer A                      | web app                     | Canonical URL and OAuth callback base.                          |
+| `EXPO_PUBLIC_API_URL` | yes      | Developer A                      | mobile app                  | Base URL for API requests.                                      |
+| `AUTH_SECRET`         | yes      | Developer A                      | Auth.js                     | Encrypts session JWTs. Generate with `openssl rand -base64 32`. |
+| `AUTH_GOOGLE_ID`      | yes      | Developer A (Google Cloud owner) | Auth.js Google provider     | OAuth client id.                                                |
+| `AUTH_GOOGLE_SECRET`  | yes      | Developer A (Google Cloud owner) | Auth.js Google provider     | OAuth client secret.                                            |
 
 \* Required in preview and production where migrations are applied.
+
+Auth.js reads the three `AUTH_*` variables lazily at request time, so builds do
+not need them. See [authentication](../authentication.md) for setup and the
+OAuth callback URLs.
 
 ## Local setup
 
@@ -45,7 +52,9 @@ Create one Neon branch per preview deployment. Set `DATABASE_URL` to that
 branch's pooled string and `DIRECT_URL` to its direct string in the hosting
 provider's preview environment settings. Set `NEXT_PUBLIC_APP_URL` and
 `EXPO_PUBLIC_API_URL` to the preview URLs. Preview branches must never point at
-production data.
+production data. Give each preview deployment its own `AUTH_SECRET` and Google
+OAuth client, and register `https://<preview-host>/api/auth/callback/google` as
+an authorized redirect URI.
 
 ## Production
 

@@ -1,5 +1,6 @@
+import { signIn } from "@/auth";
 import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -28,9 +29,8 @@ export default function SignInPage() {
         </Badge>
         <h1 className="text-3xl font-semibold tracking-tight">Sign in</h1>
         <p className="text-muted-foreground">
-          Google sign-in and role onboarding land with the authentication issue.
-          Until then this prototype runs on a demo session so every screen stays
-          explorable.
+          Sign in with Google to create your Aahaarloop identity and choose your
+          role.
         </p>
       </div>
 
@@ -38,24 +38,23 @@ export default function SignInPage() {
         <CardHeader>
           <CardTitle>Continue with Google</CardTitle>
           <CardDescription>
-            Available once Auth.js and onboarding are implemented (#8).
+            New accounts continue to role and organization setup.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <button
-            type="button"
-            disabled
-            aria-describedby="google-disabled-reason"
-            className={cn(buttonVariants({ variant: "outline" }), "w-full")}
+          <form
+            action={async () => {
+              "use server";
+              await signIn("google", { redirectTo: "/onboarding" });
+            }}
           >
-            Continue with Google
-          </button>
-          <p
-            id="google-disabled-reason"
-            className="text-sm text-muted-foreground"
-          >
-            Google sign-in is not configured yet. Use the demo session below to
-            review the screens.
+            <Button type="submit" variant="outline" className="w-full">
+              Continue with Google
+            </Button>
+          </form>
+          <p className="text-sm text-muted-foreground">
+            Requires <code>AUTH_SECRET</code>, <code>AUTH_GOOGLE_ID</code> and{" "}
+            <code>AUTH_GOOGLE_SECRET</code>. See the authentication docs.
           </p>
           <Link href="/dashboard" className={cn(buttonVariants(), "w-full")}>
             Continue with the demo session
