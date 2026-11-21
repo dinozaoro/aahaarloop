@@ -31,11 +31,11 @@ export function SiteHeader() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-sm">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-4 px-4 sm:px-6">
         <Link
           href="/"
-          className="rounded-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+          className="flex items-center gap-2.5 rounded-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
         >
           <Logo />
         </Link>
@@ -50,8 +50,8 @@ export function SiteHeader() {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary/70 hover:text-foreground",
-                  active && "bg-secondary text-foreground"
+                  "rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground",
+                  active && "bg-primary text-primary-foreground"
                 )}
               >
                 {item.label}
@@ -66,7 +66,10 @@ export function SiteHeader() {
           </Badge>
           <Link
             href="/donations/new"
-            className={cn(buttonVariants({ size: "sm" }), "hidden sm:inline-flex")}
+            className={cn(
+              buttonVariants({ size: "sm" }),
+              "hidden sm:inline-flex press-scale"
+            )}
           >
             Donate food
           </Link>
@@ -76,14 +79,14 @@ export function SiteHeader() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="md:hidden"
+                className="md:hidden press-scale"
                 aria-label="Open menu"
               >
                 <Menu aria-hidden="true" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" aria-describedby={undefined}>
-              <SheetHeader>
+            <SheetContent side="right" className="glass-dark">
+              <SheetHeader className="border-b border-border">
                 <SheetTitle>Navigation</SheetTitle>
                 <SheetDescription>
                   Jump to a workspace. This prototype runs on demo data.
@@ -106,7 +109,7 @@ export function SiteHeader() {
                 <SheetClose asChild>
                   <Link
                     href="/donations/new"
-                    className={cn(buttonVariants(), "w-full")}
+                    className={cn(buttonVariants(), "w-full press-scale")}
                   >
                     Donate food
                   </Link>

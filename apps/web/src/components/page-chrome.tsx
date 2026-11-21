@@ -62,7 +62,7 @@ export function PageHeader({
   eyebrow?: React.ReactNode;
 }) {
   return (
-    <header className="flex flex-col gap-4 border-b border-border pb-6">
+    <header className="flex flex-col gap-4 border-b border-border pb-8">
       {eyebrow}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div className="flex flex-col gap-2">
