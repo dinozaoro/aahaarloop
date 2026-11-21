@@ -5,13 +5,16 @@
   "main": "expo-router/entry",
   "scripts": {
     "dev": "expo start",
-    "build": "echo 'mobile build: use EAS (not yet configured)'",
+    "build": "pnpm build:preview",
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
-    "test": "node --test src/data/*.test.ts"
+    "test": "node --test src/data/*.test.ts",
+    "build:preview": "npx --yes eas-cli@27.11.0 build --profile preview --platform android",
+    "build:production": "npx --yes eas-cli@27.11.0 build --profile production --platform android",
+    "build:dev": "npx --yes eas-cli@27.11.0 build --profile development --platform android"
   },
   "dependencies": {
     "@aahaarloop/matching": "workspace:*",

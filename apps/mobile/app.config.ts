@@ -15,6 +15,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   icon: "./assets/images/icon.png",
   android: {
     package: "com.aahaarloop.mobile",
+    versionCode: 1,
     adaptiveIcon: {
       backgroundColor: "#E6F4FE",
       foregroundImage: "./assets/images/android-icon-foreground.png",
@@ -25,6 +26,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   ios: {
     bundleIdentifier: "com.aahaarloop.mobile",
+    buildNumber: "1",
     icon: "./assets/expo.icon",
   },
   plugins: [
