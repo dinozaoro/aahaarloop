@@ -149,6 +149,27 @@ export interface Claim {
   history: ClaimEvent[];
 }
 
+export interface PickupTask {
+  id: string;
+  donationId: string;
+  claimId: string;
+  status: "unassigned" | "assigned" | "in_progress" | "completed" | "cancelled";
+  windowStart: string;
+  windowEnd: string;
+  address: string;
+  location: GeoPoint;
+  weightKg: number;
+  createdAt: string;
+}
+
+export interface PickupAssignment {
+  id: string;
+  taskId: string;
+  volunteerId: string;
+  status: "assigned" | "accepted" | "completed";
+  assignedAt: string;
+}
+
 export interface Need {
   id: string;
   organizationId: string;
