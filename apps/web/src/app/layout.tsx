@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 
 import "./globals.css";
 
+import { inter, playfairDisplay } from "@/lib/fonts";
 import { PageChrome } from "@/components/page-chrome";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
@@ -31,7 +33,13 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className="min-h-dvh bg-background text-foreground antialiased">
+      <body
+        className={cn(
+          "min-h-dvh bg-background text-foreground antialiased",
+          inter.variable,
+          playfairDisplay.variable
+        )}
+      >
         <PageChrome>
           <SiteHeader />
           <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
