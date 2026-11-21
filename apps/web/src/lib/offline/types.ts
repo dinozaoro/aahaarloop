@@ -40,12 +40,31 @@ export interface SessionRecord {
   updatedAt: string;
 }
 
+export type SyncOperationStatus =
+  "pending" | "in_progress" | "completed" | "failed";
+
+export interface QueuedOperation {
+  id: string;
+  deviceId: string;
+  entityType: string;
+  entityId: string | null;
+  operation: string;
+  payload: unknown;
+  status: SyncOperationStatus;
+  attempts: number;
+  lastError: string | null;
+  createdAt: string;
+  nextAttemptAt: string;
+  completedAt: string | null;
+}
+
 export interface OfflineRecordMap {
   donations: CachedDonation;
   claims: CachedClaim;
   needs: CachedNeed;
   drafts: DraftRecord;
   sessions: SessionRecord;
+  operations: QueuedOperation;
 }
 
 export type StoreName = keyof OfflineRecordMap;

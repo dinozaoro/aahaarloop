@@ -1,13 +1,14 @@
 import type { OfflineRecordMap, StoreName } from "./types.ts";
 
 export const OFFLINE_DB_NAME = "aahaarloop-offline";
-export const OFFLINE_SCHEMA_VERSION = 1;
+export const OFFLINE_SCHEMA_VERSION = 2;
 export const OFFLINE_STORES = [
   "donations",
   "claims",
   "needs",
   "drafts",
   "sessions",
+  "operations",
 ] as const;
 
 export class OfflineQuotaError extends Error {
@@ -43,25 +44,30 @@ function transactionDone(transaction: IDBTransaction): Promise<void> {
 
 /** Applied inside onupgradeneeded, keyed by the previous schema version. */
 function migrate(db: IDBDatabase, fromVersion: number): void {
-  if (fromVersion >= 1) {
-    return;
+  if (fromVersion < 1) {
+    const donations = db.createObjectStore("donations", { keyPath: "id" });
+    donations.createIndex("status", "status");
+    donations.createIndex("updatedAt", "updatedAt");
+
+    const claims = db.createObjectStore("claims", { keyPath: "id" });
+    claims.createIndex("donationId", "donationId");
+    claims.createIndex("status", "status");
+
+    const needs = db.createObjectStore("needs", { keyPath: "id" });
+    needs.createIndex("category", "category");
+
+    const drafts = db.createObjectStore("drafts", { keyPath: "id" });
+    drafts.createIndex("kind", "kind");
+
+    db.createObjectStore("sessions", { keyPath: "id" });
   }
 
-  const donations = db.createObjectStore("donations", { keyPath: "id" });
-  donations.createIndex("status", "status");
-  donations.createIndex("updatedAt", "updatedAt");
-
-  const claims = db.createObjectStore("claims", { keyPath: "id" });
-  claims.createIndex("donationId", "donationId");
-  claims.createIndex("status", "status");
-
-  const needs = db.createObjectStore("needs", { keyPath: "id" });
-  needs.createIndex("category", "category");
-
-  const drafts = db.createObjectStore("drafts", { keyPath: "id" });
-  drafts.createIndex("kind", "kind");
-
-  db.createObjectStore("sessions", { keyPath: "id" });
+  if (fromVersion < 2) {
+    const operations = db.createObjectStore("operations", { keyPath: "id" });
+    operations.createIndex("status", "status");
+    operations.createIndex("createdAt", "createdAt");
+    operations.createIndex("entity", ["entityType", "entityId"]);
+  }
 }
 
 export class OfflineRepository<K extends StoreName> {
@@ -158,6 +164,7 @@ export class OfflineStore {
   readonly needs: OfflineRepository<"needs">;
   readonly drafts: OfflineRepository<"drafts">;
   readonly sessions: OfflineRepository<"sessions">;
+  readonly operations: OfflineRepository<"operations">;
 
   private readonly db: IDBDatabase;
 
@@ -168,6 +175,7 @@ export class OfflineStore {
     this.needs = new OfflineRepository(db, "needs");
     this.drafts = new OfflineRepository(db, "drafts");
     this.sessions = new OfflineRepository(db, "sessions");
+    this.operations = new OfflineRepository(db, "operations");
   }
 
   static async open(name = OFFLINE_DB_NAME): Promise<OfflineStore> {
