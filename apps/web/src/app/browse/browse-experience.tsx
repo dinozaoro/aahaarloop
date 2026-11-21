@@ -8,6 +8,7 @@ import { useMemo, useState } from "react";
 import type { Donation } from "@/lib/domain/types";
 import { CATEGORY_LABELS } from "@/lib/domain/types";
 import { SchematicMap } from "@/components/schematic-map";
+import { FavoriteButton } from "@/components/favorite-button";
 
 type Location = Donation["location"];
 type Offer = { donation: Donation; donorName: string; distanceKm: number | null; donorLocation: Location | null };
@@ -80,7 +81,7 @@ export function BrowseExperience({ offers, recipientLocation }: { offers: Offer[
             <Link href={`/browse/${donation.id}`} className="discover-offer-photo" aria-label={`View ${donation.title}`}>
               {image ? <Image src={image} fill sizes="(max-width: 700px) calc(100vw - 36px), (max-width: 1000px) 80vw, 38vw" alt="" /> : <span className="offer-category-mark" aria-hidden="true"><Utensils /></span>}
             </Link>
-            <div className="discover-offer-copy"><h2><Link href={`/browse/${donation.id}`}>{donation.title}</Link></h2><p>{donorName} · {donation.pickupArea}</p><strong>{donation.servingsAvailable} portions · {donation.weightKg} kg</strong><span>Collect by {new Intl.DateTimeFormat("en-IN", { weekday: "short", hour: "numeric", minute: "2-digit" }).format(new Date(donation.pickupDeadlineAt))}</span><small>{distanceKm === null ? "Distance unavailable" : `${formatDistance.format(distanceKm)} km · fits your pickup window`}</small></div>
+            <div className="discover-offer-copy"><h2><Link href={`/browse/${donation.id}`}>{donation.title}</Link></h2><p>{donorName} · {donation.pickupArea}</p><strong>{donation.servingsAvailable} portions · {donation.weightKg} kg</strong><span>Collect by {new Intl.DateTimeFormat("en-IN", { weekday: "short", hour: "numeric", minute: "2-digit" }).format(new Date(donation.pickupDeadlineAt))}</span><small>{distanceKm === null ? "Distance unavailable" : `${formatDistance.format(distanceKm)} km · fits your pickup window`}</small><FavoriteButton donationId={donation.id} /></div>
           </article>;
         }) : <div className="empty-state"><h2>No offers match these filters.</h2><p>Widen the pickup distance or clear a filter to see available food.</p></div>}
       </section>
