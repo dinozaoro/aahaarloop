@@ -1,10 +1,15 @@
-export { DEFAULT_SAFETY_BUFFER_MINUTES, calculateUrgency } from "./urgency.ts";
+export {
+  DEFAULT_SAFETY_BUFFER_MINUTES,
+  DEFAULT_URGENCY_THRESHOLDS,
+  calculateUrgency,
+} from "./urgency.ts";
 export type {
   Instant,
   UrgencyInput,
   UrgencyLevel,
   UrgencyResult,
   UrgencyStatus,
+  UrgencyThresholds,
 } from "./urgency.ts";
 export {
   DEFAULT_MATCHING_WEIGHTS,

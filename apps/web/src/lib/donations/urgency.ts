@@ -6,6 +6,7 @@ import {
 } from "@aahaarloop/matching";
 
 import type { BadgeVariant } from "@/components/ui/badge";
+import { getAdminConfig } from "@/lib/config/admin-config";
 import type { Donation } from "@/lib/domain/types";
 
 export const URGENCY_LABELS: Record<UrgencyLevel, string> = {
@@ -30,13 +31,15 @@ export function donationUrgency(
   donation: Donation,
   now: Date = new Date(),
 ): UrgencyResult {
+  const config = getAdminConfig();
   return calculateUrgency({
     now,
     foodExpiryAt: donation.foodExpiryAt,
     pickupDeadlineAt: donation.pickupDeadlineAt,
     travelTimeMinutes: 20,
     handlingTimeMinutes: 10,
-    bufferMinutes: 15,
+    bufferMinutes: config.safetyBufferMinutes,
+    thresholds: config.urgencyThresholds,
   });
 }
 

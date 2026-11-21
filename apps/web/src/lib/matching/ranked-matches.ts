@@ -1,6 +1,7 @@
 import {
   matchDonationsForRecipient,
   type DonationCandidate,
+  type MatchingConfig,
   type RecipientRequest,
 } from "@aahaarloop/matching";
 import type { Need } from "@aahaarloop/matching";
@@ -61,6 +62,7 @@ export function rankMatches(
   donations: readonly Donation[],
   filters: MatchFilters,
   now: string = new Date().toISOString(),
+  config?: MatchingConfig,
 ) {
   const recipient: RecipientRequest = {
     id: organization.id,
@@ -75,7 +77,10 @@ export function rankMatches(
     (donation) =>
       donation.status === "published" && donation.organizationId !== organization.id,
   );
-  const result = matchDonationsForRecipient(recipient, visible.map(toCandidate), { now });
+  const result = matchDonationsForRecipient(recipient, visible.map(toCandidate), {
+    now,
+    ...(config ? { config } : {}),
+  });
   const eligible = result.matches.filter(
     (match) =>
       (filters.category === undefined ||
@@ -114,6 +119,9 @@ export function createMatchCache(ttlMs: number, now: () => number = Date.now) {
       for (const key of entries.keys()) {
         if (key.startsWith(`${organizationId}:`)) entries.delete(key);
       }
+    },
+    invalidateAll(): void {
+      entries.clear();
     },
   };
 }
