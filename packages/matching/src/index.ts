@@ -27,3 +27,23 @@ export type {
   StorageType,
   TimeWindow,
 } from "./matching.ts";
+export {
+  DEFAULT_NEED_PRIORITY,
+  createNeed,
+  editNeed,
+  closeNeed,
+  fulfillNeed,
+  getActiveNeeds,
+  refreshNeedStatuses,
+  needsMatchCategory,
+  totalNeededQuantity,
+  validateNeedInput,
+} from "./needs.ts";
+export type {
+  Need,
+  NeedStatus,
+  NeedPriority,
+  CreateNeedInput,
+  EditNeedInput,
+  NeedValidationError,
+} from "./needs.ts";
