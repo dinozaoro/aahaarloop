@@ -11,9 +11,13 @@
     "lint": "echo 'lint: nothing yet'",
     "typecheck": "tsc --noEmit",
     "test": "node --test test/*.test.mjs",
-    "generate": "drizzle-kit generate"
+    "generate": "drizzle-kit generate",
+    "migrate": "node scripts/migrate.mjs",
+    "seed": "node scripts/seed.mjs",
+    "reset": "node scripts/reset.mjs"
   },
   "dependencies": {
+    "@aahaarloop/shared": "workspace:*",
     "drizzle-orm": "^0.44.7",
     "pg": "^8.23.1",
     "zod": "^4.6.7"

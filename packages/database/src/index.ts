@@ -5,3 +5,5 @@ export * from "./donations.ts";
 export * from "./claims.ts";
 export * from "./operations.ts";
 export * from "./relations.ts";
+export * from "./seed-data.ts";
+export * from "./seed.ts";
