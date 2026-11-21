@@ -100,7 +100,7 @@ Vérifier les deux trailers de co-auteur sur chaque commit avant merge.
 
 ---
 
-## Étape 6 — Issues restantes (13), ordre suggéré
+## Étape 6 — Issues restantes (2), ordre suggéré
 
 **P0 — avant la démo**
 
@@ -110,26 +110,26 @@ Vérifier les deux trailers de co-auteur sur chaque commit avant merge.
 
 **Logistique**
 
-- [ ] #40 missions volontaire + acceptation
-- [ ] #42 carte Leaflet + clustering (et lazy-load, voir étape 4)
+- [x] #40 missions volontaire + acceptation
+- [x] #42 carte Leaflet + clustering (et lazy-load, voir étape 4)
 - [x] #43 workflow de ramassage
 - [x] #44 livraison avec preuve + impact (PR #162, `deliveryService`)
-- [ ] #45 timeline de suivi + ETA
+- [x] #45 timeline de suivi + ETA
 
 **Mobile**
 
-- [ ] #60 auth + onboarding par rôle
-- [ ] #61 parcours dons / claims
-- [ ] #62 caméra native + upload
-- [ ] #64 reste : écran de résolution de conflits (la logique est déjà livrée)
-- [ ] #65 enregistrement du token push (la permission existe déjà)
-- [ ] #66 parcours mission volontaire + carte
+- [ ] #60 auth native + onboarding — nécessite un contrat token/PKCE côté backend et vos clés Google
+- [x] #61 parcours dons / claims
+- [x] #62 caméra native + upload
+- [x] #64 reste : écran de résolution de conflits (la logique est déjà livrée)
+- [ ] #65 enregistrement du token push — attend le contrat natif de #60
+- [x] #66 parcours mission volontaire + navigation (PR #169)
 
 **Web / admin / matching**
 
-- [ ] #47 analytics et graphiques d'impact
-- [ ] #57 détection/résolution de conflits (UI)
-- [ ] #58 états UX hors-ligne
+- [x] #47 analytics et graphiques d'impact
+- [x] #57 détection/résolution de conflits (UI)
+- [x] #58 états UX hors-ligne
 
 **Qualité / docs**
 
