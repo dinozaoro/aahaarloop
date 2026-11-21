@@ -21,8 +21,9 @@ database referenced by `DATABASE_URL`. Do not run it against production.
 ## Demo accounts
 
 All accounts use the reserved `.test` domain and fictional names. No real
-personal data is included. Sign-in is handled by Auth.js once issue #8 lands;
-no passwords are stored in the seed.
+personal data is included. Sign-in is handled by Auth.js with Google OAuth;
+no passwords are stored in the seed. See [the demo script](../demo-script.md)
+for the presenter walkthrough.
 
 | Role      | Email                            | Organization                |
 | --------- | -------------------------------- | --------------------------- |
