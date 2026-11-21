@@ -76,3 +76,11 @@ export function getNeedsForOrganization(
 export function getVolunteerProfile(): VolunteerProfile {
   return seed.volunteerProfile;
 }
+
+/** Demo write path: replaces the matching in-memory entry, or appends it. */
+export function upsertDonation(donation: Donation): void {
+  const index = donations.findIndex((item) => item.id === donation.id);
+  if (index === -1) donations.push(donation);
+  else donations[index] = donation;
+}
+
