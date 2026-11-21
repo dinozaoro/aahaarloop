@@ -34,7 +34,7 @@ export function Breadcrumbs({
             {item.href ? (
               <Link
                 href={item.href}
-                className="rounded-sm hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                className="rounded-sm hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none press-scale"
               >
                 {item.label}
               </Link>
@@ -62,11 +62,11 @@ export function PageHeader({
   eyebrow?: React.ReactNode;
 }) {
   return (
-    <header className="flex flex-col gap-4 border-b border-border pb-8">
+    <header className="flex flex-col gap-4 border-b border-border pb-10 reveal">
       {eyebrow}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+          <h1 className="text-3xl font-display font-bold tracking-tight text-balance sm:text-4xl">
             {title}
           </h1>
           {description ? (

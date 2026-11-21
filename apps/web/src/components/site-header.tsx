@@ -35,7 +35,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-4 px-4 sm:px-6">
         <Link
           href="/"
-          className="flex items-center gap-2.5 rounded-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+          className="flex items-center gap-2.5 rounded-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none press-scale"
         >
           <Logo />
         </Link>
@@ -61,15 +61,12 @@ export function SiteHeader() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
-          <Badge variant="outline" className="hidden sm:inline-flex">
+          <Badge variant="outline" className="hidden sm:inline-flex press-scale">
             Demo data
           </Badge>
           <Link
             href="/donations/new"
-            className={cn(
-              buttonVariants({ size: "sm" }),
-              "hidden sm:inline-flex press-scale"
-            )}
+            className={cn(buttonVariants({ size: "sm" }), "hidden sm:inline-flex press-scale")}
           >
             Donate food
           </Link>

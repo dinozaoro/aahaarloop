@@ -3,124 +3,114 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ============================================================================
-   Design tokens — Aahaarloop
-   Subject: food rescue / surplus redistribution
-   Palette: saffron (urgency/rescue), deep indigo (trust/deadline),
-            indian red / brick (alert), gold (value), warm cream (surface),
-            ivory (card). Green is demoted to a subtle accent only.
+   Aahaarloop — Indian aesthetic redesign
+   Subject: food rescue / surplus redistribution (India)
+   Palette: saffron, burnt sienna, gold, cream, ivory, deep indigo
+   Animation: scroll reveals, parallax, morph, shimmer, float, pulse
    ============================================================================ */
 
 :root {
-  /* Brand — saffron is the primary now */
-  --primary: oklch(0.77 0.17 50);
-  --primary-foreground: oklch(0.26 0.02 30);
-  --primary-hover: oklch(0.72 0.16 50);
-  --primary-active: oklch(0.66 0.15 50);
+  /* Brand — Indian saffron & gold */
+  --primary: oklch(0.68 0.145 45);
+  --primary-foreground: oklch(1 0 0);
+  --primary-hover: oklch(0.62 0.14 45);
+  --primary-active: oklch(0.56 0.13 45);
 
-  /* Secondary — warm cream surface (soft, non-green) */
-  --secondary: oklch(0.96 0.005 98);
-  --secondary-foreground: oklch(0.55 0.02 120);
-  --secondary-hover: oklch(0.92 0.006 98);
+  /* Secondary — burnt sienna / Indian red */
+  --secondary: oklch(0.52 0.16 35);
+  --secondary-foreground: oklch(1 0 0);
+  --secondary-hover: oklch(0.47 0.15 35);
 
-  /* Accent — deep indigo blue (trust / deadline) */
-  --accent: oklch(0.43 0.08 265);
+  /* Accent — deep indigo / Indian night */
+  --accent: oklch(0.38 0.085 285);
   --accent-foreground: oklch(1 0 0);
-  --accent-hover: oklch(0.38 0.075 265);
-  --accent-active: oklch(0.34 0.07 265);
+  --accent-hover: oklch(0.33 0.08 285);
 
-  /* Surface — warm cream / ivory */
-  --background: oklch(0.992 0.004 96);
-  --foreground: oklch(0.26 0.018 35);
+  /* Surface — cream / ivory */
+  --background: oklch(0.992 0.004 85);
+  --foreground: oklch(0.24 0.018 155);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.26 0.018 35);
-  --card-hover: oklch(0.995 0.005 96);
+  --card-foreground: oklch(0.24 0.018 155);
+  --card-hover: oklch(0.995 0.005 85);
 
   /* Popover */
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.26 0.018 35);
+  --popover-foreground: oklch(0.24 0.018 155);
 
   /* Muted */
-  --muted: oklch(0.955 0.006 98);
-  --muted-foreground: oklch(0.55 0.02 120);
+  --muted: oklch(0.96 0.01 95);
+  --muted-foreground: oklch(0.55 0.02 150);
 
   /* Borders & inputs */
-  --border: oklch(0.90 0.01 125);
-  --input: oklch(0.93 0.008 100);
-  --ring: oklch(0.77 0.17 50);
+  --border: oklch(0.9 0.01 110);
+  --input: oklch(0.93 0.012 115);
+  --ring: oklch(0.68 0.145 45);
 
   /* Semantic */
-  --success: oklch(0.6 0.12 150);
-  --success-foreground: oklch(0.97 0.01 95);
-  --warning: oklch(0.78 0.15 55);
-  --warning-foreground: oklch(0.28 0.015 30);
-  --destructive: oklch(0.56 0.18 30);
-  --destructive-foreground: oklch(1 0 0);
+  --success: oklch(0.58 0.12 152);
+  --success-foreground: oklch(0.96 0.01 95);
+  --warning: oklch(0.72 0.13 55);
+  --warning-foreground: oklch(0.96 0.01 95);
+  --destructive: oklch(0.58 0.2 25);
+  --destructive-foreground: oklch(0.99 0.01 95);
 
-  /* Radius — softer, more organic */
-  --radius: 1rem;
+  /* Radius */
+  --radius: 0.9rem;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 8px);
   --radius-full: 9999px;
 
-  /* Shadows — warm, soft elevation */
-  --shadow-soft: 0 1px 2px oklch(0.26 0.018 35 / 6%),
-    0 8px 24px -12px oklch(0.26 0.018 35 / 10%);
-  --shadow-lifted: 0 2px 4px oklch(0.26 0.018 35 / 7%),
-    0 20px 40px -20px oklch(0.26 0.018 35 / 14%);
-  --shadow-glow: 0 0 40px oklch(0.77 0.17 50 / 18%);
-  --shadow-glow-indigo: 0 0 40px oklch(0.43 0.08 265 / 12%);
+  /* Shadows — layered, no fake borders */
+  --shadow-soft: 0 1px 2px oklch(0.2 0.02 155 / 5%),
+    0 8px 24px -12px oklch(0.2 0.02 155 / 12%);
+  --shadow-lifted: 0 4px 12px oklch(0.2 0.02 155 / 8%),
+    0 24px 48px -24px oklch(0.2 0.02 155 / 20%);
+  --shadow-glow: 0 0 60px oklch(0.68 0.145 45 / 18%);
+  --shadow-indian: 0 0 40px oklch(0.52 0.16 35 / 25%);
 
-  /* Easing — strong curves, never ease-in on UI */
+  /* Easing — strong curves, Emil style */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
-  --ease-morph: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-expo: cubic-bezier(0.19, 1, 0.22, 1);
 
-  /* Durations — UI stays under 300ms, hero reveals a bit slower */
+  /* Durations — UI stays under 300ms, scroll reveals a bit more */
   --duration-press: 140ms;
   --duration-ui: 220ms;
+  --duration-scroll: 700ms;
   --duration-modal: 400ms;
-  --duration-hero: 700ms;
 
   /* Fonts */
-  --font-display: "Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman",
-    Times, serif;
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
-    Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Playfair Display", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
-  /* Animations */
-  --animate-fade-up: fade-up var(--duration-hero) var(--ease-out) both;
-  --animate-slide-up: slide-up 700ms var(--ease-out) both;
-  --animate-scale-in: scale-in 500ms var(--ease-out) both;
-  --animate-float: float 7s ease-in-out infinite;
-  --animate-float-slow: float 11s ease-in-out infinite;
-  --animate-shimmer: shimmer 4s linear infinite;
-  --animate-pulse-glow: pulse-glow 4s ease-in-out infinite;
-  --animate-morph: morph 8s var(--ease-morph) infinite alternate;
-  --animate-marquee: marquee 22s linear infinite;
+  /* Scroll reveal */
+  --reveal-duration: 800ms;
+  --reveal-distance: 24px;
 }
 
 .dark {
-  --background: oklch(0.16 0.015 30);
-  --foreground: oklch(0.97 0.008 96);
-  --card: oklch(0.2 0.018 30);
-  --card-foreground: oklch(0.97 0.008 96);
-  --card-hover: oklch(0.23 0.02 30);
-  --popover: oklch(0.2 0.018 30);
-  --popover-foreground: oklch(0.97 0.008 96);
-  --secondary: oklch(0.26 0.02 30);
+  --background: oklch(0.16 0.015 155);
+  --foreground: oklch(0.97 0.008 95);
+  --card: oklch(0.2 0.018 155);
+  --card-foreground: oklch(0.97 0.008 95);
+  --card-hover: oklch(0.23 0.02 155);
+  --popover: oklch(0.2 0.018 155);
+  --popover-foreground: oklch(0.97 0.008 95);
+  --secondary: oklch(0.58 0.15 35);
   --secondary-foreground: oklch(0.94 0.01 95);
-  --secondary-hover: oklch(0.29 0.02 30);
-  --muted: oklch(0.26 0.018 30);
-  --muted-foreground: oklch(0.7 0.02 120);
+  --muted: oklch(0.27 0.018 155);
+  --muted-foreground: oklch(0.72 0.02 120);
   --border: oklch(1 0 0 / 14%);
   --input: oklch(1 0 0 / 20%);
   --shadow-soft: 0 1px 2px oklch(0 0 0 / 30%),
     0 8px 24px -12px oklch(0 0 0 / 35%);
-  --shadow-lifted: 0 2px 4px oklch(0 0 0 / 35%),
-    0 20px 40px -20px oklch(0 0 0 / 45%);
+  --shadow-lifted: 0 4px 12px oklch(0 0 0 / 35%),
+    0 24px 48px -24px oklch(0 0 0 / 45%);
 }
 
 @theme inline {
@@ -134,7 +124,6 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary-hover: var(--secondary-hover);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
@@ -150,48 +139,46 @@
   --color-ring: var(--ring);
 
   --font-display: var(--font-display);
-  --font-sans: var(--font-sans);
+  --font-body: var(--font-body);
 
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);
   --radius-lg: var(--radius-lg);
   --radius-xl: var(--radius-xl);
-  --radius-full: var(--radius-full);
 
   --shadow-soft: var(--shadow-soft);
   --shadow-lifted: var(--shadow-lifted);
   --shadow-glow: var(--shadow-glow);
-  --shadow-glow-indigo: var(--shadow-glow-indigo);
+  --shadow-indian: var(--shadow-indian);
 
   --ease-out: var(--ease-out);
   --ease-in-out: var(--ease-in-out);
   --ease-drawer: var(--ease-drawer);
-  --ease-morph: var(--ease-morph);
+  --ease-expo: var(--ease-expo);
 
   --duration-press: var(--duration-press);
   --duration-ui: var(--duration-ui);
+  --duration-scroll: var(--duration-scroll);
   --duration-modal: var(--duration-modal);
-  --duration-hero: var(--duration-hero);
 
-  --animate-fade-up: var(--animate-fade-up);
-  --animate-slide-up: var(--animate-slide-up);
-  --animate-scale-in: var(--animate-scale-in);
-  --animate-float: var(--animate-float);
-  --animate-float-slow: var(--animate-float-slow);
-  --animate-shimmer: var(--animate-shimmer);
-  --animate-pulse-glow: var(--animate-pulse-glow);
-  --animate-morph: var(--animate-morph);
-  --animate-marquee: var(--animate-marquee);
+  --animate-fade-up: fade-up var(--duration-scroll) var(--ease-out) both;
+  --animate-slide-up: slide-up var(--duration-scroll) var(--ease-out) both;
+  --animate-scale-in: scale-in var(--duration-ui) var(--ease-out) both;
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-shimmer: shimmer 3s linear infinite;
+  --animate-pulse-glow: pulse-glow 4s ease-in-out infinite;
+  --animate-morph: morph 6s ease-in-out infinite;
+  --animate-reel: reel 16s linear infinite;
 }
 
 /* ============================================================================
-   Keyframes
+   Keyframes — scroll & motion
    ============================================================================ */
 
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(var(--reveal-distance));
   }
   to {
     opacity: 1;
@@ -202,7 +189,7 @@
 @keyframes slide-up {
   from {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(40px);
   }
   to {
     opacity: 1;
@@ -213,7 +200,7 @@
 @keyframes scale-in {
   from {
     opacity: 0;
-    transform: scale(0.94);
+    transform: scale(0.92);
   }
   to {
     opacity: 1;
@@ -224,10 +211,13 @@
 @keyframes float {
   0%,
   100% {
-    transform: translateY(0);
+    transform: translateY(0) rotate(0deg);
   }
-  50% {
-    transform: translateY(-14px);
+  33% {
+    transform: translateY(-14px) rotate(2deg);
+  }
+  66% {
+    transform: translateY(-6px) rotate(-1deg);
   }
 }
 
@@ -243,39 +233,36 @@
 @keyframes pulse-glow {
   0%,
   100% {
-    opacity: 0.55;
+    opacity: 0.5;
     transform: scale(1);
+    filter: blur(40px);
   }
   50% {
-    opacity: 1;
-    transform: scale(1.18);
+    opacity: 0.9;
+    transform: scale(1.25);
+    filter: blur(60px);
   }
 }
 
 @keyframes morph {
-  0% {
+  0%,
+  100% {
     border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
   }
-  100% {
-    border-radius: 30% 60% 70% 40% / 50% 60% 30% 50%;
+  33% {
+    border-radius: 30% 70% 70% 30% / 30% 60% 40% 70%;
   }
-}
-
-@keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
+  66% {
+    border-radius: 100% 60% 40% 40% / 70% 50% 60% 40%;
   }
 }
 
 @keyframes reel {
   0% {
-    transform: rotate(0deg);
+    transform: translateX(0);
   }
   100% {
-    transform: rotate(360deg);
+    transform: translateX(-50%);
   }
 }
 
@@ -297,9 +284,10 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
-    font-family: var(--font-sans);
+    font-family: var(--font-body);
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 
   :focus-visible {
@@ -312,13 +300,12 @@
     color: var(--primary-foreground);
   }
 
-  /* Tabular numbers for stable readouts */
   [data-tabular] {
     font-variant-numeric: tabular-nums;
   }
 }
 
-/* Respect reduced motion — gentler, never zero */
+/* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -333,23 +320,23 @@
   }
 }
 
-/* Hover motion only on fine pointers */
+/* Hover / press only on fine pointers */
 @media (hover: hover) and (pointer: fine) {
   .hover-lift:hover {
-    transform: translateY(-5px);
+    transform: translateY(-6px);
   }
 
   .hover-scale:hover {
-    transform: scale(1.02);
+    transform: scale(1.03);
   }
 
   .press-scale:active {
-    transform: scale(0.97);
+    transform: scale(0.96);
   }
 }
 
 /* ============================================================================
-   Component utilities (applied via className)
+   Component utilities
    ============================================================================ */
 
 @layer utilities {
@@ -363,20 +350,20 @@
 
   .glass {
     background: oklch(1 0 0 / 0.55);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border: 1px solid oklch(0 0 0 / 0.07);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid oklch(0 0 0 / 0.06);
   }
 
   .glass-dark {
-    background: oklch(0.2 0.018 30 / 0.55);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    background: oklch(0.2 0.018 155 / 0.55);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: 1px solid oklch(1 0 0 / 0.1);
   }
 
   .image-outline {
-    outline: 1px solid oklch(0 0 0 / 0.07);
+    outline: 1px solid oklch(0 0 0 / 0.06);
     outline-offset: -1px;
   }
 
@@ -384,165 +371,127 @@
     outline-color: oklch(1 0 0 / 0.1);
   }
 
-  .marquee-content {
-    display: flex;
-    gap: 3rem;
-    animation: marquee 22s linear infinite;
-  }
-
   .mesh-blob {
-    filter: blur(72px);
+    filter: blur(80px);
     position: absolute;
     z-index: -1;
     opacity: 0.55;
-    animation: float 9s ease-in-out infinite;
+    animation: float 10s ease-in-out infinite;
+    pointer-events: none;
   }
 
   .blob-morph {
-    position: absolute;
-    z-index: -1;
-    filter: blur(56px);
-    opacity: 0.5;
-    animation: morph 9s var(--ease-morph) infinite alternate;
-  }
-
-  .reel {
-    animation: reel 20s linear infinite;
+    animation: morph 8s ease-in-out infinite;
   }
 
   .shimmer-mask {
     position: relative;
     overflow: hidden;
-    mask-image: linear-gradient(
-      to right,
-      transparent 0%,
-      black 20%,
-      black 80%,
-      transparent 100%
-    );
-    -webkit-mask-image: linear-gradient(
-      to right,
-      transparent 0%,
-      black 20%,
-      black 80%,
-      transparent 100%
-    );
+  }
+
+  .shimmer-mask::after {
+    content: "";
+    position: absolute;
+    inset: -50% -150% -50% -150%;
     background: linear-gradient(
       90deg,
-      oklch(1 0 0 / 0.15) 0%,
-      oklch(0.77 0.17 50 / 0.35) 40%,
-      oklch(1 0 0 / 0.15) 100%
+      transparent 0%,
+      oklch(1 0 0 / 0.12) 40%,
+      oklch(1 0 0 / 0.18) 50%,
+      oklch(1 0 0 / 0.12) 60%,
+      transparent 100%
     );
-    background-size: 200% 100%;
+    transform: translateX(-100%);
     animation: shimmer 3s linear infinite;
+    pointer-events: none;
+  }
+
+  .marquee-content {
+    display: flex;
+    gap: 4rem;
+    animation: reel 20s linear infinite;
+  }
+
+  .parallax-slow {
+    transform: translateY(var(--parallax-y, 0));
+    transition: transform 0.1s ease-out;
   }
 }
 
 /* ============================================================================
-   Typography scale
+   Scroll reveal — IntersectionObserver driven
    ============================================================================ */
 
-@layer utilities {
-  .text-display-1 {
-    font-family: var(--font-display);
-    font-size: clamp(2.5rem, 6vw + 1rem, 5.5rem);
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    line-height: 1.05;
-  }
-
-  .text-display-2 {
-    font-family: var(--font-display);
-    font-size: clamp(2rem, 5vw + 0.5rem, 4rem);
-    font-weight: 700;
-    letter-spacing: -0.015em;
-    line-height: 1.1;
-  }
-
-  .text-display-3 {
-    font-family: var(--font-display);
-    font-size: clamp(1.5rem, 4vw + 0.25rem, 2.75rem);
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    line-height: 1.15;
-  }
-
-  .text-eyebrow {
-    font-size: 0.875rem;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-  }
-
-  .text-body-lg {
-    font-size: 1.125rem;
-    line-height: 1.6;
-    letter-spacing: -0.005em;
-  }
-
-  .text-body {
-    font-size: 1rem;
-    line-height: 1.6;
-    letter-spacing: -0.005em;
-  }
-
-  .text-label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    line-height: 1.4;
-  }
-
-  .text-caption {
-    font-size: 0.75rem;
-    font-weight: 500;
-    letter-spacing: 0.04em;
-    line-height: 1.4;
-    text-transform: uppercase;
-  }
-
-  .font-display {
-    font-family: var(--font-display);
-  }
-
-  .font-sans {
-    font-family: var(--font-sans);
-  }
-}
-
-/* ============================================================================
-   Staggered reveals — orchestrated, not scattered
-   ============================================================================ */
-
-.reveal > * {
+.reveal {
   opacity: 0;
-  transform: translateY(14px);
-  animation: fade-up var(--duration-hero) var(--ease-out) forwards;
+  transform: translateY(var(--reveal-distance));
+  transition: opacity var(--duration-scroll) var(--ease-expo),
+    transform var(--duration-scroll) var(--ease-expo);
 }
 
-.reveal > *:nth-child(1) {
-  animation-delay: 60ms;
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
-.reveal > *:nth-child(2) {
-  animation-delay: 140ms;
+
+.reveal-fade {
+  opacity: 0;
+  transition: opacity var(--duration-scroll) var(--ease-out);
 }
-.reveal > *:nth-child(3) {
-  animation-delay: 220ms;
+
+.reveal-fade.visible {
+  opacity: 1;
 }
-.reveal > *:nth-child(4) {
-  animation-delay: 300ms;
+
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity var(--duration-scroll) var(--ease-out),
+    transform var(--duration-scroll) var(--ease-out);
 }
-.reveal > *:nth-child(5) {
-  animation-delay: 380ms;
+
+.reveal-scale.visible {
+  opacity: 1;
+  transform: scale(1);
 }
-.reveal > *:nth-child(6) {
-  animation-delay: 460ms;
+
+.stagger > * {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 600ms var(--ease-expo), transform 600ms var(--ease-expo);
+}
+
+.stagger > *.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.stagger > *:nth-child(1).visible {
+  transition-delay: 60ms;
+}
+.stagger > *:nth-child(2).visible {
+  transition-delay: 140ms;
+}
+.stagger > *:nth-child(3).visible {
+  transition-delay: 220ms;
+}
+.stagger > *:nth-child(4).visible {
+  transition-delay: 300ms;
+}
+.stagger > *:nth-child(5).visible {
+  transition-delay: 380ms;
+}
+.stagger > *:nth-child(6).visible {
+  transition-delay: 460ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal > * {
+  .reveal,
+  .reveal-fade,
+  .reveal-scale,
+  .stagger > * {
     opacity: 1;
     transform: none;
-    animation: none;
+    transition: none;
   }
 }

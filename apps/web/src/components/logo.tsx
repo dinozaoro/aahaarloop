@@ -4,8 +4,9 @@ export function LogoMark({ className }: { className?: string }) {
   return (
     <img
       src="/assets/aahaaroop.png"
-      alt="AahaarLoop"
-      className={cn("shrink-0 object-contain", className)}
+      alt=""
+      aria-hidden="true"
+      className={cn("size-8 shrink-0 object-contain", className)}
       decoding="async"
     />
   );
@@ -13,8 +14,11 @@ export function LogoMark({ className }: { className?: string }) {
 
 export function Logo({ className }: { className?: string }) {
   return (
-    <span className={cn("inline-flex items-center gap-2.5 font-display", className)}>
+    <span className={cn("inline-flex items-center gap-2.5", className)}>
       <LogoMark />
+      <span className="font-display font-bold text-base tracking-tight">
+        Aahaarloop
+      </span>
     </span>
   );
 }
