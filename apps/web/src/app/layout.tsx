@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { InstallPrompt } from "@/components/install-prompt";
 import { PageChrome } from "@/components/page-chrome";
+import { ServiceWorkerStatus } from "@/components/service-worker-status";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Toaster } from "@/components/ui/sonner";
@@ -64,6 +65,7 @@ export default function RootLayout({
         </PageChrome>
         <Toaster />
         <InstallPrompt />
+        <ServiceWorkerStatus />
       </body>
     </html>
   );
