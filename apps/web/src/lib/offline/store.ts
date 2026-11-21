@@ -1,7 +1,7 @@
 import type { OfflineRecordMap, StoreName } from "./types.ts";
 
 export const OFFLINE_DB_NAME = "aahaarloop-offline";
-export const OFFLINE_SCHEMA_VERSION = 2;
+export const OFFLINE_SCHEMA_VERSION = 3;
 export const OFFLINE_STORES = [
   "donations",
   "claims",
@@ -9,6 +9,7 @@ export const OFFLINE_STORES = [
   "drafts",
   "sessions",
   "operations",
+  "conflicts",
 ] as const;
 
 export class OfflineQuotaError extends Error {
@@ -60,6 +61,11 @@ function migrate(db: IDBDatabase, fromVersion: number): void {
     drafts.createIndex("kind", "kind");
 
     db.createObjectStore("sessions", { keyPath: "id" });
+  }
+
+  if (fromVersion < 3) {
+    const conflicts = db.createObjectStore("conflicts", { keyPath: "id" });
+    conflicts.createIndex("resolution", "resolution");
   }
 
   if (fromVersion < 2) {
@@ -137,6 +143,19 @@ export class OfflineRepository<K extends StoreName> {
     }
   }
 
+  async update(
+    id: string,
+    patch: Partial<OfflineRecordMap[K]>,
+  ): Promise<OfflineRecordMap[K] | null> {
+    const current = await this.get(id);
+    if (!current) {
+      return null;
+    }
+    const updated = { ...current, ...patch, id } as OfflineRecordMap[K];
+    await this.put(updated);
+    return updated;
+  }
+
   async delete(id: string): Promise<void> {
     try {
       const transaction = this.database.transaction(this.name, "readwrite");
@@ -165,6 +184,7 @@ export class OfflineStore {
   readonly drafts: OfflineRepository<"drafts">;
   readonly sessions: OfflineRepository<"sessions">;
   readonly operations: OfflineRepository<"operations">;
+  readonly conflicts: OfflineRepository<"conflicts">;
 
   private readonly db: IDBDatabase;
 
@@ -176,6 +196,7 @@ export class OfflineStore {
     this.drafts = new OfflineRepository(db, "drafts");
     this.sessions = new OfflineRepository(db, "sessions");
     this.operations = new OfflineRepository(db, "operations");
+    this.conflicts = new OfflineRepository(db, "conflicts");
   }
 
   static async open(name = OFFLINE_DB_NAME): Promise<OfflineStore> {

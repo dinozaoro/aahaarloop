@@ -16,12 +16,20 @@ export {
   type SyncTransport,
 } from "./engine.ts";
 export { SyncQueue, type EnqueueInput } from "./queue.ts";
+export {
+  detectConflict,
+  resolveConflict,
+  type ConflictStrategy,
+  type VersionedRecord,
+} from "./conflicts.ts";
 export type {
   CachedClaim,
   CachedDonation,
   CachedNeed,
   DraftRecord,
   OfflineRecordMap,
+  OfflineConflict,
+  ConflictResolution,
   QueuedOperation,
   SessionRecord,
   StoreName,
