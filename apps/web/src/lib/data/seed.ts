@@ -1,6 +1,12 @@
+import type { VolunteerProfile } from "@aahaarloop/matching";
+
 import type { Claim, Donation, Need, Organization } from "@/lib/domain/types";
 
-import { DEMO_DONOR_ORG_ID, DEMO_RECIPIENT_ORG_ID } from "./constants";
+import {
+  DEMO_DONOR_ORG_ID,
+  DEMO_RECIPIENT_ORG_ID,
+  DEMO_VOLUNTEER_ID,
+} from "./constants";
 
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
@@ -10,6 +16,7 @@ export interface SeedData {
   donations: Donation[];
   claims: Claim[];
   needs: Need[];
+  volunteerProfile: VolunteerProfile;
 }
 
 export function createSeedData(now = new Date()): SeedData {
@@ -530,5 +537,23 @@ export function createSeedData(now = new Date()): SeedData {
     },
   ];
 
-  return { organizations, donations, claims, needs };
+  const volunteerProfile: VolunteerProfile = {
+    id: DEMO_VOLUNTEER_ID,
+    displayName: "Arjun Nair",
+    transportMode: "motorcycle",
+    transportCapacityKg: 25,
+    serviceArea: {
+      center: { latitude: 12.9857, longitude: 77.6062 },
+      radiusKm: 12,
+    },
+    availability: [
+      { start: at(1), end: at(4) },
+      { start: at(26), end: at(30) },
+    ],
+    verified: true,
+    createdAt: at(-168),
+    updatedAt: at(-24),
+  };
+
+  return { organizations, donations, claims, needs, volunteerProfile };
 }

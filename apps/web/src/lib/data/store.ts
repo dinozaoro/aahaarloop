@@ -1,3 +1,5 @@
+import type { VolunteerProfile } from "@aahaarloop/matching";
+
 import type { Claim, Donation, Need, Organization } from "@/lib/domain/types";
 
 import { createSeedData } from "./seed";
@@ -69,4 +71,8 @@ export function getNeedsForOrganization(
   organizationId: string,
 ): readonly Need[] {
   return needs.filter((need) => need.organizationId === organizationId);
+}
+
+export function getVolunteerProfile(): VolunteerProfile {
+  return seed.volunteerProfile;
 }

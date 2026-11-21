@@ -191,6 +191,28 @@ const result = matchDonationsForRecipient(
 - The logistics score rewards using a larger share of the available capacity; it is not a cost calculation.
 - The engine does not persist claims or update `availableServings`.
 
+## Volunteer profiles
+
+`createVolunteerProfile(input, now)` and `editVolunteerProfile(profile, input, now)` validate and return a profile with transport mode, capacity, a service area, availability windows and platform-controlled `verified` status. `validateVolunteerProfile(input)` returns field-level errors for the UI. `isVolunteerAvailable(profile, at)` checks a single instant (inclusive at both ends).
+
+`getMatchingVolunteerFields(profile)` returns `transportCapacityKg` and `volunteerAvailability` for a `RecipientRequest`, so the matching engine's weight filter and availability score use the saved profile. `canAcceptMission(profile, mission)` is the mission-assignment gate: the volunteer must be verified, carry the whole weight, have one window covering the whole pickup window, and have the pickup inside the service radius.
+
+```ts
+import {
+  canAcceptMission,
+  getMatchingVolunteerFields,
+} from "@aahaarloop/matching";
+
+const recipientRequest = {
+  id: "recipient-1",
+  location: { latitude: 12.9716, longitude: 77.5946 },
+  needs: [],
+  requiredServings: 80,
+  storage: "ambient",
+  ...getMatchingVolunteerFields(savedProfile),
+};
+```
+
 ## Tests
 
 ```bash

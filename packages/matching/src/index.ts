@@ -47,3 +47,21 @@ export type {
   EditNeedInput,
   NeedValidationError,
 } from "./needs.ts";
+export {
+  TRANSPORT_MODES,
+  TRANSPORT_MODE_LABELS,
+  canAcceptMission,
+  createVolunteerProfile,
+  editVolunteerProfile,
+  getMatchingVolunteerFields,
+  isVolunteerAvailable,
+  validateVolunteerProfile,
+} from "./volunteer.ts";
+export type {
+  MissionRequirement,
+  ServiceArea,
+  TransportMode,
+  VolunteerProfile,
+  VolunteerProfileInput,
+  VolunteerValidationError,
+} from "./volunteer.ts";
