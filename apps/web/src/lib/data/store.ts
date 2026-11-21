@@ -94,3 +94,9 @@ export function findClaimByIdempotencyKey(key: string): Claim | undefined {
   return claims.find((claim) => claim.idempotencyKey === key);
 }
 
+export function upsertOrganization(organization: Organization): void {
+  const index = organizations.findIndex((item) => item.id === organization.id);
+  if (index === -1) organizations.push(organization);
+  else organizations[index] = organization;
+}
+
