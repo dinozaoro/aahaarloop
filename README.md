@@ -15,3 +15,7 @@ npm run mobile
 ```
 
 See `apps/mobile/README.md` for the mobile workflow, environment variables and checks.
+
+## Documentation
+
+- `docs/product-spec.md` — product specification, domain glossary and matching rules.
