@@ -1,11 +1,19 @@
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ScrollReveal, StaggerScrollReveal } from "@/components/scroll-reveal";
-import { ArrowDownRight, ArrowRight, Clock3, MapPin, PackageCheck, Utensils } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowDownRight,
+  ArrowRight,
+  ArrowUpRight,
+  Check,
+  Clock3,
+  MapPin,
+  PackageCheck,
+  Utensils,
+} from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import type { Metadata } from "next";
-import { ArrowDown, ArrowUpRight, Check } from "lucide-react";
 
 import { resolveAndroidDownloadUrl } from "@/lib/links";
 
@@ -19,6 +27,7 @@ export const metadata: Metadata = {
 const STEPS = [
   {
     number: "01",
+    icon: PackageCheck,
     title: "Share surplus",
     detail: "Restaurants and food businesses list food they cannot use before it goes to waste.",
     className: "step-preview-yellow",
@@ -29,6 +38,7 @@ const STEPS = [
   },
   {
     number: "02",
+    icon: MapPin,
     title: "Find a destination",
     detail: "NGOs, community kitchens and volunteers discover relevant food donations.",
     className: "step-preview-pink",
@@ -39,6 +49,7 @@ const STEPS = [
   },
   {
     number: "03",
+    icon: Utensils,
     title: "Deliver impact",
     detail: "Food is collected, delivered and tracked, creating measurable impact.",
     className: "step-preview-peach",
