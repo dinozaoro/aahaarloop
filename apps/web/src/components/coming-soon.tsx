@@ -15,13 +15,13 @@ export function ComingSoon({
   issue: number;
 }) {
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-20 sm:px-6">
+    <div className="mx-auto w-full max-w-3xl px-4 py-24 sm:px-6">
       <Card className="reveal shadow-lifted press-scale">
         <CardHeader>
           <Badge variant="secondary" className="w-fit">
             Issue #{issue}
           </Badge>
-          <CardTitle className="text-2xl">{title}</CardTitle>
+          <CardTitle className="text-2xl font-display">{title}</CardTitle>
           <CardDescription>{description}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">

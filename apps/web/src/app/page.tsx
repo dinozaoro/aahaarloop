@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
   Clock,
@@ -7,12 +8,12 @@ import {
   MapPin,
   PackageCheck,
   ShieldCheck,
+  Sprout,
   Store,
   UtensilsCrossed,
   Users,
 } from "lucide-react";
 
-import { Logo } from "@/components/logo";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -22,6 +23,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ScrollReveal, StaggerScrollReveal } from "@/components/scroll-reveal";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -121,100 +123,237 @@ const HERO_STATS = [
   { value: "24/7", label: "deadline visibility for every donation" },
 ] as const;
 
-const MARQUEE_PARTNERS = [
-  "Indiranagar ·",
-  "Koramangala ·",
-  "Whitefield ·",
-  "HSR Layout ·",
-  "Jayanagar ·",
-  "Malleshwaram ·",
-  "Frazer Town ·",
-  "Basavanagudi ·",
-  "Cunningham Road ·",
-  "Ulsoor ·",
-] as const;
+const MARQUEE_ITEMS = [
+  "Saffron · Bengaluru · Chennai · Delhi · Mumbai · Kolkata · Pune · Hyderabad · Ahmedabad · Jaipur · Lucknow · Kochi ·",
+  "Saffron · Bengaluru · Chennai · Delhi · Mumbai · Kolkata · Pune · Hyderabad · Ahmedabad · Jaipur · Lucknow · Kochi ·",
+];
 
-function MeshBlob({ delay, color, style }: { delay: string; color: string; style?: React.CSSProperties }) {
+function FloatingSpice({
+  delay,
+  width,
+  height,
+  top,
+  left,
+  color = "primary/20",
+}: {
+  delay: string;
+  width: string;
+  height: string;
+  top: string;
+  left: string;
+  color?: string;
+}) {
   return (
     <div
       aria-hidden="true"
-      className="mesh-blob rounded-full"
-      style={{ animationDelay: delay, backgroundColor: color, ...style }}
+      className={cn(
+        "absolute rounded-full blur-[64px] animate-float blob-morph",
+        color
+      )}
+      style={{
+        animationDelay: delay,
+        width,
+        height,
+        top,
+        left,
+      }}
     />
+  );
+}
+
+function OrganicLeaf({ className, style }: { className?: string; style?: React.CSSProperties }) {
+  return (
+    <svg
+      viewBox="0 0 200 200"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={cn("block", className)}
+      aria-hidden="true"
+    >
+      <path
+        d="M 60 100 C 60 60 120 20 150 60 C 180 100 140 160 100 180 C 60 200 40 140 60 100 Z"
+        stroke="currentColor"
+        strokeWidth="2"
+        opacity="0.35"
+      />
+      <path
+        d="M 100 180 C 60 200 40 140 60 100 C 60 60 120 20 150 60 C 180 100 140 160 100 180 Z"
+        fill="currentColor"
+        opacity="0.15"
+      />
+    </svg>
+  );
+}
+
+function AnimatedCounter({
+  value,
+  label,
+  delay,
+}: {
+  value: string;
+  label: string;
+  delay: string;
+}) {
+  const [display, setDisplay] = useState("0");
+  const ref = useRef<HTMLDivElement>(null);
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !started) {
+          setStarted(true);
+          const target = Number(value.replace(/[^0-9]/g, ""));
+          const duration = 1200;
+          const start = performance.now();
+          const step = (now: number) => {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            const ease = 1 - Math.pow(1 - progress, 3);
+            const current = Math.floor(target * ease);
+            const suffix = value.replace(/[0-9]/g, "");
+            setDisplay(current.toLocaleString() + suffix);
+            if (progress < 1) {
+              requestAnimationFrame(step);
+            }
+          };
+          requestAnimationFrame(step);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [value, started]);
+
+  return (
+    <div
+      ref={ref}
+      className="reveal scale-in"
+      style={{ animationDelay: delay }}
+    >
+      <dt className="order-2 text-xs text-muted-foreground uppercase tracking-wider">
+        {label}
+      </dt>
+      <dd className="order-1 text-5xl font-display font-bold tracking-tight data-[tabular]">
+        {display}
+      </dd>
+    </div>
   );
 }
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col">
-      {/* Marquee — warm, moving band of city names */}
-      <section aria-hidden="true" className="overflow-hidden border-y border-border bg-card/60 backdrop-blur-sm">
-        <div className="marquee-content">
-          {MARQUEE_PARTNERS.flatMap((p) => [p, p])}
-        </div>
-      </section>
+    <div className="flex flex-col relative overflow-hidden">
+      {/* Background mesh blobs — warm Indian tones */}
+      <div
+        aria-hidden="true"
+        className="mesh-blob size-[900px] rounded-full bg-primary/25"
+        style={{ top: "-10%", right: "-10%", animationDelay: "0s" }}
+      />
+      <div
+        aria-hidden="true"
+        className="mesh-blob size-[800px] rounded-full bg-secondary/25"
+        style={{
+          bottom: "-15%",
+          left: "-10%",
+          animationDelay: "-2.5s",
+        }}
+      />
+      <div
+        aria-hidden="true"
+        className="mesh-blob size-[600px] rounded-full bg-accent/20"
+        style={{ top: "30%", left: "5%", animationDelay: "-5s" }}
+      />
 
-      {/* Hero — single orchestrated entrance, asymmetric layout */}
+      {/* Floating spice accents */}
+      <FloatingSpice delay="0s" width="220px" height="220px" top="15%" left="12%" color="warning/25" />
+      <FloatingSpice delay="-2s" width="280px" height="280px" top="80%" left="5%" color="secondary/20" />
+      <FloatingSpice delay="-4s" width="180px" height="180px" top="45%" left="10%" color="primary/30" />
+
       <section
         aria-labelledby="hero-title"
-        className="relative overflow-hidden border-b border-border bg-background min-h-[68vh] flex items-center"
+        className="relative z-10 min-h-[85vh] flex items-center"
       >
-        {/* Ambient blobs */}
-        <MeshBlob delay="0s" color="oklch(0.77 0.17 50 / 0.25)" style={{ top: "-10%", right: "-12%", width: "700px", height: "700px" }} />
-        <MeshBlob delay="-3s" color="oklch(0.43 0.08 265 / 0.18)" style={{ bottom: "-15%", left: "-14%", width: "600px", height: "600px" }} />
-        <MeshBlob delay="-6s" color="oklch(0.56 0.18 30 / 0.15)" style={{ top: "35%", left: "8%", width: "520px", height: "520px" }} />
+        <div className="relative mx-auto grid w-full max-w-7xl gap-10 px-4 py-28 sm:px-6 lg:grid-cols-1.15fr lg:py-40">
+          <div className="flex flex-col gap-6 lg:pr-14">
+            <ScrollReveal once threshold={0.1}>
+              <Badge variant="secondary" className="w-fit gap-2 hover-lift press-scale">
+                <Sprout aria-hidden="true" className="size-3.5" />
+                Bengaluru food rescue
+              </Badge>
+            </ScrollReveal>
 
-        <div className="relative z-10 mx-auto grid w-full max-w-7xl gap-10 px-4 py-24 sm:px-6 lg:grid-cols-1.12fr lg:py-36">
-          <div className="reveal flex flex-col gap-6 lg:pr-14">
-            <div className="flex items-center gap-2.5">
-              <Logo className="size-6" />
-              <span className="text-eyebrow text-primary font-semibold">
-                Bengaluru · Food rescue
-              </span>
-            </div>
-            <h1 id="hero-title" className="text-display-1 text-balance">
-              Every surplus<span className="text-primary italic"> has a destination</span>.
-            </h1>
-            <p className="text-body-lg max-w-lg text-muted-foreground">
-              Aahaarloop connects kitchens with surplus to the shelters and
-              community kitchens that can collect it in time. Publish, match,
-              collect — with the deadline visible at every step.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href="/donations/new"
-                className={cn(buttonVariants({ size: "lg" }), "group press-scale")}
+            <ScrollReveal once threshold={0.12}>
+              <h1
+                id="hero-title"
+                className="reveal scale-in font-display text-5xl font-bold tracking-tight text-balance sm:text-7xl lg:text-8xl"
+                style={{ animationDelay: "60ms" }}
               >
-                Donate surplus
-                <ArrowRight
-                  aria-hidden="true"
-                  className="transition-transform group-hover:translate-x-1 motion-reduce:transition-none"
-                />
-              </Link>
-              <Link
-                href="/browse"
-                className={cn(buttonVariants({ variant: "outline", size: "lg" }), "press-scale")}
-              >
-                Find food to rescue
-              </Link>
-              <Link
-                href="/signin"
-                className={cn(buttonVariants({ variant: "ghost", size: "lg" }), "press-scale")}
-              >
-                Sign in
-              </Link>
-            </div>
-            <p className="flex items-center gap-2 text-label text-muted-foreground">
-              <ShieldCheck aria-hidden="true" className="size-4 text-primary" />
-              Deterministic matching. No LLM decides who eats.
-            </p>
+                Every surplus<span className="text-primary"> has a destination.</span>
+              </h1>
+            </ScrollReveal>
+
+            <ScrollReveal once threshold={0.12}>
+              <p className="reveal max-w-lg text-lg text-muted-foreground text-pretty leading-relaxed" style={{ animationDelay: "140ms" }}>
+                Aahaarloop connects kitchens with surplus to the shelters and
+                community kitchens that can collect it in time. Publish, match,
+                collect — with the deadline visible at every step.
+              </p>
+            </ScrollReveal>
+
+            <ScrollReveal once threshold={0.12}>
+              <div className="flex flex-wrap gap-3" style={{ animationDelay: "220ms" }}>
+                <Link
+                  href="/donations/new"
+                  className={cn(buttonVariants({ size: "lg" }), "group press-scale shadow-glow")}
+                >
+                  Donate surplus
+                  <ArrowRight
+                    aria-hidden="true"
+                    className="transition-transform group-hover:translate-x-1 motion-reduce:transition-none"
+                  />
+                </Link>
+                <Link
+                  href="/browse"
+                  className={cn(
+                    buttonVariants({ variant: "outline", size: "lg" }),
+                    "press-scale"
+                  )}
+                >
+                  Find food to rescue
+                </Link>
+                <Link
+                  href="/signin"
+                  className={cn(buttonVariants({ variant: "ghost", size: "lg" }), "press-scale")}
+                >
+                  Sign in
+                </Link>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal once threshold={0.12}>
+              <p className="reveal flex items-center gap-2 text-sm text-muted-foreground" style={{ animationDelay: "300ms" }}>
+                <ShieldCheck aria-hidden="true" className="size-4 text-primary" />
+                Deterministic matching. No LLM decides who eats.
+              </p>
+            </ScrollReveal>
           </div>
 
-          <div className="reveal flex flex-col gap-6">
-            {/* Hero match card — glassmorphism */}
-            <Card className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-lifted image-outline hover-lift press-scale group">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/5 group-hover:from-primary/20 group-hover:to-accent/10 transition-colors duration-700" />
-              <CardHeader className="pt-6 gap-2 z-10 relative">
+          <div className="reveal flex flex-col gap-8" style={{ animationDelay: "380ms" }}>
+            {/* Hero match card — glassmorphism + organic leaf */}
+            <Card className="relative overflow-hidden rounded-[2.5rem] border border-border bg-card shadow-lifted image-outline hover-lift press-scale group">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 group-hover:from-primary/20 group-hover:to-secondary/20 transition-colors duration-700" />
+              <div className="absolute -right-6 -bottom-6 size-48 opacity-20 group-hover:opacity-35 transition-opacity duration-700">
+                <OrganicLeaf className="size-full animate-float" style={{ animationDelay: "-1s" }} />
+              </div>
+              <div className="absolute top-8 left-8 size-12 rounded-full bg-warning/20 flex items-center justify-center">
+                <Sprout className="size-5 text-warning" aria-hidden="true" />
+              </div>
+              <CardHeader className="pt-8 gap-2 z-10 relative">
                 <div className="flex items-center justify-between gap-2 z-10 relative">
                   <Badge variant="warning" className="z-10 relative animate-pulse-glow">
                     Critical urgency
@@ -223,9 +362,9 @@ export default function HomePage() {
                     Example match
                   </span>
                 </div>
-                <CardTitle className="text-xl z-10 relative">Vegetable biryani</CardTitle>
+                <CardTitle className="text-xl font-display z-10 relative">Vegetable biryani</CardTitle>
                 <CardDescription className="z-10 relative">
-                  40 servings · prepared meal · picked up from Indiranagar
+                  40 servings · prepared meal · Indiranagar
                 </CardDescription>
               </CardHeader>
               <CardContent className="z-10 relative">
@@ -236,123 +375,154 @@ export default function HomePage() {
                       className="flex items-center justify-between gap-4 py-2.5 z-10 relative"
                     >
                       <dt className="text-muted-foreground">{row.label}</dt>
-                      <dd className="text-right font-medium data-[tabular]">{row.value}</dd>
+                      <dd className="text-right font-medium data-[tabular]">
+                        {row.value}
+                      </dd>
                     </div>
                   ))}
                 </dl>
-                <div className="mt-4 flex items-center gap-2 rounded-lg bg-secondary px-3 py-2 text-xs text-secondary-foreground z-10 relative">
+                <div className="mt-5 flex items-center gap-2 rounded-xl bg-secondary px-3.5 py-2.5 text-xs text-secondary-foreground z-10 relative">
                   <Clock aria-hidden="true" className="size-3.5" />
                   Match score 92 · explained component by component
                 </div>
               </CardContent>
             </Card>
 
-            {/* Hero stats */}
-            <div className="grid gap-4 sm:grid-cols-3">
-              {HERO_STATS.map((stat) => (
-                <div
+            {/* Hero stats — animated counters */}
+            <div className="grid gap-5 sm:grid-cols-3 stagger">
+              {HERO_STATS.map((stat, i) => (
+                <AnimatedCounter
                   key={stat.label}
-                  className="reveal flex flex-col gap-1 [animation-delay:520ms]"
-                >
-                  <dt className="order-2 text-caption text-muted-foreground uppercase tracking-wider">
-                    {stat.label}
-                  </dt>
-                  <dd className="order-1 text-display-3 font-bold tracking-tight data-[tabular] text-primary">
-                    {stat.value}
-                  </dd>
-                </div>
+                  value={stat.value}
+                  label={stat.label}
+                  delay={`${200 + i * 120}ms`}
+                />
               ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* The gap — problem statement */}
-      <section aria-labelledby="gap-title" className="border-b border-border bg-muted/50">
-        <div className="mx-auto grid w-full max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-1.1fr lg:py-24">
-          <div className="flex flex-col gap-4 lg:pr-8">
-            <p className="text-eyebrow text-primary">The gap</p>
-            <h2 id="gap-title" className="text-display-3 font-bold tracking-tight text-balance sm:text-display-2">
-              Good food is thrown away while people nearby go hungry.
-            </h2>
+      {/* Marquee — moving city names, Indian feel */}
+      <section aria-hidden="true" className="border-b border-border bg-secondary/30">
+        <div className="px-4 py-6 sm:px-6 overflow-hidden">
+          <div className="flex w-full items-center overflow-x-hidden">
+            {MARQUEE_ITEMS.map((items, i) => (
+              <div key={i} className="marquee-content whitespace-nowrap text-xs text-muted-foreground uppercase tracking-widest">
+                {items}
+              </div>
+            ))}
           </div>
-          <div className="flex flex-col gap-5 text-muted-foreground">
-            <p className="text-body text-pretty leading-relaxed">
-              Surplus is rarely a lack of goodwill. Kitchens cannot tell, in
-              time, who can collect the food before it is unsafe, and recipient
-              organisations cannot tell what is available within their storage,
-              transport and kitchen capacity.
-            </p>
-            <p className="text-body text-pretty leading-relaxed">
-              Aahaarloop closes that gap with a shared deadline, a ranked match
-              list that explains itself, and a claim both sides can follow from
-              publish to handover.
-            </p>
-            <ul className="grid gap-4 text-sm sm:grid-cols-3">
-              <li className="rounded-xl border border-border bg-card p-4 shadow-soft hover-lift press-scale">
-                <span className="block font-semibold text-primary">Deadlines, not guesses</span>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Use-by, best-before and pickup deadlines stay separate.
-                </p>
-              </li>
-              <li className="rounded-xl border border-border bg-card p-4 shadow-soft hover-lift press-scale">
-                <span className="block font-semibold text-primary">Capacity-aware</span>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Storage, vehicle space and servings are hard filters.
-                </p>
-              </li>
-              <li className="rounded-xl border border-border bg-card p-4 shadow-soft hover-lift press-scale">
-                <span className="block font-semibold text-primary">Explainable</span>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Every match shows urgency, distance, quantity and needs scores.
-                </p>
-              </li>
+        </div>
+      </section>
+
+      {/* The gap — problem statement */}
+      <section
+        aria-labelledby="gap-title"
+        className="border-b border-border bg-secondary/40 relative overflow-hidden"
+      >
+        <div className="relative z-10 mx-auto grid w-full max-w-7xl gap-14 px-4 py-28 sm:px-6 lg:grid-cols-1.1fr lg:py-36">
+          <div className="flex flex-col gap-5 lg:pr-10">
+            <ScrollReveal once threshold={0.1}>
+              <p className="reveal text-sm font-semibold tracking-wide text-primary uppercase" style={{ animationDelay: "60ms" }}>
+                The gap
+              </p>
+            </ScrollReveal>
+            <ScrollReveal once threshold={0.12}>
+              <h2 id="gap-title" className="reveal text-3xl font-display font-bold tracking-tight text-balance sm:text-4xl" style={{ animationDelay: "80ms" }}>
+                Good food is thrown away while people nearby go hungry.
+              </h2>
+            </ScrollReveal>
+            <ScrollReveal once threshold={0.12}>
+              <p className="reveal text-lg text-pretty leading-relaxed text-muted-foreground" style={{ animationDelay: "160ms" }}>
+                Surplus is rarely a lack of goodwill. Kitchens cannot tell, in
+                time, who can collect the food before it is unsafe, and
+                recipient organisations cannot tell what is available within
+                their storage, transport and kitchen capacity.
+              </p>
+            </ScrollReveal>
+          </div>
+          <div className="flex flex-col gap-5 reveal" style={{ animationDelay: "240ms" }}>
+            <ul className="grid gap-5 text-sm sm:grid-cols-3">
+              {[
+                {
+                  title: "Deadlines, not guesses",
+                  body: "Use-by, best-before and pickup deadlines stay separate.",
+                },
+                {
+                  title: "Capacity-aware",
+                  body: "Storage, vehicle space and servings are hard filters.",
+                },
+                {
+                  title: "Explainable",
+                  body: "Every match shows urgency, distance, quantity and needs scores.",
+                },
+              ].map((item, index) => (
+                <li
+                  key={item.title}
+                  className="rounded-[2rem] border border-border bg-card p-6 shadow-soft hover-lift press-scale reveal"
+                  style={{ animationDelay: `${300 + index * 100}ms` }}
+                >
+                  <span className="block font-semibold text-primary">
+                    {item.title}
+                  </span>
+                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                    {item.body}
+                  </p>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
       </section>
 
       {/* How it works */}
-      <section aria-labelledby="flow-title" className="border-b border-border">
-        <div className="mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:py-24">
-          <div className="flex flex-col gap-4">
-            <p className="text-eyebrow text-primary">How it works</p>
-            <h2 id="flow-title" className="max-w-2xl text-display-3 font-bold tracking-tight text-balance sm:text-display-2">
+      <section aria-labelledby="flow-title" className="border-b border-border relative overflow-hidden">
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-28 sm:px-6 lg:py-36">
+          <div className="flex flex-col gap-5 reveal" style={{ animationDelay: "60ms" }}>
+            <p className="text-sm font-semibold tracking-wide text-primary uppercase">
+              How it works
+            </p>
+            <h2 id="flow-title" className="max-w-2xl text-3xl font-display font-bold tracking-tight text-balance sm:text-4xl">
               Three steps from surplus to a shared meal.
             </h2>
           </div>
-          <ol className="mt-12 grid gap-8 md:grid-cols-3">
-            {STEPS.map((step, index) => (
-              <li key={step.title} className="reveal flex flex-col gap-4 [animation-delay:${index * 80}ms]">
-                <Card className="flex-1 flex flex-col gap-4 p-6 shadow-soft hover-lift press-scale group">
-                  <CardHeader className="gap-3">
-                    <div className="flex items-center gap-3">
-                      <span
-                        aria-hidden="true"
-                        className="grid size-10 place-items-center rounded-xl bg-primary/10 text-sm font-semibold text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
-                      >
-                        {index + 1}
-                      </span>
-                      <step.icon
-                        aria-hidden="true"
-                        className="size-5 text-primary group-hover:text-primary transition-colors"
-                      />
-                    </div>
-                    <CardTitle className="text-lg">{step.title}</CardTitle>
-                    <CardDescription>{step.description}</CardDescription>
-                  </CardHeader>
-                </Card>
-              </li>
-            ))}
-          </ol>
+          <StaggerScrollReveal once threshold={0.12}>
+            <ol className="mt-16 grid gap-10 md:grid-cols-3">
+              {STEPS.map((step, index) => (
+                <li key={step.title} className="flex flex-col gap-4 reveal">
+                  <Card className="flex-1 flex flex-col gap-4 p-7 shadow-soft hover-lift press-scale group">
+                    <CardHeader className="gap-3">
+                      <div className="flex items-center gap-3">
+                        <span
+                          aria-hidden="true"
+                          className={cn(
+                            "grid size-11 place-items-center rounded-[1.5rem] bg-primary/10 text-lg font-display font-bold text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300 press-scale"
+                          )}
+                        >
+                          {index + 1}
+                        </span>
+                        <step.icon
+                          aria-hidden="true"
+                          className="size-5 text-primary group-hover:scale-110 transition-transform duration-300"
+                        />
+                      </div>
+                      <CardTitle className="text-lg">{step.title}</CardTitle>
+                      <CardDescription>{step.description}</CardDescription>
+                    </CardHeader>
+                  </Card>
+                </li>
+              ))}
+            </ol>
+          </StaggerScrollReveal>
         </div>
       </section>
 
       {/* Impact */}
-      <section aria-labelledby="impact-title" className="border-b border-border bg-primary text-primary-foreground">
-        <div className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6">
-          <div className="flex flex-col gap-3">
-            <h2 id="impact-title" className="text-display-3 font-bold tracking-tight">
+      <section aria-labelledby="impact-title" className="border-b border-border bg-primary text-primary-foreground relative overflow-hidden">
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-20 sm:px-6">
+          <div className="flex flex-col gap-4 reveal" style={{ animationDelay: "80ms" }}>
+            <h2 id="impact-title" className="text-2xl font-display font-bold tracking-tight">
               What rescue looks like
             </h2>
             <p className="max-w-2xl text-sm text-primary-foreground/80 text-pretty">
@@ -360,84 +530,88 @@ export default function HomePage() {
               impact measurements.
             </p>
           </div>
-          <dl className="mt-10 grid gap-8 sm:grid-cols-3">
-            {IMPACT.map((stat) => (
-              <div key={stat.label} className="flex flex-col gap-1.5 reveal [animation-delay:100ms]">
-                <dt className="order-2 text-xs text-primary-foreground/70 uppercase tracking-wider">
-                  {stat.label}
-                </dt>
-                <dd className="order-1 text-display-2 font-bold tracking-tight data-[tabular]">
-                  {stat.value}
-                </dd>
-              </div>
-            ))}
-          </dl>
+          <StaggerScrollReveal once threshold={0.12}>
+            <dl className="mt-14 grid gap-10 sm:grid-cols-3">
+              {IMPACT.map((stat, i) => (
+                <div key={stat.label} className="flex flex-col gap-2">
+                  <AnimatedCounter
+                    value={stat.value}
+                    label={stat.label}
+                    delay={`${i * 100}ms`}
+                  />
+                </div>
+              ))}
+            </dl>
+          </StaggerScrollReveal>
         </div>
       </section>
 
       {/* Roles */}
-      <section aria-labelledby="roles-title" className="border-b border-border">
-        <div className="mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:py-24">
-          <div className="flex flex-col gap-4">
-            <p className="text-eyebrow text-primary">Built for every side of the handover</p>
-            <h2 id="roles-title" className="max-w-2xl text-display-3 font-bold tracking-tight text-balance sm:text-display-2">
+      <section aria-labelledby="roles-title" className="border-b border-border relative overflow-hidden">
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-28 sm:px-6 lg:py-36">
+          <div className="flex flex-col gap-5 reveal" style={{ animationDelay: "60ms" }}>
+            <p className="text-sm font-semibold tracking-wide text-primary uppercase">
+              Built for every side of the handover
+            </p>
+            <h2 id="roles-title" className="max-w-2xl text-3xl font-display font-bold tracking-tight text-balance sm:text-4xl">
               One workspace per role, one shared deadline.
             </h2>
           </div>
-          <div className="mt-12 grid gap-8 lg:grid-cols-3">
-            {ROLES.map((role) => (
-              <Card
-                key={role.name}
-                className="flex-1 flex flex-col justify-between p-6 shadow-soft hover-lift press-scale group"
-              >
-                <CardHeader className="gap-3">
-                  <span className="grid size-10 place-items-center rounded-xl bg-secondary text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                    <role.icon aria-hidden="true" className="size-5 group-hover:text-primary-foreground transition-colors" />
-                  </span>
-                  <CardTitle>{role.name}</CardTitle>
-                  <CardDescription>{role.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="flex flex-col gap-4">
-                  <ul className="flex flex-col gap-2 text-sm">
-                    {role.points.map((point) => (
-                      <li key={point} className="flex items-start gap-2">
-                        <UtensilsCrossed
-                          aria-hidden="true"
-                          className="mt-0.5 size-4 shrink-0 text-primary"
-                        />
-                        {point}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link
-                    href={role.href}
-                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary underline-offset-4 hover:underline press-scale"
-                  >
-                    {role.cta}
-                    <ArrowRight aria-hidden="true" className="size-4" />
-                  </Link>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <StaggerScrollReveal once threshold={0.12}>
+            <div className="mt-16 grid gap-10 lg:grid-cols-3">
+              {ROLES.map((role) => (
+                <Card key={role.name} className="flex-1 flex flex-col justify-between p-7 shadow-soft hover-lift press-scale">
+                  <CardHeader className="gap-3">
+                    <span className={cn(
+                      "grid size-11 place-items-center rounded-[1.5rem] bg-secondary text-primary press-scale"
+                    )}>
+                      <role.icon aria-hidden="true" className="size-5" />
+                    </span>
+                    <CardTitle>{role.name}</CardTitle>
+                    <CardDescription>{role.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex flex-col gap-4">
+                    <ul className="flex flex-col gap-2 text-sm">
+                      {role.points.map((point) => (
+                        <li key={point} className="flex items-start gap-2">
+                          <UtensilsCrossed
+                            aria-hidden="true"
+                            className="mt-0.5 size-4 shrink-0 text-primary"
+                          />
+                          {point}
+                        </li>
+                      ))}
+                    </ul>
+                    <Link
+                      href={role.href}
+                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary underline-offset-4 hover:underline press-scale"
+                    >
+                      {role.cta}
+                      <ArrowRight aria-hidden="true" className="size-4" />
+                    </Link>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </StaggerScrollReveal>
         </div>
       </section>
 
       {/* CTA */}
-      <section aria-labelledby="cta-title">
-        <div className="mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:py-24">
-          <div className="flex flex-col gap-8 rounded-3xl border border-border bg-accent/90 px-8 py-16 sm:px-12 lg:flex-row lg:items-center lg:justify-between">
+      <section aria-labelledby="cta-title" className="relative overflow-hidden">
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-28 sm:px-6 lg:py-36">
+          <div className="flex flex-col gap-8 reveal rounded-[3rem] border border-border bg-primary/10 px-8 py-20 sm:px-12 lg:flex-row lg:items-center lg:justify-between" style={{ animationDelay: "100ms" }}>
             <div className="flex max-w-2xl flex-col gap-3">
-              <h2 id="cta-title" className="text-display-3 font-bold tracking-tight text-accent-foreground text-balance">
+              <h2 id="cta-title" className="text-3xl font-display font-bold tracking-tight text-balance">
                 Rescue tonight&apos;s surplus instead of binning it.
               </h2>
-              <p className="text-body text-accent-foreground/90 text-pretty leading-relaxed">
+              <p className="text-muted-foreground text-pretty leading-relaxed">
                 Start with a draft, add a photo if you have one, and publish
                 when the pickup details are ready.
               </p>
             </div>
-            <div className="flex flex-wrap gap-3">
-              <Link href="/donations/new" className={cn(buttonVariants({ size: "lg" }), "press-scale")}>
+            <div className="flex flex-wrap gap-3 reveal" style={{ animationDelay: "180ms" }}>
+              <Link href="/donations/new" className={cn(buttonVariants({ size: "lg" }), "press-scale shadow-glow")}>
                 Create a donation
               </Link>
               <Link
@@ -448,7 +622,7 @@ export default function HomePage() {
               </Link>
             </div>
           </div>
-          <p className="mt-8 text-xs text-muted-foreground">
+          <p className="mt-10 text-xs text-muted-foreground reveal" style={{ animationDelay: "260ms" }}>
             Aahaarloop helps route surplus food; it does not certify that food is
             safe to eat. Donors and recipients remain responsible for food
             safety. Diet and allergen filters are preferences, not guarantees.
