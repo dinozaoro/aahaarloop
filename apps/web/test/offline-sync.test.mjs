@@ -77,6 +77,7 @@ test("flush replays each operation once and marks it completed", async () => {
     succeeded: 1,
     retried: 0,
     failed: 0,
+    conflicts: 0,
   });
   assert.equal(second.processed, 0);
   assert.deepEqual(sent, [op.id]);
