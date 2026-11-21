@@ -1,138 +1,208 @@
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { ArrowDownRight, ArrowRight, Clock3, MapPin, PackageCheck, Utensils } from "lucide-react";
-import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
+import type { Metadata } from "next";
+import { ArrowDown, ArrowUpRight, Check } from "lucide-react";
+
+import { resolveAndroidDownloadUrl } from "@/lib/links";
 
 export const metadata: Metadata = {
-  title: "Good food should find a table",
+  title: "Good food deserves another destination",
   description:
-    "AahaarLoop helps restaurants and food businesses share surplus with nearby NGOs, shelters and community kitchens.",
+    "Connect surplus food with the people and communities who need it. Every donation can make a difference.",
   alternates: { canonical: "/" },
 };
 
 const STEPS = [
   {
-    icon: Utensils,
-    title: "A kitchen has extra",
-    detail: "Add what is available, how much, and when it needs to be collected.",
+    number: "01",
+    title: "Share surplus",
+    detail: "Restaurants and food businesses list food they cannot use before it goes to waste.",
+    className: "step-preview-yellow",
+    previewTitle: "New food listing",
+    previewLabel: "What’s available?",
+    previewFood: "Freshly made vegetable biryani",
+    previewMeta: "32 portions · Vegetarian",
   },
   {
-    icon: MapPin,
-    title: "Nearby groups see it",
-    detail: "Matches consider distance, quantity, needs, timing and storage.",
+    number: "02",
+    title: "Find a destination",
+    detail: "NGOs, community kitchens and volunteers discover relevant food donations.",
+    className: "step-preview-pink",
+    previewTitle: "A good match, close by.",
+    previewLabel: "Community kitchen · Indiranagar, Bengaluru · 1.2 km",
+    previewFood: "A match for 32 warm meals",
+    previewMeta: "Nearby donation match",
   },
   {
-    icon: PackageCheck,
-    title: "A pickup gets arranged",
-    detail: "The recipient claims the food and both sides can follow the handover.",
+    number: "03",
+    title: "Deliver impact",
+    detail: "Food is collected, delivered and tracked, creating measurable impact.",
+    className: "step-preview-peach",
+    previewTitle: "Food delivered. Loop complete.",
+    previewLabel: "Listed · Collected · Shared",
+    previewFood: "32 more reasons to keep going.",
+    previewMeta: "Delivery status",
   },
 ] as const;
 
+const IMPACT = [
+  ["2,450", "kg of food rescued", "Good food, kept in the loop."],
+  ["8,167", "meals estimated", "More possibilities at the table."],
+  ["38", "organizations supported", "Stronger local connections."],
+  ["312", "donations completed", "Small acts, brought full circle."],
+] as const;
+
+function AndroidAction({ inverse = false }: { inverse?: boolean }) {
+  const href = resolveAndroidDownloadUrl(process.env.NEXT_PUBLIC_ANDROID_APK_URL);
+  const className = inverse
+    ? "landing-button landing-button-dark"
+    : "landing-button landing-button-primary";
+  const label = "Download for Android";
+
+  if (!href) {
+    return (
+      <span className={`${className} is-unavailable`} aria-disabled="true" title="Android download URL is not configured">
+        {label}<ArrowDown aria-hidden="true" />
+      </span>
+    );
+  }
+
+  return <a className={className} href={href}>{label}<ArrowDown aria-hidden="true" /></a>;
+}
+
 export default function HomePage() {
   return (
-    <div>
-      <section className="site-shell grid gap-10 pb-20 pt-14 sm:pt-20 lg:grid-cols-[1.03fr_0.97fr] lg:items-center lg:gap-16 lg:pb-28 lg:pt-24">
-        <div className="flex flex-col items-start gap-6">
-          <p className="eyebrow">A local route for surplus food</p>
-          <h1 className="hero-title">Good food should find a table.</h1>
-          <p className="max-w-xl text-lg leading-8 text-muted-foreground">
-            AahaarLoop connects restaurants and food businesses with nearby NGOs, shelters and community kitchens ready to collect.
-          </p>
-          <div className="flex w-full flex-wrap gap-3 pt-1">
-            <Link href="/donations/new" className={cn(buttonVariants({ size: "lg" }))}>
-              Offer surplus <ArrowRight aria-hidden="true" />
-            </Link>
-            <Link href="/browse" className={cn(buttonVariants({ variant: "outline", size: "lg" }))}>
-              Find food nearby
-            </Link>
-          </div>
-          <p className="text-sm text-muted-foreground">For kitchens, community groups and the people who help them meet.</p>
+    <div className="landing-page">
+      <section id="hero" className="landing-hero" aria-labelledby="hero-title">
+        <p className="landing-eyebrow"><span aria-hidden="true">●</span> A little less waste. A lot more possibility.</p>
+        <h1 id="hero-title" className="landing-title">
+          <span>Good food deserves</span>
+          <em>another destination.</em>
+        </h1>
+        <p className="landing-intro">Connect surplus food with the people and communities who need it. Every donation can make a difference.</p>
+        <div className="landing-actions">
+          <AndroidAction />
+          <Link className="landing-button landing-button-secondary" href="/browse">Explore Web App <ArrowUpRight aria-hidden="true" /></Link>
         </div>
+        <p className="landing-download-note">
+          {process.env.NEXT_PUBLIC_ANDROID_APK_URL
+            ? "Direct APK install · No Play Store needed"
+            : "Direct APK download · URL pending"}
+        </p>
 
-        <div className="relative overflow-hidden rounded-2xl bg-[#293d5b] p-6 text-white sm:p-9">
-          <div aria-hidden="true" className="absolute -right-12 -top-16 size-64 rounded-full border border-white/10" />
-          <div aria-hidden="true" className="absolute -right-2 -top-6 size-44 rounded-full border border-white/10" />
-          <div className="relative">
-            <div className="flex items-center justify-between gap-3 border-b border-white/15 pb-5">
-              <div>
-                <p className="text-sm text-white/65">One shared route</p>
-                <h2 className="mt-1 text-xl font-semibold tracking-tight">From kitchen to community</h2>
+        <figure className="food-story">
+          <Image
+            src="/images/indian-table-current.jpg"
+            alt="A shared Indian meal, ready to find its next table"
+            fill
+            priority
+            sizes="(max-width: 700px) calc(100vw - 40px), 92vw"
+            className="food-story-image"
+          />
+          <span className="food-story-label">Made to be shared</span>
+          <article className="floating-donation" aria-label="Illustrative donation">
+            <span className="availability"><i /> Surplus available</span>
+            <h2>A little extra. A lot of good.</h2>
+            <p>Vegetarian thali <span>24 portions</span></p>
+            <span className="collection-time">Collect by 8:30 PM <ArrowUpRight aria-hidden="true" /></span>
+          </article>
+          <article className="floating-delivery" aria-label="Illustrative delivery status">
+            <span className="delivery-check"><Check aria-hidden="true" /></span>
+            <span><strong>A better destination.</strong><small>24 meals, shared with care</small></span>
+          </article>
+          <figcaption>Kitchen <span aria-hidden="true">→</span> community</figcaption>
+        </figure>
+        <div className="image-caption"><span>Good food. New possibilities.</span><span>Illustrative donation journey / 01</span></div>
+      </section>
+
+      <div className="community-ribbon" aria-label="AahaarLoop community">
+        <span>Made for Indian kitchens</span><i aria-hidden="true">+</i>
+        <span>Powered by local communities</span><i aria-hidden="true">+</i>
+        <span>Every portion matters</span><i aria-hidden="true">+</i>
+        <span>Good food, full circle</span>
+      </div>
+
+      <section className="opportunity-section" aria-labelledby="opportunity-title">
+        <div className="opportunity-image">
+          <Image src="/images/sharing-a-meal.jpg" alt="Neighbours sharing a warm meal" fill sizes="(max-width: 760px) 100vw, 42vw" />
+        </div>
+        <div className="opportunity-copy">
+          <p className="landing-eyebrow">01 / The opportunity</p>
+          <h2 id="opportunity-title">Good food shouldn’t end up in the bin.</h2>
+          <p>Sometimes, a kitchen makes more than it needs.</p>
+          <p>Somewhere nearby, a meal can make a difference.</p>
+          <p>The missing ingredient? A connection.</p>
+          <blockquote><span>Not leftovers.</span><strong>A fresh possibility.</strong></blockquote>
+        </div>
+      </section>
+
+      <section className="how-section" id="how-it-works" aria-labelledby="how-title">
+        <div className="section-heading section-heading-split">
+          <div><p className="landing-eyebrow">02 / How it works</p><h2 id="how-title">A small act. A full circle.</h2></div>
+          <p>Three simple steps. Real-world impact.</p>
+        </div>
+        <ol className="steps-list">
+          {STEPS.map((step) => (
+            <li key={step.number}>
+              <div className={`step-preview ${step.className}`}>
+                <div className="step-preview-card">
+                  <div className="step-preview-top"><span>{step.previewTitle}</span><span aria-hidden="true">+</span></div>
+                  <span className="step-preview-label">{step.previewLabel}</span>
+                  <strong>{step.previewFood}</strong>
+                  <span className="step-preview-meta">{step.previewMeta}</span>
+                </div>
               </div>
-              <ArrowDownRight aria-hidden="true" className="size-6 text-[#e9a16e]" />
-            </div>
-            <ol className="mt-2">
-              {STEPS.map(({ icon: Icon, title, detail }, index) => (
-                <li key={title} className="grid grid-cols-[2.5rem_1fr] gap-4 border-b border-white/15 py-5 last:border-0 last:pb-1">
-                  <span className="flex size-9 items-center justify-center rounded-lg bg-white/10 text-[#f2b17c]">
-                    <Icon aria-hidden="true" className="size-[18px]" />
-                  </span>
-                  <div>
-                    <p className="font-medium">{title}</p>
-                    <p className="mt-1 max-w-sm text-sm leading-6 text-white/65">{detail}</p>
-                  </div>
-                  {index < STEPS.length - 1 ? <span aria-hidden="true" className="col-start-1 ml-[17px] h-2 border-l border-dashed border-white/25" /> : null}
-                </li>
-              ))}
-            </ol>
-            <p className="mt-6 flex items-center gap-2 text-xs leading-5 text-white/55">
-              <Clock3 aria-hidden="true" className="size-4 shrink-0" />
-              Pickup deadlines and food handling details stay visible along the way.
-            </p>
-          </div>
-        </div>
+              <span className="step-number">{step.number}</span>
+              <h3>{step.title}</h3>
+              <p>{step.detail}</p>
+            </li>
+          ))}
+        </ol>
       </section>
 
-      <section className="border-y border-border bg-white/70">
-        <div className="site-shell grid gap-10 py-14 sm:py-16 lg:grid-cols-[0.7fr_1.3fr] lg:gap-20">
-          <div className="flex flex-col items-start gap-4">
-            <p className="eyebrow">Made for the handover</p>
-            <h2 className="section-title max-w-sm">The useful details come first.</h2>
-            <p className="max-w-md text-sm leading-6 text-muted-foreground">
-              A good pickup depends on more than a food listing. AahaarLoop keeps the practical information together so both sides can decide in time.
-            </p>
-            <Link href="/design" className="mt-1 inline-flex items-center gap-2 text-sm font-semibold text-primary">
-              See what the product supports <ArrowRight aria-hidden="true" className="size-4" />
+      <section className="community-section" id="community" aria-labelledby="community-title">
+        <header className="community-heading">
+          <div><p className="landing-eyebrow">03 / One loop. Many hands.</p><h2 id="community-title">Different roles. Shared purpose.</h2></div>
+          <p>A place for everyone at the table.</p>
+        </header>
+        <div className="community-layout">
+          <div className="community-photo">
+            <Image src="/images/community-kitchen.jpg" alt="Kitchen volunteers sharing a moment" fill sizes="(max-width: 760px) 100vw, 42vw" />
+          </div>
+          <div className="ecosystem-roles">
+            <Link href="/signin" className="ecosystem-role">
+              <span className="step-number">01</span><span><strong>Food donors</strong><small>A little extra in your kitchen. A meaningful difference nearby.<em>Restaurants · Cafés · Caterers</em></small></span><ArrowUpRight aria-hidden="true" />
+            </Link>
+            <Link href="/signin" className="ecosystem-role">
+              <span className="step-number">02</span><span><strong>NGOs &amp; community kitchens</strong><small>Find food that fits your community, right when it’s needed.<em>Discover · Coordinate · Distribute</em></small></span><ArrowUpRight aria-hidden="true" />
+            </Link>
+            <Link href="/signin" className="ecosystem-role">
+              <span className="step-number">03</span><span><strong>Volunteers</strong><small>Be the connection between a generous kitchen and a fuller table.<em>Collect · Deliver · Make a difference</em></small></span><ArrowUpRight aria-hidden="true" />
             </Link>
           </div>
-          <div className="grid gap-x-10 sm:grid-cols-2">
-            {[
-              ["A clear time window", "Pickup deadline and use-by date are handled separately."],
-              ["A suitable match", "Distance, quantity, food needs and storage requirements guide recommendations."],
-              ["A safer handover", "Allergens and handling notes are shown for people to review."],
-              ["A visible journey", "Claims and pickup progress can be followed through the handover."],
-            ].map(([title, detail]) => (
-              <div key={title} className="step-rule py-5">
-                <h3 className="font-semibold tracking-tight">{title}</h3>
-                <p className="mt-2 max-w-sm text-sm leading-6 text-muted-foreground">{detail}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
-      <section className="site-shell grid gap-6 py-14 sm:py-16 md:grid-cols-2 md:gap-10">
-        <div className="rounded-xl border border-border bg-card p-6 sm:p-8">
-          <p className="eyebrow">For food businesses</p>
-          <h2 className="mt-3 text-2xl font-semibold tracking-tight">Share what your kitchen cannot use today.</h2>
-          <p className="mt-3 max-w-md text-sm leading-6 text-muted-foreground">Post the quantity, collection time and handling details. Nearby organisations can respond when the offer fits their needs.</p>
-          <Link href="/donations/new" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary">Start a donation <ArrowRight aria-hidden="true" className="size-4" /></Link>
+      <section className="impact-section" id="impact" aria-labelledby="impact-title">
+        <div className="impact-heading">
+          <div><p className="landing-eyebrow">04 / The difference we can make</p><h2 id="impact-title">Every portion adds up.</h2></div>
+          <span className="impact-badge">Illustrative impact · sample data</span>
         </div>
-        <div className="rounded-xl border border-border bg-[#eee9df] p-6 sm:p-8">
-          <p className="eyebrow">For community organisations</p>
-          <h2 className="mt-3 text-2xl font-semibold tracking-tight">Find food that works for your kitchen.</h2>
-          <p className="mt-3 max-w-md text-sm leading-6 text-muted-foreground">Browse nearby offers, check quantity and pickup requirements, then coordinate a claim with the donor.</p>
-          <Link href="/browse" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary">Browse available food <ArrowRight aria-hidden="true" className="size-4" /></Link>
-        </div>
+        <dl className="impact-metrics">
+          {IMPACT.map(([value, label, detail]) => (
+            <div key={label}><dt>{label}</dt><dd>{value}</dd><p>{detail}</p></div>
+          ))}
+        </dl>
+        <p className="impact-disclosure">Sample figures show how impact could be presented. Estimated meals use 0.3 kg per meal; actual portions vary.</p>
       </section>
 
-      <section className="site-shell pb-14 sm:pb-20">
-        <div className="flex flex-col gap-5 border-t border-border pt-8 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-xl font-semibold tracking-tight">Food safety stays with the people handling the food.</h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">AahaarLoop helps with discovery and coordination. It does not inspect, certify or guarantee that food is safe to eat.</p>
-          </div>
-          <Link href="/signin" className={cn(buttonVariants({ variant: "outline" }), "shrink-0")}>Join AahaarLoop <ArrowRight aria-hidden="true" /></Link>
+      <section className="landing-cta" id="download" aria-labelledby="cta-title">
+        <div><p className="landing-eyebrow">The next chapter starts with you</p><h2 id="cta-title">Good food.<br />Better together.</h2><p>Share a little. Change someone’s day.</p></div>
+        <div className="landing-cta-actions">
+          <AndroidAction inverse />
+          <Link className="landing-button landing-button-light" href="/browse">Explore Web App <ArrowUpRight aria-hidden="true" /></Link>
+          <span className="android-install-label">Android installation</span>
+          <span className="android-install-note">QR placeholder · URL pending</span>
         </div>
       </section>
     </div>
