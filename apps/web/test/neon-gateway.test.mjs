@@ -1,8 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-const { chatCompletion, getGatewayConfig, listGatewayModels } =
-  await import("../src/lib/ai/gateway.ts");
+const {
+  chatCompletion,
+  GatewayUnavailableError,
+  getGatewayConfig,
+  getGatewayStatus,
+  listGatewayModels,
+} = await import("../src/lib/ai/gateway.ts");
 
 const BASE = "https://branch-api.ai.example.neon.tech";
 const TOKEN = "nt_live_test";
@@ -84,6 +89,59 @@ test("chatCompletion posts to the chat-completions dialect and returns the text"
     );
     assert.equal(text, "bonjour");
     assert.equal(body.model, "test-model");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("getGatewayStatus reports availability without making an inference call", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () =>
+    new Response(
+      JSON.stringify({
+        data: [
+          { id: "a", enabled: false, unavailable_reason: "paid_plan_required" },
+        ],
+      }),
+      { status: 200, headers: { "content-type": "application/json" } },
+    );
+  try {
+    const status = await withEnv(
+      { NEON_AI_GATEWAY_BASE_URL: BASE, NEON_AI_GATEWAY_TOKEN: TOKEN },
+      () => getGatewayStatus(),
+    );
+    assert.deepEqual(status, {
+      available: false,
+      modelCount: 1,
+      enabledCount: 0,
+      reason: "paid_plan_required",
+    });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("a 403 paid_plan_required raises a typed, non-retryable error", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () =>
+    new Response(
+      JSON.stringify({ error: { unavailable_reason: "paid_plan_required" } }),
+      { status: 403 },
+    );
+  try {
+    await assert.rejects(
+      () =>
+        withEnv(
+          { NEON_AI_GATEWAY_BASE_URL: BASE, NEON_AI_GATEWAY_TOKEN: TOKEN },
+          () =>
+            chatCompletion("claude-haiku-4-5", [
+              { role: "user", content: "hi" },
+            ]),
+        ),
+      (error) =>
+        error instanceof GatewayUnavailableError &&
+        error.reason.includes("credits"),
+    );
   } finally {
     globalThis.fetch = originalFetch;
   }

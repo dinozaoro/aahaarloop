@@ -11,6 +11,23 @@ export interface GatewayConfig {
   token: string;
 }
 
+export class GatewayUnavailableError extends Error {
+  readonly reason: string;
+
+  constructor(reason: string) {
+    super(`AI Gateway unavailable: ${reason}`);
+    this.name = "GatewayUnavailableError";
+    this.reason = reason;
+  }
+}
+
+export interface GatewayStatus {
+  available: boolean;
+  modelCount: number;
+  enabledCount: number;
+  reason?: string;
+}
+
 export interface GatewayModel {
   id: string;
   enabled: boolean;
@@ -57,6 +74,23 @@ export async function listGatewayModels(): Promise<GatewayModel[]> {
   return body.data ?? [];
 }
 
+/** Free health check: lists models without making a paid inference call. */
+export async function getGatewayStatus(): Promise<GatewayStatus> {
+  const models = await listGatewayModels();
+  const enabledCount = models.filter((model) => model.enabled).length;
+  const reason =
+    enabledCount === 0
+      ? (models.find((model) => model.unavailable_reason)?.unavailable_reason ??
+        "no enabled models")
+      : undefined;
+  return {
+    available: enabledCount > 0,
+    modelCount: models.length,
+    enabledCount,
+    ...(reason ? { reason } : {}),
+  };
+}
+
 export async function chatCompletion(
   model: string,
   messages: Array<{ role: "system" | "user" | "assistant"; content: string }>,
@@ -67,6 +101,11 @@ export async function chatCompletion(
   });
   if (!response.ok) {
     const detail = await response.text();
+    if (response.status === 403 && detail.includes("paid_plan_required")) {
+      throw new GatewayUnavailableError(
+        "AI Gateway credits are not enabled on this Neon account",
+      );
+    }
     throw new Error(
       `AI Gateway chat completion returned ${response.status}: ${detail.slice(0, 300)}`,
     );
