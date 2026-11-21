@@ -440,3 +440,13 @@
   .notification-row { gap: 12px; }
   .notification-row h2 { font-size: 11px; }
 }
+
+.impact-charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 18px 0; }
+.impact-chart { border: 1px solid #E6DAD5; border-radius: 18px; padding: 18px; background: #FFFDF9; }
+.impact-chart h2 { font-size: 14px; margin: 0 0 12px; }
+.impact-bars { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.impact-bars li { display: grid; grid-template-columns: 64px 1fr 44px; align-items: center; gap: 8px; font-size: 11px; }
+.impact-bar-label { color: #70605D; }
+.impact-bar-track { display: block; height: 8px; border-radius: 999px; background: #F0E8E2; overflow: hidden; }
+.impact-bar-track > span { display: block; height: 100%; border-radius: 999px; background: #A05F32; }
+.impact-bars strong { text-align: right; }
