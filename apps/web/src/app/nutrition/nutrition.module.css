@@ -6,7 +6,6 @@
 }
 
 .page {
-  --primary: oklch(0.6759 0.1115 56.2);
   --nut-clay: oklch(0.7221 0.1087 56.6);
   --nut-cream: oklch(0.9874 0.0189 93.7);
   --nut-forest: oklch(0.3111 0.0598 166.9);
@@ -385,8 +384,8 @@
   gap: 14px;
   padding: 9px 10px 9px 21px;
   border-radius: 999px;
-  background: var(--primary, oklch(0.6759 0.1115 56.2));
-  color: white;
+  background: var(--primary);
+  color: var(--primary-foreground);
   font-size: 0.84rem;
   font-weight: 600;
   text-decoration: none;
