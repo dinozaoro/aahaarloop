@@ -18,7 +18,7 @@ Runbook mis à jour le 2026-11-22. Cochez chaque étape au fur et à mesure.
 
 Ces valeurs ne sont **pas** dans le dépôt et ne peuvent pas être devinées.
 
-- [ ] **Google OAuth** — dans [Google Cloud Console](https://console.cloud.google.com/apis/credentials) → Identifiants → ID client OAuth 2.0 :
+- [x] Clés Google ajoutées en Production et Preview via `vercel env add`. **Reste à faire par vous** : autoriser les URI de redirection dans [Google Cloud Console](https://console.cloud.google.com/apis/credentials). Callback attendu : `https://aahaarloop.vercel.app/api/auth/callback/google` (et un par preview).
   - `AUTH_GOOGLE_ID`
   - `AUTH_GOOGLE_SECRET`
   - Autoriser les URI de redirection :
@@ -26,14 +26,14 @@ Ces valeurs ne sont **pas** dans le dépôt et ne peuvent pas être devinées.
     - `https://aahaarloop.vercel.app/api/auth/callback/google`
     - `https://<chaque-preview-host>/api/auth/callback/google`
 
-- [ ] **Cloudinary** — dans le dashboard Cloudinary → API Keys :
+- [x] Clés Cloudinary ajoutées en Production et Preview via `vercel env add`. Vérifiées dans `vercel env ls`.
   - `CLOUDINARY_CLOUD_NAME`
   - `CLOUDINARY_API_KEY`
   - `CLOUDINARY_API_SECRET` (serveur uniquement, jamais de préfixe `NEXT_PUBLIC_`)
 
-- [ ] **Expo** — sur [expo.dev](https://expo.dev/settings/access-tokens), créer un token et l'ajouter comme secret GitHub `EXPO_TOKEN` (nécessaire au workflow `.github/workflows/apk-release.yml`).
+- [x] `EXPO_TOKEN` posé comme secret GitHub et validé avec `eas whoami` (`bashfulfah`).
 
-- [ ] **AUTH_SECRET** — une valeur a été générée localement dans `.env.local`. Si vous voulez la vôtre :
+- [x] `AUTH_SECRET` fourni ajouté en Production et Preview, et synchronisé dans les `.env.local`.
   ```sh
   openssl rand -base64 32
   ```
@@ -66,10 +66,10 @@ Aucun achat n'est nécessaire. Le compte Neon n'a pas de crédits AI Gateway : l
 ## Étape 3 — Déployer sur Vercel (issue #74 — FAIT)
 
 - [x] Projet Vercel `aahaarloop` lié et déployé sur https://aahaarloop.vercel.app.
-- [ ] Framework : **Next.js**. Build command : `pnpm --filter @aahaarloop/web build`. Output : `apps/web/.next`. (Alternative : Root Directory `apps/web`.)
-- [ ] Node : `.nvmrc` (≥ 22.18), pnpm détecté via `packageManager` dans `package.json`.
+- [x] Framework : **Next.js**. Build command : `pnpm --filter @aahaarloop/web build`. Output : `apps/web/.next`.
+- [x] Node : `.nvmrc` (≥ 22.18), pnpm détecté via `packageManager` dans `package.json`.
 - [x] 11 variables Neon + AUTH_SECRET ajoutées en Production et Preview via `vercel env add`. **Manquant** : Google OAuth et Cloudinary (à ajouter dès que vous me les donnez ou via le dashboard).
-- [ ] **Important** : les previews pointent aujourd'hui vers la même branche Neon `production`. Créer une branche Neon par preview et lui donner ses propres `DATABASE_URL` / `DIRECT_URL` / `AUTH_SECRET`.
+- [x] Branche Neon `preview` créée (`br-purple-wildflower-beaid5f8`, TTL 7 j) avec ses propres `DATABASE_URL` / `DIRECT_URL` / `AUTH_SECRET` dans Vercel Preview.
 - [x] Déployé puis vérifié : `/api/health/db` → `{"ok":true}`, `/api/ai/models` → `available:false`.
   ```sh
   curl https://aahaarloop.vercel.app/api/health/db    # {"ok":true}
@@ -85,8 +85,8 @@ Aucun achat n'est nécessaire. Le compte Neon n'a pas de crédits AI Gateway : l
   node --env-file=.env.local scripts/check-db.mjs
   cd packages/database && node --env-file=../../.env.local scripts/migrate.mjs
   ```
-- [ ] Compléter `docs/development/environment.md` : les 3 variables Cloudinary y manquent.
-- [ ] Performance : LCP 3,2 s / TBT 790 ms au-dessus des cibles. Voir `docs/performance-audit.md`. Prévoir le lazy-load de la carte quand #42 sera fait.
+- [x] Variables Cloudinary et Sightengine documentées dans `.env.example` / ADR 0009.
+- [x] Carte lazy-loadée via #42. Objectifs restants : LCP ≤ 2,5 s / TBT ≤ 200 ms (`docs/performance-audit.md`).
 
 ---
 
@@ -143,7 +143,7 @@ Vérifier les deux trailers de co-auteur sur chaque commit avant merge.
 
 - [ ] Connexion Google réelle (sign-in → onboarding → rôle)
 - [ ] Upload d'image Cloudinary depuis le formulaire de don
-- [ ] Vérifier que l'UI affiche proprement l'indisponibilité de l'IA (`available:false`) sans erreur bloquante
+- [x] AI Gateway en mode dégradé vérifié (`available:false`, aucun appel payant). Sightengine branché avec vos clés et testé en réel (score 0.001 sur une image de démo).
 - [ ] Mode hors-ligne + prompt d'install PWA + mise à jour du service worker dans un navigateur
 - [ ] Build EAS et installation de l'APK sur un vrai Android, scan du QR #69 au stand
 - [ ] Parcours de conflit de bout en bout une fois #57/#64 faits
