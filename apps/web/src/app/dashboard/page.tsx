@@ -4,23 +4,23 @@ import type { Metadata } from "next";
 import { WorkspaceShell } from "@/components/workspace-shell";
 import { getDonationsForOrganization, getClaimsForDonor } from "@/lib/data/store";
 import { DEMO_DONOR_ORG_ID } from "@/lib/data/constants";
+import { buildDonorDashboard } from "@/lib/donor-dashboard";
 import { CATEGORY_LABELS, DONATION_STATUS_LABELS } from "@/lib/domain/types";
 
 export const metadata: Metadata = { title: "Dashboard" };
 const stamp = (date: string) => new Intl.DateTimeFormat("en-IN", { hour: "numeric", minute: "2-digit" }).format(new Date(date));
+const day = new Intl.DateTimeFormat("en-IN", { weekday: "long", day: "numeric", month: "long" }).format(new Date());
 
 export default function DashboardPage() {
-  const donations = [...getDonationsForOrganization(DEMO_DONOR_ORG_ID)].sort((a, b) => a.pickupDeadlineAt.localeCompare(b.pickupDeadlineAt));
+  const donations = getDonationsForOrganization(DEMO_DONOR_ORG_ID);
   const claims = getClaimsForDonor(DEMO_DONOR_ORG_ID);
-  const open = donations.filter((item) => ["published", "claimed", "pickup_scheduled"].includes(item.status));
-  const urgent = open[0];
-  const rescued = donations.reduce((sum, item) => sum + item.servingsTotal - item.servingsAvailable, 0);
+  const { active, urgent, rescuedServings, awaitingPickup } = buildDonorDashboard(donations, claims);
   return <WorkspaceShell>
-    <div className="page-heading"><div><p className="page-kicker">Saturday, 21 November</p><h1>Good afternoon, Meera.</h1><p>Let’s make today’s surplus count.</p></div><Link href="/donations/new" className="primary-action"><span>＋</span> Post surplus</Link></div>
-    <section className="stat-strip" aria-label="Donation summary"><div><span>Food rescued</span><strong>{rescued}<small> servings</small></strong><em>Across all posted donations</em></div><div><span>Active donations</span><strong>{open.length.toString().padStart(2, "0")}</strong><em>Visible to nearby organisations</em></div><div><span>Awaiting pickup</span><strong>{claims.filter((claim) => ["confirmed", "pickup_scheduled"].includes(claim.status)).length.toString().padStart(2, "0")}</strong><em>{urgent ? `Next deadline at ${stamp(urgent.pickupDeadlineAt)}` : "No pickups scheduled"}</em></div></section>
+    <div className="page-heading"><div><p className="page-kicker">{day}</p><h1>Good afternoon, Meera.</h1><p>Let’s make today’s surplus count.</p></div><Link href="/donations/new" className="primary-action"><span>＋</span> Post surplus</Link></div>
+    <section className="stat-strip" aria-label="Donation summary"><div><span>Food rescued</span><strong>{rescuedServings}<small> servings</small></strong><em>Across all posted donations</em></div><div><span>Active donations</span><strong>{active.length.toString().padStart(2, "0")}</strong><em>Visible to nearby organisations</em></div><div><span>Awaiting pickup</span><strong>{awaitingPickup.length.toString().padStart(2, "0")}</strong><em>{urgent ? `Next deadline at ${stamp(urgent.pickupDeadlineAt)}` : "No pickups scheduled"}</em></div></section>
     <div className="dashboard-columns">
       <section className="panel donations-panel"><div className="panel-heading"><div><h2>Your active donations</h2><p>Keep an eye on what is ready to move.</p></div><Link href="/donations" className="text-link">View all <span>↗</span></Link></div>
-        <div className="donation-list">{open.slice(0, 3).map((donation, index) => <article className="donation-row" key={donation.id}><div className={`food-thumb food-thumb-${index}`}><Image src="/images/tasty-bowl.webp" width={180} height={140} alt="" /></div><div className="donation-copy"><span className="food-category">{CATEGORY_LABELS[donation.category]}</span><h3>{donation.title}</h3><p>{donation.servingsAvailable} servings left · {donation.pickupArea}</p></div><div className="donation-state"><span className={`status status-${donation.status}`}>{DONATION_STATUS_LABELS[donation.status]}</span><small>Pickup by {stamp(donation.pickupDeadlineAt)}</small></div></article>)}</div>
+        <div className="donation-list">{active.length === 0 ? <p className="sample-note">No active donations yet. Post surplus to make it available to nearby organisations.</p> : active.slice(0, 3).map((donation, index) => <article className="donation-row" key={donation.id}><div className={`food-thumb food-thumb-${index}`}><Image src="/images/tasty-bowl.webp" width={180} height={140} alt="" /></div><div className="donation-copy"><span className="food-category">{CATEGORY_LABELS[donation.category]}</span><h3>{donation.title}</h3><p>{donation.servingsAvailable} servings left · {donation.pickupArea}</p></div><div className="donation-state"><span className={`status status-${donation.status}`}>{DONATION_STATUS_LABELS[donation.status]}</span><small>Pickup by {stamp(donation.pickupDeadlineAt)}</small></div></article>)}</div>
         <p className="sample-note">Preview workspace · seeded examples reset when the server restarts.</p>
       </section>
       <aside className="right-rail"><section className="urgent-panel"><div className="urgent-label"><i /> Upcoming pickup</div><h2>{urgent?.title ?? "No urgent pickups"}</h2><p>{urgent ? `${urgent.servingsAvailable} servings are ready for collection` : "New matches will appear here."}</p><div className="urgent-time"><span className="tiny-icon">◷</span><span>Pickup deadline<strong>{urgent ? stamp(urgent.pickupDeadlineAt) : "—"}</strong></span></div><Link href="/claims" className="urgent-link">Coordinate pickup <span>→</span></Link></section>
