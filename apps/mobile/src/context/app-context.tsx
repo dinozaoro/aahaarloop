@@ -16,7 +16,7 @@ interface AppContextValue {
   cachedDonations: ApiDonation[];
   cacheDonations: (donations: ApiDonation[]) => Promise<void>;
   refreshOffline: () => Promise<void>;
-  claims: Array<{ id: string; donationId: string; servings: number; status: string }>;
+  claims: { id: string; donationId: string; servings: number; status: string }[];
   addClaim: (claim: { id: string; donationId: string; servings: number; status: string }) => void;
 }
 
@@ -88,6 +88,8 @@ export function AppProvider({ children }: PropsWithChildren) {
         setPreferencesHydrated(true);
       }
     })();
+    // Local hydration belongs to the mount effect and may update several stores.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void loadLocalData();
     void refreshOffline();
     const timer = setInterval(() => void refreshOffline(), 30_000);

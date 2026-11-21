@@ -1,23 +1,13 @@
-import {
-  AndroidImportance,
-  getPermissionsAsync,
-  requestPermissionsAsync,
-  setNotificationChannelAsync,
-  type PermissionStatus,
-} from "expo-notifications";
+import * as Notifications from "expo-notifications";
+import { AndroidImportance } from "expo-notifications";
 import { Platform } from "react-native";
 
-export async function requestNotificationPermission(): Promise<PermissionStatus> {
+export async function requestNotificationPermission(): Promise<Notifications.PermissionStatus> {
   if (Platform.OS === "android") {
-    await setNotificationChannelAsync("updates", {
-      name: "AahaarLoop updates",
-      importance: AndroidImportance.DEFAULT,
-    });
+    await Notifications.setNotificationChannelAsync("updates", { name: "AahaarLoop updates", importance: AndroidImportance.DEFAULT });
   }
-  const current = await getPermissionsAsync();
-  if (current.granted) {
-    return current.status;
-  }
-  const requested = await requestPermissionsAsync();
+  const current = await Notifications.getPermissionsAsync();
+  if (current.granted) return current.status;
+  const requested = await Notifications.requestPermissionsAsync();
   return requested.status;
 }

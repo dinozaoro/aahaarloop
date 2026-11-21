@@ -25,17 +25,6 @@ export async function queueRequest(request: QueuedRequest): Promise<QueuedOperat
   });
 }
 
-export async function listSyncConflicts() {
-  return (await getQueue()).listConflicts();
-}
-
-export async function resolveSyncConflict(
-  id: string,
-  resolution: "merged" | "overwritten" | "cancelled",
-) {
-  return (await getQueue()).resolveConflict(id, resolution);
-}
-
 export async function getQueueCounts() {
   return (await getQueue()).counts();
 }

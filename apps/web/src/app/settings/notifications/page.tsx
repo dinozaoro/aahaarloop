@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { NotificationPreferencesForm } from "@/components/notification-preferences-form";
+import { NotificationPreferencesForm } from "./notification-preferences-form";
 
 export const metadata: Metadata = { title: "Notification preferences" };
 

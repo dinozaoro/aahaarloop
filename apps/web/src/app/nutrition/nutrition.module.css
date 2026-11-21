@@ -1,10 +1,5 @@
 /* Reference composition restyled with the logo-derived cream / leaf-green / clay palette. */
 
-:global(body:has([data-nutrition]) header),
-:global(body:has([data-nutrition]) footer) {
-  display: none;
-}
-
 .page {
   --nut-clay: oklch(0.7221 0.1087 56.6);
   --nut-cream: oklch(0.9874 0.0189 93.7);
@@ -781,9 +776,9 @@
     translate: 0 0;
   }
 
-  :global(*),
-  :global(*::before),
-  :global(*::after) {
+  .page :global(*),
+  .page :global(*::before),
+  .page :global(*::after) {
     transition-duration: 0.01ms !important;
   }
 }

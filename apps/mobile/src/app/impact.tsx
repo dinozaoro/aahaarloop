@@ -7,6 +7,8 @@ import { colors } from "@/theme";
 export default function ImpactScreen() {
   const [donations, setDonations] = useState<ApiDonation[]>([]); const [loading, setLoading] = useState(true); const [error, setError] = useState(false);
   const load = useCallback(async () => { try { const result = await apiFetch<{ donations: ApiDonation[] }>("/api/donations"); setDonations(result.donations ?? []); } catch { setError(true); } finally { setLoading(false); } }, []);
+  // Data loading is intentionally kicked off after mount.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { void load(); }, [load]);
   const portions = donations.reduce((sum, item) => sum + (item.servingsTotal ?? 0), 0);
   return <Screen><View style={impactStyles.header}><Text style={impactStyles.eyebrow}>THE DIFFERENCE</Text><Heading size={30}>Small actions, shared impact.</Heading><Text style={styles.body}>Metrics below use the donations visible to your authenticated account.</Text></View>{loading ? <LoadingCards /> : error ? <EmptyState title="Impact is waiting." body="We could not load the verified donation data." primary="Try again" onPrimary={() => { setLoading(true); setError(false); void load(); }} /> : <><View style={impactStyles.grid}><Metric value={String(donations.length)} label="donations listed" /><Metric value={String(portions)} label="portions listed" /></View><Card><Text style={impactStyles.title}>Estimated meals</Text><Text style={styles.body}>Estimated meals are based on listed portions, not a food-safety or delivery verification.</Text><Text style={impactStyles.big}>{portions}</Text></Card></>}</Screen>;

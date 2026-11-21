@@ -12,7 +12,7 @@ import { z } from "zod";
 
 export const runtime = "nodejs";
 
-export async function currentActor() {
+async function currentActor() {
   const session = await auth();
   if (!session?.user?.id) throw new ApiError("unauthorized", "Sign in required");
   return session.user;
