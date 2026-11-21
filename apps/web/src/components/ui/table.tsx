@@ -1,6 +1,5 @@
-import type * as React from "react";
-
 import { cn } from "@/lib/utils";
+import type * as React from "react";
 
 function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
@@ -40,7 +39,7 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
       data-slot="table-row"
       className={cn(
         "border-b border-border transition-colors hover:bg-muted/50",
-        className
+        className,
       )}
       {...props}
     />
@@ -54,7 +53,7 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
       scope="col"
       className={cn(
         "h-10 px-3 text-left align-middle text-xs font-semibold tracking-wide text-muted-foreground uppercase",
-        className
+        className,
       )}
       {...props}
     />
@@ -71,7 +70,10 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
   );
 }
 
-function TableCaption({ className, ...props }: React.ComponentProps<"caption">) {
+function TableCaption({
+  className,
+  ...props
+}: React.ComponentProps<"caption">) {
   return (
     <caption
       data-slot="table-caption"

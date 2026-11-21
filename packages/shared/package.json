@@ -10,10 +10,13 @@
     "build": "echo 'no build: source consumed directly'",
     "lint": "echo 'lint: nothing yet'",
     "typecheck": "tsc --noEmit",
-    "test": "echo 'no tests'"
+    "test": "node --test test/*.test.mjs"
   },
   "devDependencies": {
     "@aahaarloop/config": "workspace:*",
     "typescript": "~6.0.3"
+  },
+  "dependencies": {
+    "zod": "^4.6.7"
   }
 }

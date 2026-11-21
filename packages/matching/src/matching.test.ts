@@ -1,11 +1,12 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
+
+import { matchDonationsForRecipient as publicMatch } from "./index.ts";
 import {
   DEFAULT_MATCHING_WEIGHTS,
   haversineDistanceKm,
   matchDonationsForRecipient,
 } from "./matching.ts";
-import { matchDonationsForRecipient as publicMatch } from "./index.ts";
 import type {
   DonationCandidate,
   MatchingConfig,
@@ -22,7 +23,7 @@ function at(offsetMs: number): Date {
 }
 
 function donation(
-  overrides: Partial<DonationCandidate> = {}
+  overrides: Partial<DonationCandidate> = {},
 ): DonationCandidate {
   return {
     id: "donation-1",
@@ -38,7 +39,7 @@ function donation(
 }
 
 function recipient(
-  overrides: Partial<RecipientRequest> = {}
+  overrides: Partial<RecipientRequest> = {},
 ): RecipientRequest {
   return {
     id: "recipient-1",
@@ -47,16 +48,17 @@ function recipient(
     requiredServings: 100,
     storage: "ambient",
     transportCapacityKg: 1000,
-    volunteerAvailability: [
-      { start: at(-HOUR_MS), end: at(HOUR_MS) },
-    ],
+    volunteerAvailability: [{ start: at(-HOUR_MS), end: at(HOUR_MS) }],
     ...overrides,
   };
 }
 
 function match(
   donations: readonly DonationCandidate[],
-  options: { config?: MatchingConfig; recipient?: Partial<RecipientRequest> } = {}
+  options: {
+    config?: MatchingConfig;
+    recipient?: Partial<RecipientRequest>;
+  } = {},
 ) {
   return matchDonationsForRecipient(recipient(options.recipient), donations, {
     now: NOW,
@@ -78,8 +80,12 @@ function only(weight: keyof MatchingWeights): MatchingConfig {
   };
 }
 
-function reasonsFor(result: ReturnType<typeof match>, donationId = "donation-1") {
-  return result.excluded.find((entry) => entry.donationId === donationId)?.reasons;
+function reasonsFor(
+  result: ReturnType<typeof match>,
+  donationId = "donation-1",
+) {
+  return result.excluded.find((entry) => entry.donationId === donationId)
+    ?.reasons;
 }
 
 describe("haversineDistanceKm", () => {
@@ -87,16 +93,16 @@ describe("haversineDistanceKm", () => {
     assert.equal(
       haversineDistanceKm(
         { latitude: 10, longitude: 20 },
-        { latitude: 10, longitude: 20 }
+        { latitude: 10, longitude: 20 },
       ),
-      0
+      0,
     );
   });
 
   it("matches the known distance of one degree of latitude", () => {
     const distance = haversineDistanceKm(
       { latitude: 0, longitude: 0 },
-      { latitude: 0, longitude: 1 }
+      { latitude: 0, longitude: 1 },
     );
 
     assert.ok(Math.abs(distance - 111.195) < 0.01);
@@ -122,7 +128,7 @@ describe("matching components", () => {
     for (const entry of cases) {
       const result = match(
         [donation({ pickupDeadlineAt: at(entry.hours * HOUR_MS) })],
-        { config: only("urgency") }
+        { config: only("urgency") },
       );
       const best = result.matches[0];
 
@@ -138,15 +144,19 @@ describe("matching components", () => {
 
     const result = match(
       [donation({ location: { latitude: 0, longitude: 0.5 } })],
-      { config: { ...only("distance"), maxDistanceKm: 100 } }
+      { config: { ...only("distance"), maxDistanceKm: 100 } },
     );
     const best = result.matches[0];
 
     assert.ok(best);
-    const expected = 100 * (1 - haversineDistanceKm(
-      { latitude: 0, longitude: 0 },
-      { latitude: 0, longitude: 0.5 }
-    ) / 100);
+    const expected =
+      100 *
+      (1 -
+        haversineDistanceKm(
+          { latitude: 0, longitude: 0 },
+          { latitude: 0, longitude: 0.5 },
+        ) /
+          100);
     assert.ok(Math.abs(best.totalScore - expected) < 0.02);
   });
 
@@ -195,7 +205,7 @@ describe("matching components", () => {
     assert.equal(available.matches[0]?.totalScore, 100);
     assert.equal(
       available.matches[0]?.explanation.availability.availableNow,
-      true
+      true,
     );
 
     const unavailable = match([donation()], {
@@ -209,7 +219,7 @@ describe("matching components", () => {
     assert.equal(unavailable.matches[0]?.totalScore, 0);
     assert.equal(
       unavailable.matches[0]?.explanation.availability.availableNow,
-      false
+      false,
     );
   });
 
@@ -228,7 +238,7 @@ describe("matching components", () => {
   it("uses proportional weight for partial claims", () => {
     const result = match(
       [donation({ availableServings: 40, totalWeightKg: 100 })],
-      { config: only("logistics"), recipient: { transportCapacityKg: 200 } }
+      { config: only("logistics"), recipient: { transportCapacityKg: 200 } },
     );
     const best = result.matches[0];
 
@@ -246,7 +256,7 @@ describe("weighted total", () => {
     assert.equal(result.matches[0]?.totalScore, 73);
     assert.deepEqual(
       result.matches[0]?.explanation.urgency.weight,
-      DEFAULT_MATCHING_WEIGHTS.urgency
+      DEFAULT_MATCHING_WEIGHTS.urgency,
     );
   });
 
@@ -260,14 +270,13 @@ describe("weighted total", () => {
 
     assert.equal(match([urgent, near]).matches[0]?.donationId, "urgent");
     assert.equal(
-      match([urgent, near], { config: only("urgency") }).matches[0]
-        ?.donationId,
-      "urgent"
+      match([urgent, near], { config: only("urgency") }).matches[0]?.donationId,
+      "urgent",
     );
     assert.equal(
       match([urgent, near], { config: only("distance") }).matches[0]
         ?.donationId,
-      "near"
+      "near",
     );
   });
 
@@ -277,27 +286,22 @@ describe("weighted total", () => {
     });
 
     assert.ok(
-      Math.abs(
-        (result.matches[0]?.explanation.urgency.weight ?? 0) - 2 / 2.7
-      ) < 0.0001
+      Math.abs((result.matches[0]?.explanation.urgency.weight ?? 0) - 2 / 2.7) <
+        0.0001,
     );
   });
 });
 
 describe("hard filters", () => {
   it("excludes expired deadlines", () => {
-    const result = match([
-      donation({ pickupDeadlineAt: at(-HOUR_MS) }),
-    ]);
+    const result = match([donation({ pickupDeadlineAt: at(-HOUR_MS) })]);
 
     assert.equal(result.matches.length, 0);
     assert.deepEqual(reasonsFor(result), ["expired"]);
   });
 
   it("excludes deadlines consumed by handling and buffer", () => {
-    const result = match([
-      donation({ pickupDeadlineAt: at(20 * MINUTE_MS) }),
-    ]);
+    const result = match([donation({ pickupDeadlineAt: at(20 * MINUTE_MS) })]);
 
     assert.equal(result.matches.length, 0);
     assert.deepEqual(reasonsFor(result), ["infeasible"]);
@@ -376,14 +380,11 @@ describe("hard filters", () => {
 
 describe("ordering and determinism", () => {
   it("breaks score ties by distance then donation id", () => {
-    const result = match([
-      donation({ id: "b" }),
-      donation({ id: "a" }),
-    ]);
+    const result = match([donation({ id: "b" }), donation({ id: "a" })]);
 
     assert.deepEqual(
       result.matches.map((entry) => entry.donationId),
-      ["a", "b"]
+      ["a", "b"],
     );
   });
 
@@ -396,7 +397,7 @@ describe("ordering and determinism", () => {
 
     assert.deepEqual(
       matchDonationsForRecipient(recipient(), donations, input),
-      matchDonationsForRecipient(recipient(), donations, input)
+      matchDonationsForRecipient(recipient(), donations, input),
     );
   });
 
@@ -421,62 +422,62 @@ describe("input validation", () => {
             },
           },
         }),
-      /positive sum/
+      /positive sum/,
     );
   });
 
   it("rejects negative weights", () => {
     assert.throws(
       () => match([donation()], { config: { weights: { urgency: -1 } } }),
-      /weights.urgency/
+      /weights.urgency/,
     );
   });
 
   it("rejects invalid config numbers", () => {
     assert.throws(
       () => match([donation()], { config: { maxDistanceKm: 0 } }),
-      /maxDistanceKm/
+      /maxDistanceKm/,
     );
     assert.throws(
       () => match([donation()], { config: { averageSpeedKmh: 0 } }),
-      /averageSpeedKmh/
+      /averageSpeedKmh/,
     );
     assert.throws(
       () => match([donation()], { config: { handlingTimeMinutes: -1 } }),
-      /handlingTimeMinutes/
+      /handlingTimeMinutes/,
     );
   });
 
   it("rejects invalid recipient values", () => {
     assert.throws(
       () => match([donation()], { recipient: { requiredServings: 0 } }),
-      /requiredServings/
+      /requiredServings/,
     );
     assert.throws(
       () => match([donation()], { recipient: { transportCapacityKg: -1 } }),
-      /transportCapacityKg/
+      /transportCapacityKg/,
     );
     assert.throws(
       () =>
         match([donation()], {
           recipient: { location: { latitude: 91, longitude: 0 } },
         }),
-      /latitude/
+      /latitude/,
     );
   });
 
   it("rejects invalid donation values", () => {
     assert.throws(
       () => match([donation({ availableServings: 101 })]),
-      /availableServings/
+      /availableServings/,
     );
     assert.throws(
       () => match([donation({ totalWeightKg: 0 })]),
-      /totalWeightKg/
+      /totalWeightKg/,
     );
     assert.throws(
       () => match([donation({ storage: "room" as never })]),
-      /storage/
+      /storage/,
     );
   });
 
@@ -485,12 +486,10 @@ describe("input validation", () => {
       () =>
         match([donation()], {
           recipient: {
-            volunteerAvailability: [
-              { start: at(HOUR_MS), end: at(HOUR_MS) },
-            ],
+            volunteerAvailability: [{ start: at(HOUR_MS), end: at(HOUR_MS) }],
           },
         }),
-      /volunteerAvailability/
+      /volunteerAvailability/,
     );
   });
 
@@ -500,7 +499,7 @@ describe("input validation", () => {
         matchDonationsForRecipient(recipient(), [donation()], {
           now: "2026-11-21T10:00:00",
         }),
-      /explicit timezone offset/
+      /explicit timezone offset/,
     );
   });
 });

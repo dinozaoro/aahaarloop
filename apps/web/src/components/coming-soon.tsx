@@ -1,9 +1,14 @@
-import Link from "next/link";
-
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 export function ComingSoon({
   title,
@@ -28,10 +33,7 @@ export function ComingSoon({
           <Link href="/design" className={cn(buttonVariants())}>
             View the design system
           </Link>
-          <Link
-            href="/"
-            className={cn(buttonVariants({ variant: "outline" }))}
-          >
+          <Link href="/" className={cn(buttonVariants({ variant: "outline" }))}>
             Back to home
           </Link>
         </CardContent>

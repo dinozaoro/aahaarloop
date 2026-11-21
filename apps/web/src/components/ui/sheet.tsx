@@ -1,11 +1,10 @@
 "use client";
 
-import type * as React from "react";
-import { Dialog as DialogPrimitive } from "radix-ui";
+import { cn } from "@/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import { X } from "lucide-react";
-
-import { cn } from "@/lib/utils";
+import { Dialog as DialogPrimitive } from "radix-ui";
+import type * as React from "react";
 
 const sheetVariants = cva(
   "fixed z-50 flex flex-col gap-4 bg-card p-6 text-card-foreground shadow-lifted transition ease-in-out",
@@ -14,14 +13,13 @@ const sheetVariants = cva(
       side: {
         right: "inset-y-0 right-0 h-full w-3/4 max-w-sm border-l",
         left: "inset-y-0 left-0 h-full w-3/4 max-w-sm border-r",
-        bottom:
-          "inset-x-0 bottom-0 max-h-[85vh] rounded-t-xl border-t",
+        bottom: "inset-x-0 bottom-0 max-h-[85vh] rounded-t-xl border-t",
       },
     },
     defaultVariants: {
       side: "right",
     },
-  }
+  },
 );
 
 function Sheet(props: React.ComponentProps<typeof DialogPrimitive.Root>) {
@@ -29,7 +27,7 @@ function Sheet(props: React.ComponentProps<typeof DialogPrimitive.Root>) {
 }
 
 function SheetTrigger(
-  props: React.ComponentProps<typeof DialogPrimitive.Trigger>
+  props: React.ComponentProps<typeof DialogPrimitive.Trigger>,
 ) {
   return <DialogPrimitive.Trigger data-slot="sheet-trigger" {...props} />;
 }

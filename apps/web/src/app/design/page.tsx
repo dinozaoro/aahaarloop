@@ -1,14 +1,9 @@
 "use client";
 
-import { toast } from "sonner";
-
 import { Logo } from "@/components/logo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogClose,
@@ -44,13 +39,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 
 const COLOR_TOKENS = [
   ["background", "bg-background border"],
@@ -106,8 +97,12 @@ export default function DesignPage() {
           Typography
         </h2>
         <div className="flex flex-col gap-2">
-          <p className="text-4xl font-semibold tracking-tight">Text 4xl / 600</p>
-          <p className="text-2xl font-semibold tracking-tight">Text 2xl / 600</p>
+          <p className="text-4xl font-semibold tracking-tight">
+            Text 4xl / 600
+          </p>
+          <p className="text-2xl font-semibold tracking-tight">
+            Text 2xl / 600
+          </p>
           <p className="text-lg">Text lg / 400</p>
           <p className="text-sm text-muted-foreground">
             Text sm muted, used for descriptions and metadata.
@@ -178,7 +173,10 @@ export default function DesignPage() {
             </Field>
             <Field className="sm:col-span-2">
               <FieldLabel htmlFor="demo-notes">Notes</FieldLabel>
-              <Textarea id="demo-notes" placeholder="Allergens, packaging, handling…" />
+              <Textarea
+                id="demo-notes"
+                placeholder="Allergens, packaging, handling…"
+              />
             </Field>
           </CardContent>
         </Card>

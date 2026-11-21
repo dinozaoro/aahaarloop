@@ -1,9 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Menu } from "lucide-react";
-
 import { Logo } from "@/components/logo";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -18,6 +14,9 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { Menu } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard" },
@@ -40,7 +39,10 @@ export function SiteHeader() {
           <Logo />
         </Link>
 
-        <nav aria-label="Main" className="hidden flex-1 items-center gap-1 md:flex">
+        <nav
+          aria-label="Main"
+          className="hidden flex-1 items-center gap-1 md:flex"
+        >
           {NAV_ITEMS.map((item) => {
             const active =
               pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -51,7 +53,7 @@ export function SiteHeader() {
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground",
-                  active && "bg-primary text-primary-foreground"
+                  active && "bg-primary text-primary-foreground",
                 )}
               >
                 {item.label}
@@ -61,12 +63,18 @@ export function SiteHeader() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
-          <Badge variant="outline" className="hidden sm:inline-flex press-scale">
+          <Badge
+            variant="outline"
+            className="hidden sm:inline-flex press-scale"
+          >
             Demo data
           </Badge>
           <Link
             href="/donations/new"
-            className={cn(buttonVariants({ size: "sm" }), "hidden sm:inline-flex press-scale")}
+            className={cn(
+              buttonVariants({ size: "sm" }),
+              "hidden sm:inline-flex press-scale",
+            )}
           >
             Donate food
           </Link>

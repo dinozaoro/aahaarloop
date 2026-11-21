@@ -1,4 +1,4 @@
-import { filterByStatus, filterByCategory } from "../lib/filters";
+import { filterByCategory, filterByStatus } from "../lib/filters";
 
 describe("filterByStatus", () => {
   const donations = [

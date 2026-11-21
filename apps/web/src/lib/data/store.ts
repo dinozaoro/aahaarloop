@@ -1,6 +1,6 @@
-import { createSeedData } from "./seed";
-
 import type { Claim, Donation, Need, Organization } from "@/lib/domain/types";
+
+import { createSeedData } from "./seed";
 
 // Demo persistence: module-level state in the Next.js server process. Every
 // mutation issue replaces this with the database layer; until then the data
@@ -21,10 +21,10 @@ export function getDonation(id: string): Donation | undefined {
 }
 
 export function getDonationsForOrganization(
-  organizationId: string
+  organizationId: string,
 ): readonly Donation[] {
   return donations.filter(
-    (donation) => donation.organizationId === organizationId
+    (donation) => donation.organizationId === organizationId,
   );
 }
 
@@ -41,18 +41,18 @@ export function getClaimsForDonation(donationId: string): readonly Claim[] {
 }
 
 export function getClaimsForOrganization(
-  organizationId: string
+  organizationId: string,
 ): readonly Claim[] {
-  return claims.filter(
-    (claim) => claim.recipientOrgId === organizationId
-  );
+  return claims.filter((claim) => claim.recipientOrgId === organizationId);
 }
 
-export function getClaimsForDonor(donorOrganizationId: string): readonly Claim[] {
+export function getClaimsForDonor(
+  donorOrganizationId: string,
+): readonly Claim[] {
   const donationIds = new Set(
     getDonationsForOrganization(donorOrganizationId).map(
-      (donation) => donation.id
-    )
+      (donation) => donation.id,
+    ),
   );
   return claims.filter((claim) => donationIds.has(claim.donationId));
 }
@@ -65,6 +65,8 @@ export function getOrganizations(): readonly Organization[] {
   return organizations;
 }
 
-export function getNeedsForOrganization(organizationId: string): readonly Need[] {
+export function getNeedsForOrganization(
+  organizationId: string,
+): readonly Need[] {
   return needs.filter((need) => need.organizationId === organizationId);
 }

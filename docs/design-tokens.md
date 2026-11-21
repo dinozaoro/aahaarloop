@@ -8,17 +8,17 @@ Tailwind's `@theme`. Components use token utilities (`bg-card`, `text-muted-fore
 
 ## Color
 
-| Token | Role |
-| --- | --- |
-| `background` / `foreground` | Page canvas and body text |
-| `card` / `card-foreground` | Panels, dialogs, sheets, inputs |
-| `primary` / `primary-foreground` | Main action and brand |
-| `secondary` / `secondary-foreground` | Subdued surfaces and active nav |
-| `muted` / `muted-foreground` | Metadata, captions, disabled text |
-| `accent` / `accent-foreground` | Highlights such as urgency badges |
-| `destructive` | Errors, cancellation |
-| `success` / `warning` | Positive and caution statuses |
-| `border` / `input` / `ring` | Borders, form outlines, focus ring |
+| Token                                | Role                               |
+| ------------------------------------ | ---------------------------------- |
+| `background` / `foreground`          | Page canvas and body text          |
+| `card` / `card-foreground`           | Panels, dialogs, sheets, inputs    |
+| `primary` / `primary-foreground`     | Main action and brand              |
+| `secondary` / `secondary-foreground` | Subdued surfaces and active nav    |
+| `muted` / `muted-foreground`         | Metadata, captions, disabled text  |
+| `accent` / `accent-foreground`       | Highlights such as urgency badges  |
+| `destructive`                        | Errors, cancellation               |
+| `success` / `warning`                | Positive and caution statuses      |
+| `border` / `input` / `ring`          | Borders, form outlines, focus ring |
 
 Values are authored in OKLCH for predictable contrast. Light and dark values
 exist; the dark palette is opt-in through the `.dark` class and no theme switch

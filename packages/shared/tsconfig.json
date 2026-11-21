@@ -1,1 +1,7 @@
-{ "extends": "@aahaarloop/config/tsconfig.base.json", "include": ["src"] }
+{
+  "extends": "@aahaarloop/config/tsconfig.base.json",
+  "compilerOptions": {
+    "allowImportingTsExtensions": true
+  },
+  "include": ["src"]
+}

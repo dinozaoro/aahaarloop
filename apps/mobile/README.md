@@ -24,8 +24,8 @@ Copy the example file and adjust the API URL:
 cp apps/mobile/.env.example apps/mobile/.env.local
 ```
 
-| Variable | Purpose |
-| --- | --- |
+| Variable              | Purpose                                                    |
+| --------------------- | ---------------------------------------------------------- |
 | `EXPO_PUBLIC_API_URL` | Public API base URL inlined into the bundle at build time. |
 
 `app.config.ts` reads the variable and exposes it as `extra.apiUrl`; `src/config/env.ts` is the only

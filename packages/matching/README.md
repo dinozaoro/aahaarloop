@@ -27,23 +27,23 @@ All values are converted to epoch milliseconds. Travel and handling default to 0
 
 ### Levels
 
-| Operational margin | Level |
-| --- | --- |
-| more than 12 hours | `low` |
-| 6 to 12 hours | `medium` |
-| 3 to 6 hours, excluding 6 | `high` |
+| Operational margin                | Level      |
+| --------------------------------- | ---------- |
+| more than 12 hours                | `low`      |
+| 6 to 12 hours                     | `medium`   |
+| 3 to 6 hours, excluding 6         | `high`     |
 | more than 0 and less than 3 hours | `critical` |
 
 Boundary rule: `low` is strictly more than 12 hours; `medium` is 6 to 12 hours inclusive; `high` is 3 hours inclusive to 6 hours exclusive; `critical` is strictly between 0 and 3 hours. Therefore exactly 12 hours is `medium`, exactly 6 hours is `medium`, and exactly 3 hours is `high`.
 
 ### Statuses
 
-| Status | Meaning | Claimable |
-| --- | --- | --- |
-| `active` | Deadline is in the future and the operational margin is positive. | yes |
-| `expired` | The effective deadline is at or before `now`. | no |
-| `infeasible` | The deadline is in the future, but travel, handling and buffer consume the remaining time. | no |
-| `unknown` | No food expiry or pickup deadline was provided. | no |
+| Status       | Meaning                                                                                    | Claimable |
+| ------------ | ------------------------------------------------------------------------------------------ | --------- |
+| `active`     | Deadline is in the future and the operational margin is positive.                          | yes       |
+| `expired`    | The effective deadline is at or before `now`.                                              | no        |
+| `infeasible` | The deadline is in the future, but travel, handling and buffer consume the remaining time. | no        |
+| `unknown`    | No food expiry or pickup deadline was provided.                                            | no        |
 
 Expired and infeasible donations must not be presented as normally claimable. Admin review, if any, is outside this function.
 
@@ -86,14 +86,14 @@ const result = calculateUrgency({
 
 A donation is excluded when any of these fail:
 
-| Filter | Rule |
-| --- | --- |
-| Time feasibility | The urgency calculation must return `active`. |
-| Distance | Haversine distance must not exceed `maxDistanceKm` (default 25 km). |
-| Storage | The donation's required storage must not exceed what the recipient can provide (`ambient` < `chilled` < `frozen`). |
-| Quantity | `availableServings` must be positive. With `allowPartialClaims: false`, it must also cover `requiredServings`. |
-| Needs | If the recipient lists needs, at least one donation category must match. An empty needs list accepts anything. |
-| Transport | The claimed weight must fit `transportCapacityKg`. |
+| Filter           | Rule                                                                                                               |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Time feasibility | The urgency calculation must return `active`.                                                                      |
+| Distance         | Haversine distance must not exceed `maxDistanceKm` (default 25 km).                                                |
+| Storage          | The donation's required storage must not exceed what the recipient can provide (`ambient` < `chilled` < `frozen`). |
+| Quantity         | `availableServings` must be positive. With `allowPartialClaims: false`, it must also cover `requiredServings`.     |
+| Needs            | If the recipient lists needs, at least one donation category must match. An empty needs list accepts anything.     |
+| Transport        | The claimed weight must fit `transportCapacityKg`.                                                                 |
 
 Excluded entries list every failed reason, so a caller can explain the rejection.
 
@@ -101,14 +101,14 @@ Excluded entries list every failed reason, so a caller can explain the rejection
 
 Every eligible match is scored 0–100 per component, then combined with normalized weights.
 
-| Component | Default weight | 0–100 score |
-| --- | --- | --- |
-| Urgency | 0.30 | `critical` 100, `high` 75, `medium` 50, `low` 25 |
-| Distance | 0.25 | Linear from 100 at 0 km to 0 at `maxDistanceKm` |
-| Quantity | 0.15 | `claimableServings / requiredServings` |
-| Needs | 0.15 | Matched needs divided by listed needs; 100 when no needs are listed |
-| Availability | 0.10 | 100 when a volunteer window contains `now`, otherwise 0 |
-| Logistics | 0.05 | Claimed weight divided by transport capacity (right-sized transport scores higher) |
+| Component    | Default weight | 0–100 score                                                                        |
+| ------------ | -------------- | ---------------------------------------------------------------------------------- |
+| Urgency      | 0.30           | `critical` 100, `high` 75, `medium` 50, `low` 25                                   |
+| Distance     | 0.25           | Linear from 100 at 0 km to 0 at `maxDistanceKm`                                    |
+| Quantity     | 0.15           | `claimableServings / requiredServings`                                             |
+| Needs        | 0.15           | Matched needs divided by listed needs; 100 when no needs are listed                |
+| Availability | 0.10           | 100 when a volunteer window contains `now`, otherwise 0                            |
+| Logistics    | 0.05           | Claimed weight divided by transport capacity (right-sized transport scores higher) |
 
 Weights are normalized to sum to 1, so callers can pass any non-negative values. Missing keys fall back to the defaults; all-zero weights are rejected. The explanation payload includes each raw score, normalized weight, contribution, and the inputs behind it (`distanceKm`, `claimableServings`, `matchedCategories`, `remainingMinutes`, `claimedWeightKg`).
 
@@ -149,7 +149,7 @@ const result = matchDonationsForRecipient(
       pickupDeadlineAt: "2026-11-21T18:00:00Z",
     },
   ],
-  { now: "2026-11-21T10:00:00Z" }
+  { now: "2026-11-21T10:00:00Z" },
 );
 
 // result.matches[0].claimableServings -> 80

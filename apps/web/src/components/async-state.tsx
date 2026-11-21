@@ -1,8 +1,7 @@
 "use client";
 
-import { CircleAlert, CircleCheck, LoaderCircle } from "lucide-react";
-
 import { cn } from "@/lib/utils";
+import { CircleAlert, CircleCheck, LoaderCircle } from "lucide-react";
 
 type Status = "loading" | "error" | "empty" | "success";
 
@@ -32,7 +31,7 @@ export function AsyncState({
       aria-live={status === "error" ? "assertive" : "polite"}
       className={cn(
         "flex flex-col items-center gap-3 rounded-xl border border-dashed border-border bg-card/60 px-6 py-10 text-center",
-        className
+        className,
       )}
     >
       <Icon
@@ -41,13 +40,15 @@ export function AsyncState({
           "size-6 text-muted-foreground",
           status === "loading" && "animate-spin motion-reduce:animate-none",
           status === "error" && "text-destructive",
-          status === "success" && "text-success"
+          status === "success" && "text-success",
         )}
       />
       <div className="flex flex-col gap-1">
         <p className="font-semibold">{title}</p>
         {description ? (
-          <p className="max-w-md text-sm text-muted-foreground">{description}</p>
+          <p className="max-w-md text-sm text-muted-foreground">
+            {description}
+          </p>
         ) : null}
       </div>
       {action}

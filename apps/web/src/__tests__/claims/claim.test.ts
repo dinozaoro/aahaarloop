@@ -1,8 +1,4 @@
-import {
-  Claim,
-  getPendingClaims,
-  getClaimStatusColor,
-} from "../lib/claims";
+import { Claim, getClaimStatusColor, getPendingClaims } from "../lib/claims";
 
 describe("getPendingClaims", () => {
   const claims: Claim[] = [
@@ -37,7 +33,7 @@ describe("getPendingClaims", () => {
 
   it("returns empty array when no pending claims", () => {
     const result = getPendingClaims(
-      claims.filter((c) => c.status !== "pending")
+      claims.filter((c) => c.status !== "pending"),
     );
     expect(result).toHaveLength(0);
   });

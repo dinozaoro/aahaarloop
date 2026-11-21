@@ -45,7 +45,7 @@ export function toEpochMs(value: Instant, field: string): number {
 
   if (typeof value !== "string" || !ISO_WITH_OFFSET.test(value)) {
     throw new TypeError(
-      `${field} must be a Date or an ISO 8601 string with an explicit timezone offset`
+      `${field} must be a Date or an ISO 8601 string with an explicit timezone offset`,
     );
   }
 
@@ -59,7 +59,7 @@ export function toEpochMs(value: Instant, field: string): number {
 function toNonNegativeMinutes(
   value: number | undefined,
   field: string,
-  fallback: number
+  fallback: number,
 ): number {
   if (value === undefined) {
     return fallback;
@@ -102,7 +102,7 @@ export function calculateUrgency(input: UrgencyInput): UrgencyResult {
     toNonNegativeMinutes(
       input.bufferMinutes,
       "bufferMinutes",
-      DEFAULT_SAFETY_BUFFER_MINUTES
+      DEFAULT_SAFETY_BUFFER_MINUTES,
     ) * MINUTE_MS;
 
   const foodExpiryMs =
@@ -115,7 +115,7 @@ export function calculateUrgency(input: UrgencyInput): UrgencyResult {
       : toEpochMs(input.pickupDeadlineAt, "pickupDeadlineAt");
 
   const deadlines = [foodExpiryMs, pickupDeadlineMs].filter(
-    (value): value is number => value !== null
+    (value): value is number => value !== null,
   );
 
   if (deadlines.length === 0) {

@@ -1,10 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import {
-  DEFAULT_SAFETY_BUFFER_MINUTES,
-  calculateUrgency,
-} from "./urgency.ts";
+
 import { calculateUrgency as publicCalculateUrgency } from "./index.ts";
+import { calculateUrgency, DEFAULT_SAFETY_BUFFER_MINUTES } from "./urgency.ts";
 
 const MINUTE_MS = 60_000;
 const HOUR_MS = 60 * MINUTE_MS;
@@ -15,7 +13,7 @@ function at(offsetMs: number): Date {
 }
 
 function calculate(
-  overrides: Partial<Parameters<typeof calculateUrgency>[0]> = {}
+  overrides: Partial<Parameters<typeof calculateUrgency>[0]> = {},
 ) {
   return calculateUrgency({
     now: NOW,
@@ -95,9 +93,7 @@ describe("calculateUrgency expired and infeasible", () => {
 
     assert.equal(result.status, "expired");
     assert.equal(result.claimable, false);
-    assert.ok(
-      result.remainingMinutes !== null && result.remainingMinutes < 0
-    );
+    assert.ok(result.remainingMinutes !== null && result.remainingMinutes < 0);
   });
 
   it("marks a future deadline as infeasible when travel consumes the margin", () => {
@@ -236,21 +232,21 @@ describe("calculateUrgency timezones", () => {
   it("rejects an ISO string without an explicit offset", () => {
     assert.throws(
       () => calculate({ pickupDeadlineAt: "2026-11-21T16:00:00" }),
-      /explicit timezone offset/
+      /explicit timezone offset/,
     );
   });
 
   it("rejects an invalid Date", () => {
     assert.throws(
       () => calculate({ pickupDeadlineAt: new Date(Number.NaN) }),
-      /valid Date/
+      /valid Date/,
     );
   });
 
   it("rejects an impossible ISO date", () => {
     assert.throws(
       () => calculate({ pickupDeadlineAt: "2026-13-01T00:00:00Z" }),
-      /valid date/
+      /valid date/,
     );
   });
 });
@@ -259,11 +255,11 @@ describe("calculateUrgency input validation", () => {
   it("rejects negative durations", () => {
     assert.throws(
       () => calculate({ travelTimeMinutes: -1 }),
-      /travelTimeMinutes/
+      /travelTimeMinutes/,
     );
     assert.throws(
       () => calculate({ handlingTimeMinutes: -1 }),
-      /handlingTimeMinutes/
+      /handlingTimeMinutes/,
     );
     assert.throws(() => calculate({ bufferMinutes: -1 }), /bufferMinutes/);
   });
@@ -271,19 +267,16 @@ describe("calculateUrgency input validation", () => {
   it("rejects non-finite durations", () => {
     assert.throws(
       () => calculate({ travelTimeMinutes: Number.NaN }),
-      /travelTimeMinutes/
+      /travelTimeMinutes/,
     );
     assert.throws(
       () => calculate({ bufferMinutes: Number.POSITIVE_INFINITY }),
-      /bufferMinutes/
+      /bufferMinutes/,
     );
   });
 
   it("rejects an invalid now", () => {
-    assert.throws(
-      () => calculateUrgency({ now: "not-a-date" }),
-      /now/
-    );
+    assert.throws(() => calculateUrgency({ now: "not-a-date" }), /now/);
   });
 });
 

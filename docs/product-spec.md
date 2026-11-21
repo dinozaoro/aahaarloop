@@ -19,12 +19,12 @@ Every surplus has a destination.
 
 ## Personas
 
-| Persona | Description | Main need |
-| --- | --- | --- |
-| Donor | Restaurant, hotel, caterer, bakery, canteen or household with surplus | Publish quickly and know the food will be collected before the deadline |
-| Recipient organization | Shelter, NGO, community kitchen, orphanage | See what is safe and claimable now, within capacity, storage and dietary constraints |
-| Volunteer | Individual or partner courier | Clear pickup tasks with addresses, windows and quantities |
-| Admin | Platform operator | Moderate listings and reports, audit privileged actions, tune city configuration |
+| Persona                | Description                                                           | Main need                                                                            |
+| ---------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Donor                  | Restaurant, hotel, caterer, bakery, canteen or household with surplus | Publish quickly and know the food will be collected before the deadline              |
+| Recipient organization | Shelter, NGO, community kitchen, orphanage                            | See what is safe and claimable now, within capacity, storage and dietary constraints |
+| Volunteer              | Individual or partner courier                                         | Clear pickup tasks with addresses, windows and quantities                            |
+| Admin                  | Platform operator                                                     | Moderate listings and reports, audit privileged actions, tune city configuration     |
 
 ## User journeys
 
@@ -61,16 +61,16 @@ draft -> published -> claimed -> pickup_scheduled -> picked_up -> delivered
              +--> expired
 ```
 
-| Status | Meaning | Visible to recipients |
-| --- | --- | --- |
-| `draft` | Being prepared by the donor; autosaved, not published. | No |
-| `published` | Available for matching and claims. | Yes |
-| `claimed` | At least one claim holds the available servings. | Yes, without remaining servings |
-| `pickup_scheduled` | A volunteer and window are assigned. | Yes |
-| `picked_up` | Collected, in transit. | No (history only) |
-| `delivered` | Handed over with proof. | History only |
-| `cancelled` | Withdrawn by the donor or an admin, with a reason. | No |
-| `expired` | Effective deadline passed before completion. | No |
+| Status             | Meaning                                                | Visible to recipients           |
+| ------------------ | ------------------------------------------------------ | ------------------------------- |
+| `draft`            | Being prepared by the donor; autosaved, not published. | No                              |
+| `published`        | Available for matching and claims.                     | Yes                             |
+| `claimed`          | At least one claim holds the available servings.       | Yes, without remaining servings |
+| `pickup_scheduled` | A volunteer and window are assigned.                   | Yes                             |
+| `picked_up`        | Collected, in transit.                                 | No (history only)               |
+| `delivered`        | Handed over with proof.                                | History only                    |
+| `cancelled`        | Withdrawn by the donor or an admin, with a reason.     | No                              |
+| `expired`          | Effective deadline passed before completion.           | No                              |
 
 State transitions are explicit; the publish action is the only way to leave
 `draft`, and cancellation always records a reason and an event.
@@ -84,26 +84,26 @@ pending -> confirmed -> pickup_scheduled -> picked_up -> delivered
    +--> expired
 ```
 
-| Status | Meaning | Guarded cancel |
-| --- | --- | --- |
-| `pending` | Created, awaiting donor confirmation. | Yes |
-| `confirmed` | Donor accepted the claim. | Yes |
-| `pickup_scheduled` | Pickup window assigned. | Yes, until the volunteer departs |
-| `picked_up` | Food collected. | No |
-| `delivered` | Delivered to the recipient. | No |
-| `cancelled` | Cancelled by either side with a reason. | No |
-| `expired` | Expired before confirmation. | No |
+| Status             | Meaning                                 | Guarded cancel                   |
+| ------------------ | --------------------------------------- | -------------------------------- |
+| `pending`          | Created, awaiting donor confirmation.   | Yes                              |
+| `confirmed`        | Donor accepted the claim.               | Yes                              |
+| `pickup_scheduled` | Pickup window assigned.                 | Yes, until the volunteer departs |
+| `picked_up`        | Food collected.                         | No                               |
+| `delivered`        | Delivered to the recipient.             | No                               |
+| `cancelled`        | Cancelled by either side with a reason. | No                               |
+| `expired`          | Expired before confirmation.            | No                               |
 
 ## Key dates: DLC, DDM and pickup deadline
 
 The three dates are deliberately separate and must never be collapsed into one
 field.
 
-| Field | Business meaning | Effect |
-| --- | --- | --- |
-| `food_expiry_at` (DLC, use-by) | Food-safety limit. The food must not be consumed after it. | Acts as a hard deadline for matching and expiry. |
-| `best_before_at` (DDM, best-before) | Quality date. Food remains edible but may lose quality. | Displayed to donors and recipients; excluded from urgency and expiry. |
-| `pickup_deadline_at` | Operational limit: the time by which the food must be collected. | Acts as a hard deadline for matching and expiry. |
+| Field                               | Business meaning                                                 | Effect                                                                |
+| ----------------------------------- | ---------------------------------------------------------------- | --------------------------------------------------------------------- |
+| `food_expiry_at` (DLC, use-by)      | Food-safety limit. The food must not be consumed after it.       | Acts as a hard deadline for matching and expiry.                      |
+| `best_before_at` (DDM, best-before) | Quality date. Food remains edible but may lose quality.          | Displayed to donors and recipients; excluded from urgency and expiry. |
+| `pickup_deadline_at`                | Operational limit: the time by which the food must be collected. | Acts as a hard deadline for matching and expiry.                      |
 
 `effective_deadline_at = min(food_expiry_at, pickup_deadline_at)` over all
 donation items. Missing both means the donation is `unknown` and not claimable;
@@ -118,15 +118,15 @@ remaining_minutes = effective_deadline_at - now - travel_minutes - handling_minu
 Defaults: travel from distance at 25 km/h, handling 10 minutes, safety buffer 15
 minutes. Levels (`remaining_minutes`):
 
-| Range | Level |
-| --- | --- |
-| > 12 h | `low` |
-| 6 h to 12 h inclusive | `medium` |
-| 3 h inclusive to < 6 h | `high` |
-| > 0 and < 3 h | `critical` |
-| deadline <= now | `expired` |
+| Range                              | Level        |
+| ---------------------------------- | ------------ |
+| > 12 h                             | `low`        |
+| 6 h to 12 h inclusive              | `medium`     |
+| 3 h inclusive to < 6 h             | `high`       |
+| > 0 and < 3 h                      | `critical`   |
+| deadline <= now                    | `expired`    |
 | deadline in future but margin <= 0 | `infeasible` |
-| no hard deadline | `unknown` |
+| no hard deadline                   | `unknown`    |
 
 `expired`, `infeasible` and `unknown` are not normally claimable. The full
 contract lives in `packages/matching/README.md`.
@@ -142,14 +142,14 @@ exist, and claimed weight within transport capacity.
 Eligible donations are scored 0-100 per component and combined with normalized
 weights (defaults):
 
-| Component | Weight | Score |
-| --- | --- | --- |
-| Urgency | 0.30 | critical 100, high 75, medium 50, low 25 |
-| Distance | 0.25 | linear, 100 at 0 km to 0 at max distance |
-| Quantity | 0.15 | claimable servings / required servings |
-| Needs | 0.15 | matched needs / listed needs, 100 when none listed |
-| Availability | 0.10 | 100 when a volunteer window contains now, else 0 |
-| Logistics | 0.05 | claimed weight / transport capacity |
+| Component    | Weight | Score                                              |
+| ------------ | ------ | -------------------------------------------------- |
+| Urgency      | 0.30   | critical 100, high 75, medium 50, low 25           |
+| Distance     | 0.25   | linear, 100 at 0 km to 0 at max distance           |
+| Quantity     | 0.15   | claimable servings / required servings             |
+| Needs        | 0.15   | matched needs / listed needs, 100 when none listed |
+| Availability | 0.10   | 100 when a volunteer window contains now, else 0   |
+| Logistics    | 0.05   | claimed weight / transport capacity                |
 
 Weights are configurable per city and normalized to sum to 1. Every match
 returns a per-component explanation so recipients can see why it ranked where
@@ -207,26 +207,26 @@ must say so.
 
 ## Glossary
 
-| Term | Definition |
-| --- | --- |
+| Term               | Definition                                                                          |
+| ------------------ | ----------------------------------------------------------------------------------- |
 | Surplus / donation | A set of edible items offered by a donor with dates, storage and a pickup location. |
-| Serving | One portion used for quantity matching; donors state total and available servings. |
-| Claim | A recipient organization's request for some or all of a donation's servings. |
-| Partial claim | A claim for fewer servings than available; the rest stays claimable. |
-| DLC | Date limite de consommation (use-by); a food-safety date. |
-| DDM | Date de durabilité minimale (best-before); a quality date. |
-| Pickup deadline | Latest time the food can be collected. |
-| Effective deadline | Earliest of the food expiry and the pickup deadline. |
-| Operational margin | Remaining minutes after travel, handling and safety buffer. |
-| Urgency | Level derived from the operational margin: low, medium, high, critical. |
-| Match | A donation ranked for a recipient by the matching engine, with reasons. |
-| Need | A recipient's active requirement: category, quantity, deadline, priority. |
-| Capacity | Recipient storage and transport limits used as hard filters. |
-| Verification | Admin confirmation that an organization is legitimate; shown in the UI. |
-| Handover | The physical transfer from donor to volunteer to recipient. |
-| Proof of delivery | Photo or signature reference recorded when the recipient receives food. |
-| Expired | The effective deadline passed; the donation is not claimable. |
-| Infeasible | Deadline is in the future but travel, handling and buffer consume the margin. |
+| Serving            | One portion used for quantity matching; donors state total and available servings.  |
+| Claim              | A recipient organization's request for some or all of a donation's servings.        |
+| Partial claim      | A claim for fewer servings than available; the rest stays claimable.                |
+| DLC                | Date limite de consommation (use-by); a food-safety date.                           |
+| DDM                | Date de durabilité minimale (best-before); a quality date.                          |
+| Pickup deadline    | Latest time the food can be collected.                                              |
+| Effective deadline | Earliest of the food expiry and the pickup deadline.                                |
+| Operational margin | Remaining minutes after travel, handling and safety buffer.                         |
+| Urgency            | Level derived from the operational margin: low, medium, high, critical.             |
+| Match              | A donation ranked for a recipient by the matching engine, with reasons.             |
+| Need               | A recipient's active requirement: category, quantity, deadline, priority.           |
+| Capacity           | Recipient storage and transport limits used as hard filters.                        |
+| Verification       | Admin confirmation that an organization is legitimate; shown in the UI.             |
+| Handover           | The physical transfer from donor to volunteer to recipient.                         |
+| Proof of delivery  | Photo or signature reference recorded when the recipient receives food.             |
+| Expired            | The effective deadline passed; the donation is not claimable.                       |
+| Infeasible         | Deadline is in the future but travel, handling and buffer consume the margin.       |
 
 ## Review
 
