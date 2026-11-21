@@ -100,7 +100,7 @@ Vérifier les deux trailers de co-auteur sur chaque commit avant merge.
 
 ---
 
-## Étape 6 — Issues restantes (15), ordre suggéré
+## Étape 6 — Issues restantes (13), ordre suggéré
 
 **P0 — avant la démo**
 
@@ -112,8 +112,8 @@ Vérifier les deux trailers de co-auteur sur chaque commit avant merge.
 
 - [ ] #40 missions volontaire + acceptation
 - [ ] #42 carte Leaflet + clustering (et lazy-load, voir étape 4)
-- [ ] #43 workflow de ramassage
-- [ ] #44 workflow de livraison + preuve
+- [x] #43 workflow de ramassage
+- [x] #44 livraison avec preuve + impact (PR #162, `deliveryService`)
 - [ ] #45 timeline de suivi + ETA
 
 **Mobile**
@@ -133,9 +133,9 @@ Vérifier les deux trailers de co-auteur sur chaque commit avant merge.
 
 **Qualité / docs**
 
-- [ ] #71 stratégie de tests
-- [ ] #75 monitoring production
-- [ ] #76 documentation des routes API
+- [x] #71 stratégie de tests
+- [x] #75 monitoring production
+- [x] #76 documentation des routes API
 
 ---
 
