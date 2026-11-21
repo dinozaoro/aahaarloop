@@ -201,6 +201,13 @@ export class ClaimRepository {
     );
   }
 
+  list(): Promise<LocalClaim[]> {
+    return this.db.getAllAsync<LocalClaim>(
+      `${CLAIM_SELECT} ORDER BY created_at DESC`,
+      [],
+    );
+  }
+
   async remove(id: string): Promise<void> {
     await this.db.runAsync("DELETE FROM claims WHERE id = ?", [id]);
   }
