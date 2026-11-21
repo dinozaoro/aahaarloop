@@ -33,14 +33,11 @@ need SQL use `node:sqlite` in memory. CI runs the same commands with no secrets.
 - Claim concurrency: `claims-transaction.test.mjs` runs parallel claims and proves the total never exceeds availability; idempotent replay is covered.
 - Donation → delivery: the new end-to-end test covers the flow through a **completed pickup task**.
 
-## Known gap
+## Known gaps
 
-The app does not yet flip the claim and donation statuses to `delivered` when a
-pickup is completed — that workflow is issue #44. The end-to-end test therefore
-stops at `task.status === "completed"`. Extend it with explicit `delivered`
-assertions when #44 lands.
-
-There is also no browser-driven E2E (Playwright) suite and no test against a
+The end-to-end test now covers delivery confirmation through issue #44:
+mandatory proof, quantity discrepancy and an impact record. It remains a
+service-level flow; there is no browser-driven E2E (Playwright) suite and no test against a
 real Postgres database. Both are deliberate: the demo store and injected fakes
 keep the suite fast and secret-free. Add a dedicated test database and a
 Playwright job before treating the web UI as regression-proof.

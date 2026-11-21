@@ -5,7 +5,12 @@ import { createPickupService, type PickupRepository } from "./tasks.ts";
 
 const tasks: PickupTask[] = [];
 const assignments: PickupAssignment[] = [];
-const trail: Array<{ taskId: string; action: string; actorId: string; at: string }> = [];
+const trail: Array<{
+  taskId: string;
+  action: string;
+  actorId: string;
+  at: string;
+}> = [];
 
 const repository: PickupRepository = {
   tasks: () => tasks,
@@ -32,3 +37,4 @@ const repository: PickupRepository = {
 export const pickupService = createPickupService(repository);
 export const pickupTrail = trail;
 export const listPickupTasks = () => tasks;
+export const listPickupAssignments = () => assignments;
