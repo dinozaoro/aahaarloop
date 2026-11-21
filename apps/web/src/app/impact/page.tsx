@@ -1,31 +1,45 @@
 import type { Metadata } from "next";
+import { ImpactCharts } from "@/components/impact-charts";
 import { WorkspaceShell } from "@/components/workspace-shell";
-import { getDonationsForOrganization, getClaimsForDonor } from "@/lib/data/store";
 import { DEMO_DONOR_ORG_ID } from "@/lib/data/constants";
+import { getClaimsForDonor, getOrganization } from "@/lib/data/store";
+import { monthlyRescued, statusCounts } from "@/lib/impact/series";
 
 export const metadata: Metadata = { title: "Impact" };
 
+const MONTHLY_GOAL_KG = 200;
+const kgFormat = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 });
+const time = (value: string) => new Intl.DateTimeFormat("en-IN", { weekday: "short", hour: "numeric", minute: "2-digit" }).format(new Date(value));
+
 export default function ImpactPage() {
-  const donations = getDonationsForOrganization(DEMO_DONOR_ORG_ID);
-  const claims = getClaimsForDonor(DEMO_DONOR_ORG_ID);
-  const servings = donations.reduce((sum, item) => sum + item.servingsTotal - item.servingsAvailable, 0);
-  const kilograms = donations.reduce((sum, item) => sum + item.weightKg * ((item.servingsTotal - item.servingsAvailable) / Math.max(item.servingsTotal, 1)), 0);
-  const months = Array.from({ length: 6 }, (_, index) => {
-    const date = new Date();
-    date.setDate(1);
-    date.setMonth(date.getMonth() - (5 - index));
-    const key = `${date.getFullYear()}-${date.getMonth()}`;
-    const count = donations.filter((item) => {
-      const updated = new Date(item.updatedAt);
-      return `${updated.getFullYear()}-${updated.getMonth()}` === key;
-    }).reduce((sum, item) => sum + item.servingsTotal - item.servingsAvailable, 0);
-    return { label: new Intl.DateTimeFormat("en-IN", { month: "short" }).format(date), count };
+  const claims = [...getClaimsForDonor(DEMO_DONOR_ORG_ID)].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  const delivered = claims.filter((claim) => claim.status === "delivered");
+  const rescuedKg = delivered.reduce((sum, claim) => sum + claim.weightKg, 0);
+  const meals = Math.round(rescuedKg / 0.3);
+  const completedDonations = new Set(delivered.map((claim) => claim.donationId)).size;
+  const organizations = new Set(delivered.map((claim) => claim.recipientOrgId)).size;
+  const monthDelivered = delivered.filter((claim) => {
+    const date = new Date(claim.updatedAt);
+    const now = new Date();
+    return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
   });
-  const chartMax = Math.max(1, ...months.map((month) => month.count));
-  const organisations = new Set(claims.map((claim) => claim.recipientOrgId)).size;
-  return <WorkspaceShell><div className="page-heading"><div><p className="page-kicker">The value of what you share</p><h1>Your impact, made visible.</h1><p>Small surpluses add up when they reach the right people.</p></div><button className="outline-action">This month⌄</button></div>
-    <section className="impact-highlight"><div><span>Estimated meals shared</span><strong>{servings.toLocaleString("en-IN")}</strong><p>Estimated from servings recorded across your donations.</p></div><div className="impact-mark">{organisations}<small>partner organisations</small></div></section>
-    <section className="impact-stats"><article><span>Food redirected</span><strong>{kilograms.toFixed(0)} <small>kg</small></strong><p>Estimated from claimed quantities.</p></article><article><span>Completed handovers</span><strong>{claims.filter((item) => item.status === "delivered").length}</strong><p>Marked delivered by the recipient.</p></article><article><span>Organisations reached</span><strong>{organisations}</strong><p>Unique recipient organisations in preview claims.</p></article></section>
-    <section className="trend-panel"><div className="panel-heading"><div><h2>Food rescued over time</h2><p>Recorded servings grouped by donation activity</p></div><span className="chart-legend"><i /> Servings</span></div><div className="chart-area" role="img" aria-label="Bar chart showing recorded rescued servings over the past six months"><div className="chart-y"><span>{chartMax}</span><span>{Math.round(chartMax * .66)}</span><span>{Math.round(chartMax * .33)}</span><span>0</span></div><div className="chart-bars">{months.map(({count, label})=><div className="chart-col" key={label}><div className="chart-bar" style={{height:`${count ? Math.max(8, count / chartMax * 100) : 0}%`}} /><span>{label}</span></div>)}</div></div><p className="chart-footnote">Seeded preview activity only; impact estimates are directional and not independently verified.</p></section>
-  </WorkspaceShell>;
+  const monthKg = monthDelivered.reduce((sum, claim) => sum + claim.weightKg, 0);
+
+  return <WorkspaceShell><div className="impact-page">
+    <div className="page-heading"><div><p className="page-kicker">Bengaluru / Demo</p><h1>Good food. A growing difference.</h1><p>Your kitchen’s impact · This month · Based on recorded handovers</p></div></div>
+    <section className="impact-metrics" aria-label="Impact totals">
+      <div><strong>{kgFormat.format(rescuedKg)}</strong><span>kg of food rescued</span></div>
+      <div><strong>{meals.toLocaleString("en-IN")}</strong><span>Meals estimated</span></div>
+      <div><strong>{completedDonations}</strong><span>Completed donations</span></div>
+      <div><strong>{organizations}</strong><span>Organizations helped</span></div>
+    </section>
+    <ImpactCharts
+      monthly={monthlyRescued(delivered)}
+      statuses={statusCounts(claims)}
+    />
+    <div className="impact-content">
+      <section className="impact-goal"><h2>A little closer, every day.</h2><strong>{kgFormat.format(monthKg)} / {MONTHLY_GOAL_KG} kg monthly goal</strong><div className="impact-progress" role="progressbar" aria-label="Monthly food rescue goal" aria-valuemin={0} aria-valuemax={MONTHLY_GOAL_KG} aria-valuenow={Math.min(monthKg, MONTHLY_GOAL_KG)}><span style={{ width: `${Math.min(100, monthKg / MONTHLY_GOAL_KG * 100)}%` }} /></div><p>{monthDelivered.length} completed {monthDelivered.length === 1 ? "handover" : "handovers"} recorded this month.</p><small>Meals are estimated at 0.3 kg per meal and rounded. Actual portions vary; these preview figures are not verified impact.</small></section>
+      <section className="impact-story"><h2>The story behind the numbers</h2>{delivered.length ? delivered.slice(0, 5).map((claim) => { const recipient = getOrganization(claim.recipientOrgId); return <article key={claim.id}><time>{time(claim.updatedAt)}</time><h3>{claim.donationTitle} → {recipient?.name ?? claim.recipientName}</h3><p>{kgFormat.format(claim.weightKg)} kg rescued · {claim.servings} portions</p></article>; }) : <p className="dashboard-empty">Completed handovers will appear here.</p>}</section>
+    </div>
+  </div></WorkspaceShell>;
 }

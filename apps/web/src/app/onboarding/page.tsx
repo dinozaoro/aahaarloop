@@ -1,24 +1,18 @@
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { requireUser } from "@/lib/auth/guards";
 import { SELF_ASSIGNABLE_ROLES } from "@/lib/auth/onboarding";
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { Logo } from "@/components/logo";
 import { completeOnboarding } from "./actions";
 
-export const metadata: Metadata = {
-  title: "Set up your account",
-  alternates: { canonical: "/onboarding" },
-};
+export const metadata: Metadata = { title: "Choose your role", alternates: { canonical: "/onboarding" } };
+
+const ROLE_DETAILS = {
+  donor: { title: "Share surplus", description: "List food, coordinate collections and see your impact.", audience: "Food donors · Restaurants, cafés and caterers" },
+  recipient: { title: "Find food", description: "Discover relevant donations and arrange reliable pickups.", audience: "NGOs & community kitchens" },
+  volunteer: { title: "Move food forward", description: "Collect and deliver food in your neighbourhood.", audience: "Volunteers" },
+} as const;
 
 const ERRORS: Record<string, string> = {
   "invalid-role": "Choose donor, recipient or volunteer.",
@@ -28,120 +22,51 @@ const ERRORS: Record<string, string> = {
   "not-found": "No organization has that slug. Check it or create one.",
 };
 
-export default async function OnboardingPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ error?: string }>;
-}) {
+export default async function OnboardingPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const user = await requireUser();
   const { error } = await searchParams;
-  const message = error
-    ? (ERRORS[error] ?? "Please check your details.")
-    : null;
+  const message = error ? (ERRORS[error] ?? "Please check your details.") : null;
 
-  return (
-    <main
-      id="main"
-      className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-16 sm:px-6"
-    >
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-semibold tracking-tight">
-          Set up your account
-        </h1>
-        <p className="text-muted-foreground">
-          Signed in as {user.email}. Choose your role and an organization to
-          finish setting up Aahaarloop.
-        </p>
-        {user.needsOnboarding ? null : (
-          <p className="text-sm text-muted-foreground">
-            Your account is already set up. You can update it below or{" "}
-            <Link className="underline" href="/dashboard">
-              go to your dashboard
-            </Link>
-            .
-          </p>
-        )}
-      </div>
+  return <div className="onboarding-page">
+    <header className="account-header"><Link href="/" aria-label="AahaarLoop home"><Logo /></Link><span>Bengaluru demo · No real donations</span></header>
+    <main id="main" className="onboarding-main">
+      <p className="onboarding-kicker">01 / Your place in the loop</p>
+      <h1>How would you like to help?</h1>
+      <p className="onboarding-intro">Choose a starting role. You can request another role from your profile later.</p>
+      <p className="onboarding-signed-in">Signed in as {user.email}</p>
+      <form action={completeOnboarding} className="onboarding-form">
+        <fieldset className="role-options">
+          <legend className="sr-only">Choose your role</legend>
+          {SELF_ASSIGNABLE_ROLES.map((role) => {
+            const details = ROLE_DETAILS[role];
+            return <label key={role} className="role-option">
+              <input type="radio" name="role" value={role} defaultChecked={user.role === role} required />
+              <span className="role-option-copy"><strong>{details.title}</strong><span>{details.description}</span><small>{details.audience}</small></span>
+              <span className="role-option-action" aria-hidden="true">Choose role →</span>
+            </label>;
+          })}
+        </fieldset>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Your role</CardTitle>
-          <CardDescription>
-            Admins are assigned by an existing admin.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form action={completeOnboarding} className="flex flex-col gap-8">
-            <fieldset className="flex flex-col gap-3">
-              <legend className="mb-2 text-sm font-medium">I am a…</legend>
-              {SELF_ASSIGNABLE_ROLES.map((role) => (
-                <div key={role} className="flex items-center gap-3">
-                  <input
-                    type="radio"
-                    id={`role-${role}`}
-                    name="role"
-                    value={role}
-                    defaultChecked={user.role === role}
-                    required
-                  />
-                  <Label htmlFor={`role-${role}`} className="capitalize">
-                    {role}
-                  </Label>
-                </div>
-              ))}
-            </fieldset>
+        <section className="onboarding-organization" aria-labelledby="organization-title">
+          <div><p className="onboarding-kicker">02 / A few useful details</p><h2 id="organization-title">Set up your organization</h2></div>
+          <fieldset className="organization-mode">
+            <legend>Organization</legend>
+            <label><input type="radio" name="orgMode" value="create" defaultChecked /> Create a new organization</label>
+            <label><input type="radio" name="orgMode" value="join" /> Join an existing organization</label>
+          </fieldset>
+          <div className="onboarding-fields">
+            <label htmlFor="orgName">Organization name</label>
+            <input id="orgName" name="orgName" placeholder="Hope Shelter" minLength={2} maxLength={120} />
+            <label htmlFor="joinSlug">Organization slug <span>(for joining)</span></label>
+            <input id="joinSlug" name="joinSlug" placeholder="hope-shelter" pattern="[a-z0-9]+(-[a-z0-9]+)*" />
+            <small>Slug joining is a demo mechanism; production needs invite tokens.</small>
+          </div>
+        </section>
 
-            <fieldset className="flex flex-col gap-3">
-              <legend className="mb-2 text-sm font-medium">Organization</legend>
-              <div className="flex items-center gap-3">
-                <input
-                  type="radio"
-                  id="org-create"
-                  name="orgMode"
-                  value="create"
-                  defaultChecked
-                />
-                <Label htmlFor="org-create">Create a new organization</Label>
-              </div>
-              <div className="flex items-center gap-3">
-                <input type="radio" id="org-join" name="orgMode" value="join" />
-                <Label htmlFor="org-join">Join an existing organization</Label>
-              </div>
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="orgName">Organization name</Label>
-                <Input
-                  id="orgName"
-                  name="orgName"
-                  placeholder="Hope Shelter"
-                  minLength={2}
-                  maxLength={120}
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="joinSlug">Or join by organization slug</Label>
-                <Input
-                  id="joinSlug"
-                  name="joinSlug"
-                  placeholder="hope-shelter"
-                  pattern="[a-z0-9]+(-[a-z0-9]+)*"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Slug joining is a demo mechanism; production needs invite
-                  tokens.
-                </p>
-              </div>
-            </fieldset>
-
-            {message ? (
-              <p role="alert" className="text-sm text-destructive">
-                {message}
-              </p>
-            ) : null}
-
-            <Button type="submit">Finish setup</Button>
-          </form>
-        </CardContent>
-      </Card>
+        {message ? <p role="alert" className="onboarding-error">{message}</p> : null}
+        <button type="submit" className="account-action account-action-primary onboarding-submit">Finish setup</button>
+      </form>
+      <p className="onboarding-disclosure">Only your role and organization name are saved by this setup flow. Contact, pickup and food-handling details are not collected here.</p>
     </main>
-  );
+  </div>;
 }

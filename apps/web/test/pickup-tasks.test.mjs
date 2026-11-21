@@ -84,3 +84,16 @@ test("double assignment is rejected and status changes are audited", () => {
     "pickup.task.completed",
   ]);
 });
+
+test("a volunteer can start only their own assigned mission", () => {
+  const { service, state } = setup();
+  const task = service.generateForClaim(claim, donation);
+  service.assign(task.id, "v1", "user-admin");
+  assert.throws(
+    () => service.start(task.id, "someone-else"),
+    /only the assignee can start/i,
+  );
+  assert.equal(service.start(task.id, "v1").status, "in_progress");
+  assert.equal(state.tasks[0].status, "in_progress");
+  assert.throws(() => service.start(task.id, "v1"), /only an assigned task/i);
+});

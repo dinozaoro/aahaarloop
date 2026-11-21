@@ -231,3 +231,16 @@ export const HISTORY_DONATION_STATUSES: DonationStatus[] = [
   "cancelled",
   "expired",
 ];
+
+export interface ImpactRecord {
+  id: string;
+  organizationId: string;
+  donationId: string;
+  claimId: string;
+  metric: "servings_rescued";
+  value: number;
+  discrepancy: number;
+  proofType: "signature" | "photo";
+  note: string | null;
+  recordedAt: string;
+}

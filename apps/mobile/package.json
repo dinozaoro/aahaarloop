@@ -5,14 +5,15 @@
   "main": "expo-router/entry",
   "scripts": {
     "dev": "expo start",
-    "build": "npx --yes eas-cli@16 build --profile preview --platform android",
+    "build": "tsc --noEmit",
     "build:production": "npx --yes eas-cli@16 build --profile production --platform android",
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
-    "test": "node --test eas-build.test.mjs src/data/*.test.ts"
+    "test": "node --test eas-build.test.mjs src/data/*.test.ts",
+    "build:preview": "npx --yes eas-cli@16 build --profile preview --platform android"
   },
   "dependencies": {
     "@aahaarloop/matching": "workspace:*",

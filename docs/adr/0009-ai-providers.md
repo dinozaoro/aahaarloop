@@ -22,5 +22,5 @@ callers. No live provider is configured in this repository.
 - Timeouts, rate limits and a failed analysis degrade to `failed` or
   `unavailable` and publishing continues.
 - Adding a provider means implementing the interface, not rewriting UI flows.
-- Provider credentials, model versions and cost limits need human setup and
-  review before production use.
+- Provider credentials (`SIGHTENGINE_API_USER`, `SIGHTENGINE_API_SECRET`), model
+  versions and cost limits need human setup and review before production use.

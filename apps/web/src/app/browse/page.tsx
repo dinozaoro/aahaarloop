@@ -1,18 +1,41 @@
-import Link from "next/link";
-import Image from "next/image";
 import type { Metadata } from "next";
+
 import { WorkspaceShell } from "@/components/workspace-shell";
+import { DEMO_RECIPIENT_ORG_ID } from "@/lib/data/constants";
 import { getAllDonations, getOrganization } from "@/lib/data/store";
-import { CATEGORY_LABELS, STORAGE_LABELS } from "@/lib/domain/types";
+
+import { BrowseExperience } from "./browse-experience";
 
 export const metadata: Metadata = { title: "Discover food" };
 
+function distanceInKm(a: { latitude: number; longitude: number }, b: { latitude: number; longitude: number }) {
+  const radians = (degrees: number) => degrees * Math.PI / 180;
+  const latitudeDelta = radians(b.latitude - a.latitude);
+  const longitudeDelta = radians(b.longitude - a.longitude);
+  const distance = 2 * 6371 * Math.asin(Math.sqrt(
+    Math.sin(latitudeDelta / 2) ** 2
+    + Math.cos(radians(a.latitude)) * Math.cos(radians(b.latitude)) * Math.sin(longitudeDelta / 2) ** 2,
+  ));
+  return Math.round(distance * 10) / 10;
+}
+
 export default function BrowsePage() {
-  const donations = getAllDonations().filter((item) => item.servingsAvailable > 0 && item.status === "published");
-  return <WorkspaceShell><div className="page-heading"><div><p className="page-kicker">Find food nearby</p><h1>Offers for your kitchen.</h1><p>Available surplus, matched to your collection window.</p></div><div className="view-switch"><button className="selected">☷ List</button><button>⌖ Map</button></div></div>
-    <div className="search-row"><label className="search-box"><span>⌕</span><input aria-label="Search food or area" placeholder="Search food or area" /></label><button className="filter-button">☷ Filters <span>3</span></button><label className="sort-select">Sort by <select defaultValue="match"><option value="match">Best match</option><option value="distance">Nearest</option><option value="deadline">Pickup deadline</option></select></label></div>
-    <div className="browse-layout"><aside className="filter-rail"><div className="filter-group"><h2>Food type</h2>{["Prepared meals", "Bakery", "Fresh produce", "Dairy"].map((label, i) => <label key={label}><input type="checkbox" defaultChecked={i === 0} /> {label}</label>)}</div><div className="filter-group"><h2>Pickup distance</h2><p className="distance-value">Within <strong>5 km</strong></p><input type="range" min="1" max="20" defaultValue="5" aria-label="Maximum distance in kilometres" /></div><div className="filter-group"><h2>Handling</h2><label><input type="checkbox" /> Chilled storage</label><label><input type="checkbox" /> No listed allergens</label></div><p className="filter-note">Always review food condition and allergen details with the donor.</p></aside>
-      <section className="offer-list" aria-label="Available donations">{donations.length ? donations.map((item, index) => { const donor = getOrganization(item.organizationId); return <article className="offer-card" key={item.id}><div className={`offer-photo food-thumb-${index}`}><Image src="/images/tasty-bowl.webp" width={480} height={360} alt="" /><span className="offer-match">Good match</span></div><div className="offer-content"><div className="offer-title-line"><span className="food-category">{CATEGORY_LABELS[item.category]}</span><span className="distance-chip">2.4 km away</span></div><h2>{item.title}</h2><p>{donor?.name ?? "Food partner"} · {item.pickupArea}</p><div className="offer-meta"><span><b>{item.servingsAvailable}</b> servings</span><span>{STORAGE_LABELS[item.storage]}</span><span>Collect by {new Intl.DateTimeFormat("en-IN", { hour: "numeric", minute: "2-digit" }).format(new Date(item.pickupDeadlineAt))}</span></div><div className="allergen-note">{item.allergens.length ? `Contains ${item.allergens.join(", ")}` : "No listed allergens"}</div><Link href={`/browse/${item.id}`} className="offer-open">View donation <span>→</span></Link></div></article>; }) : <div className="empty-state"><h2>No offers are available right now.</h2><p>Try widening your distance or check back later today.</p></div>}</section>
-    </div><p className="sample-note">Example workspace · availability and distances use seeded preview data.</p>
+  const recipient = getOrganization(DEMO_RECIPIENT_ORG_ID);
+  const offers = getAllDonations()
+    .filter((donation) => donation.servingsAvailable > 0 && donation.status === "published")
+    .map((donation) => {
+      const donor = getOrganization(donation.organizationId);
+      return {
+        donation,
+        donorName: donor?.name ?? "Food partner",
+        distanceKm: recipient && donor ? distanceInKm(recipient.location, donor.location) : null,
+        donorLocation: donor?.location ?? null,
+      };
+    });
+
+  return <WorkspaceShell>
+    <div className="page-heading browse-page-heading"><div><p className="page-kicker">Bengaluru / Demo · Today, {new Intl.DateTimeFormat("en-IN", { hour: "numeric", minute: "2-digit" }).format(new Date())}</p><h1>Find food. Make room for possibility.</h1><p>Matches based on location, needs and collection times — not an unexplained score.</p></div></div>
+    <BrowseExperience offers={offers} recipientLocation={recipient?.location ?? null} />
+    <p className="sample-note">Preview workspace · availability and distances use seeded data for {getOrganization(DEMO_RECIPIENT_ORG_ID)?.area ?? "your area"}.</p>
   </WorkspaceShell>;
 }

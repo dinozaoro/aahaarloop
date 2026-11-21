@@ -255,10 +255,10 @@ export function DonationDatesForm() {
               ))}
             </p>
             <Link
-              href="/donations/new/location"
+              href="#pickup-location"
               className={cn(buttonVariants(), "w-fit")}
             >
-              Continue to pickup details
+              Review pickup details
             </Link>
           </CardContent>
         </Card>

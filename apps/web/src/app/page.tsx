@@ -4,31 +4,75 @@ import { ScrollReveal, StaggerScrollReveal } from "@/components/scroll-reveal";
 import { ArrowDownRight, ArrowRight, Clock3, MapPin, PackageCheck, Utensils } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import type { Metadata } from "next";
+import { ArrowDown, ArrowUpRight, Check } from "lucide-react";
+
+import { resolveAndroidDownloadUrl } from "@/lib/links";
 
 export const metadata: Metadata = {
-  title: "Good food should find a table",
+  title: "Good food deserves another destination",
   description:
-    "AahaarLoop helps restaurants and food businesses share surplus with nearby NGOs, shelters and community kitchens.",
+    "Connect surplus food with the people and communities who need it. Every donation can make a difference.",
   alternates: { canonical: "/" },
 };
 
 const STEPS = [
   {
-    icon: Utensils,
-    title: "A kitchen has extra",
-    detail: "Add what is available, how much, and when it needs to be collected.",
+    number: "01",
+    title: "Share surplus",
+    detail: "Restaurants and food businesses list food they cannot use before it goes to waste.",
+    className: "step-preview-yellow",
+    previewTitle: "New food listing",
+    previewLabel: "What’s available?",
+    previewFood: "Freshly made vegetable biryani",
+    previewMeta: "32 portions · Vegetarian",
   },
   {
-    icon: MapPin,
-    title: "Nearby groups see it",
-    detail: "Matches consider distance, quantity, needs, timing and storage.",
+    number: "02",
+    title: "Find a destination",
+    detail: "NGOs, community kitchens and volunteers discover relevant food donations.",
+    className: "step-preview-pink",
+    previewTitle: "A good match, close by.",
+    previewLabel: "Community kitchen · Indiranagar, Bengaluru · 1.2 km",
+    previewFood: "A match for 32 warm meals",
+    previewMeta: "Nearby donation match",
   },
   {
-    icon: PackageCheck,
-    title: "A pickup gets arranged",
-    detail: "The recipient claims the food and both sides can follow the handover.",
+    number: "03",
+    title: "Deliver impact",
+    detail: "Food is collected, delivered and tracked, creating measurable impact.",
+    className: "step-preview-peach",
+    previewTitle: "Food delivered. Loop complete.",
+    previewLabel: "Listed · Collected · Shared",
+    previewFood: "32 more reasons to keep going.",
+    previewMeta: "Delivery status",
   },
 ] as const;
+
+const IMPACT = [
+  ["2,450", "kg of food rescued", "Good food, kept in the loop."],
+  ["8,167", "meals estimated", "More possibilities at the table."],
+  ["38", "organizations supported", "Stronger local connections."],
+  ["312", "donations completed", "Small acts, brought full circle."],
+] as const;
+
+function AndroidAction({ inverse = false }: { inverse?: boolean }) {
+  const href = resolveAndroidDownloadUrl(process.env.NEXT_PUBLIC_ANDROID_APK_URL);
+  const className = inverse
+    ? "landing-button landing-button-dark"
+    : "landing-button landing-button-primary";
+  const label = "Download for Android";
+
+  if (!href) {
+    return (
+      <span className={`${className} is-unavailable`} aria-disabled="true" title="Android download URL is not configured">
+        {label}<ArrowDown aria-hidden="true" />
+      </span>
+    );
+  }
+
+  return <a className={className} href={href}>{label}<ArrowDown aria-hidden="true" /></a>;
+}
 
 export default function HomePage() {
   return (

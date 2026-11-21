@@ -12,6 +12,13 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      { source: "/nutrition", destination: "/", permanent: false },
+      { source: "/design", destination: "/browse", permanent: false },
+      { source: "/donations/new/location", destination: "/donations/new/dates#pickup-location", permanent: false },
+    ];
+  },
 };
 
 export default nextConfig;

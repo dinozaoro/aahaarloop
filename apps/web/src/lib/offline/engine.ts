@@ -1,5 +1,6 @@
+import type { OfflineRepository } from "./store.ts";
 import type { SyncQueue } from "./queue.ts";
-import type { QueuedOperation } from "./types.ts";
+import type { OfflineConflict, QueuedOperation } from "./types.ts";
 
 export const BACKGROUND_SYNC_TAG = "aahaarloop-sync";
 
@@ -16,11 +17,13 @@ export interface FlushReport {
   succeeded: number;
   retried: number;
   failed: number;
+  conflicts: number;
 }
 
 export interface SyncEngineOptions {
   queue: SyncQueue;
   transport: SyncTransport;
+  conflicts?: OfflineRepository<"conflicts">;
   maxAttempts?: number;
   baseDelayMs?: number;
   maxDelayMs?: number;
@@ -32,11 +35,13 @@ const EMPTY_REPORT: FlushReport = {
   succeeded: 0,
   retried: 0,
   failed: 0,
+  conflicts: 0,
 };
 
 export class SyncEngine {
   private readonly queue: SyncQueue;
   private readonly transport: SyncTransport;
+  private readonly conflicts?: OfflineRepository<"conflicts">;
   private readonly maxAttempts: number;
   private readonly baseDelayMs: number;
   private readonly maxDelayMs: number;
@@ -48,6 +53,7 @@ export class SyncEngine {
   constructor(options: SyncEngineOptions) {
     this.queue = options.queue;
     this.transport = options.transport;
+    this.conflicts = options.conflicts;
     this.maxAttempts = options.maxAttempts ?? 5;
     this.baseDelayMs = options.baseDelayMs ?? 1_000;
     this.maxDelayMs = options.maxDelayMs ?? 60_000;
@@ -94,6 +100,30 @@ export class SyncEngine {
             lastError: null,
           });
           report.succeeded += 1;
+          continue;
+        }
+
+        if (!result.retryable && "conflict" in result) {
+          const conflict = result as unknown as { conflict: true; remoteVersion: unknown };
+          if (this.conflicts) {
+            const record: OfflineConflict = {
+              id: crypto.randomUUID(),
+              operationId: operation.id,
+              entityType: operation.entityType,
+              entityId: operation.entityId,
+              localVersion: operation.payload,
+              remoteVersion: conflict.remoteVersion,
+              resolution: "pending",
+              detectedAt: new Date(this.now()).toISOString(),
+              resolvedAt: null,
+            };
+            await this.conflicts.put(record);
+          }
+          await this.queue.update(operation.id, {
+            status: "failed",
+            lastError: "conflict detected",
+          });
+          report.conflicts += 1;
           continue;
         }
 

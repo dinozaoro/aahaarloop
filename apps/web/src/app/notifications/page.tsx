@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { WorkspaceShell } from "@/components/workspace-shell";
-import { Papicon } from "@/components/papicon";
 import { getClaimsForDonor } from "@/lib/data/store";
 import { DEMO_DONOR_ORG_ID } from "@/lib/data/constants";
 
 export const metadata: Metadata = { title: "Notifications" };
 
 export default function NotificationsPage() {
-  const claims = [...getClaimsForDonor(DEMO_DONOR_ORG_ID)].sort((a,b) => b.createdAt.localeCompare(a.createdAt));
-  return <WorkspaceShell><div className="page-heading"><div><p className="page-kicker">AahaarLoop updates</p><h1>Notifications</h1><p>Claims and pickup changes from your partner organisations.</p></div><button className="outline-action">Mark all as read</button></div><section className="notifications-panel">{claims.map((claim) => <article className="notification-row" key={claim.id}><span className="notification-icon"><Papicon name="bell" /></span><div><p><strong>{claim.recipientName}</strong> {claim.status === "pending" ? "requested" : claim.status === "pickup_scheduled" ? "scheduled a pickup for" : claim.status === "delivered" ? "completed the handover for" : "confirmed"} <strong>{claim.servings} servings of {claim.donationTitle}</strong>.</p><small>{new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", timeStyle: "short" }).format(new Date(claim.updatedAt))}</small></div><i className="notification-unread" /></article>)}</section><p className="sample-note">Preview notifications are generated from seeded claim activity.</p></WorkspaceShell>;
+  const claims = [...getClaimsForDonor(DEMO_DONOR_ORG_ID)].sort((a,b) => b.updatedAt.localeCompare(a.updatedAt));
+  const title = (status: string) => status === "pending" ? "A kitchen requested your donation" : status === "pickup_scheduled" ? "Pickup is scheduled" : status === "delivered" ? "Delivery completed" : status === "picked_up" ? "Your food was collected" : "Donation claim confirmed";
+  const description = (claim: (typeof claims)[number]) => `${claim.servings} portions of ${claim.donationTitle} · ${claim.recipientName}`;
+  return <WorkspaceShell><div className="notifications-page"><div className="page-heading"><div><p className="page-kicker">Bengaluru / Demo</p><h1>Your loop, up to date.</h1><p>Useful updates. Only when they matter.</p></div></div><div className="notifications-toolbar"><span>All updates</span><Link href="/settings">Notification preferences ↗</Link></div><section className="notifications-panel" aria-label="Recent claim activity">{claims.map((claim) => <article className="notification-row" key={claim.id}><div><h2>{title(claim.status)}</h2><p>{description(claim)}</p></div><time>{new Intl.DateTimeFormat("en-IN", { hour: "numeric", minute: "2-digit" }).format(new Date(claim.updatedAt))}</time></article>)}</section><p className="sample-note">Preview activity comes from seeded claims. Notifications and read status are not connected to the shared API.</p></div></WorkspaceShell>;
 }

@@ -65,6 +65,21 @@ export interface OfflineRecordMap {
   drafts: DraftRecord;
   sessions: SessionRecord;
   operations: QueuedOperation;
+  conflicts: OfflineConflict;
+}
+
+export type ConflictResolution = "pending" | "merged" | "overwritten" | "cancelled";
+
+export interface OfflineConflict {
+  id: string;
+  operationId: string;
+  entityType: string;
+  entityId: string | null;
+  localVersion: unknown;
+  remoteVersion: unknown;
+  resolution: ConflictResolution;
+  detectedAt: string;
+  resolvedAt: string | null;
 }
 
 export type StoreName = keyof OfflineRecordMap;

@@ -1,30 +1,22 @@
-import { Badge } from "@/components/ui/badge";
 import type { Metadata } from "next";
 
 import { DonationDatesForm } from "./donation-dates-form";
 import { WorkspaceShell } from "@/components/workspace-shell";
+import { DonationLocationForm } from "../location/donation-location-form";
 
 export const metadata: Metadata = {
-  title: "Donation dates and storage",
+  title: "Pickup and handling",
   alternates: { canonical: "/donations/new/dates" },
 };
 
 export default function DonationDatesPage() {
   return (
-    <WorkspaceShell><div className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-10 sm:px-6">
-      <div className="flex flex-col gap-2">
-        <Badge variant="secondary" className="w-fit">
-          Step 2 of 3
-        </Badge>
-        <h1 className="text-3xl font-semibold tracking-tight">
-          Dates, storage and allergens
-        </h1>
-        <p className="text-muted-foreground">
-          Separate the food-safety use-by date from the quality best-before date
-          and the operational pickup deadline.
-        </p>
-      </div>
-      <DonationDatesForm />
+    <WorkspaceShell><div className="site-shell donation-step-page py-10 sm:py-14">
+      <p className="page-kicker">Bengaluru / Demo · Today, 5:45 PM</p>
+      <h1>A few details for a reliable pickup.</h1>
+      <p className="donation-step-description">Step 2 of 2 · Food details saved as a draft</p>
+      <ol aria-label="Donation steps" className="donation-progress"><li><span aria-hidden="true">○</span> 1&nbsp; Food details</li><li aria-current="step"><span aria-hidden="true">●</span> 2&nbsp; Pickup &amp; handling</li></ol>
+      <div className="donation-pickup-grid"><div><DonationDatesForm /></div><div id="pickup-location"><DonationLocationForm /></div></div>
     </div></WorkspaceShell>
   );
 }

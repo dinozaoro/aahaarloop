@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Pencil, Plus } from "lucide-react";
 
 import { Breadcrumbs, PageHeader } from "@/components/page-chrome";
+import { WorkspaceShell } from "@/components/workspace-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -278,7 +279,7 @@ export default function RecipientNeedsPage() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-10 sm:px-6">
+    <WorkspaceShell><div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-10 sm:px-6">
       <Breadcrumbs
         items={[{ label: "Recipient", href: "/recipient" }, { label: "Needs" }]}
       />
@@ -440,6 +441,6 @@ export default function RecipientNeedsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </div></WorkspaceShell>
   );
 }
