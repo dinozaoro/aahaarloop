@@ -308,6 +308,12 @@
 .filter-pill-check.selected { background: #F5C4D3; }
 .discover-results-heading { display: flex; justify-content: space-between; margin: 18px 0 10px; color: #70605D; font-size: 10px; }
 .discover-results-heading span:last-child { color: #E12620; }
+.discover-view-switch { display: inline-flex; gap: 4px; }
+.discover-view-switch button { border: 1px solid #E6DAD5; background: transparent; color: #70605D; font-size: 10px; padding: 3px 10px; border-radius: 999px; cursor: pointer; }
+.discover-view-switch button.selected { background: #063A2A; border-color: #063A2A; color: #FFF7F0; }
+.donation-map { border-radius: 18px; overflow: hidden; border: 1px solid #E6DAD5; }
+.donation-map .leaflet-container { font: inherit; }
+.map-loading { display: grid; place-items: center; min-height: 220px; color: #70605D; }
 .discover-layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr); align-items: start; gap: 18px; }
 .discover-offer-list { gap: 14px; }
 .discover-offer-card { display: block; overflow: hidden; border: 0; border-radius: 9px; background: #fff; }
