@@ -34,7 +34,7 @@ const HOUR_MS = 60 * MINUTE_MS;
 const ISO_WITH_OFFSET =
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d{1,3})?)?(?:Z|[+-]\d{2}:?\d{2})$/;
 
-function toEpochMs(value: Instant, field: string): number {
+export function toEpochMs(value: Instant, field: string): number {
   if (value instanceof Date) {
     const ms = value.getTime();
     if (Number.isNaN(ms)) {
