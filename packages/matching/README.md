@@ -1,6 +1,6 @@
 # @aahaarloop/matching
 
-Deterministic business rules shared by the web and mobile apps. The package starts with the urgency calculator required by issue #28.
+Deterministic business rules shared by the web and mobile apps: the urgency calculator from issue #28 and the matching engine from issue #29.
 
 ## Urgency calculation
 
@@ -77,6 +77,93 @@ const result = calculateUrgency({
 - The function does not certify that food is safe to eat.
 - A missing deadline is not treated as low urgency; it is `unknown`.
 - The function does not schedule reminders or expire donations in the database.
+
+## Matching engine
+
+`matchDonationsForRecipient(recipient, donations, { now, config })` filters and ranks donations for one recipient. It is pure and deterministic, and it does not use an LLM.
+
+### Hard filters
+
+A donation is excluded when any of these fail:
+
+| Filter | Rule |
+| --- | --- |
+| Time feasibility | The urgency calculation must return `active`. |
+| Distance | Haversine distance must not exceed `maxDistanceKm` (default 25 km). |
+| Storage | The donation's required storage must not exceed what the recipient can provide (`ambient` < `chilled` < `frozen`). |
+| Quantity | `availableServings` must be positive. With `allowPartialClaims: false`, it must also cover `requiredServings`. |
+| Needs | If the recipient lists needs, at least one donation category must match. An empty needs list accepts anything. |
+| Transport | The claimed weight must fit `transportCapacityKg`. |
+
+Excluded entries list every failed reason, so a caller can explain the rejection.
+
+### Components and weights
+
+Every eligible match is scored 0–100 per component, then combined with normalized weights.
+
+| Component | Default weight | 0–100 score |
+| --- | --- | --- |
+| Urgency | 0.30 | `critical` 100, `high` 75, `medium` 50, `low` 25 |
+| Distance | 0.25 | Linear from 100 at 0 km to 0 at `maxDistanceKm` |
+| Quantity | 0.15 | `claimableServings / requiredServings` |
+| Needs | 0.15 | Matched needs divided by listed needs; 100 when no needs are listed |
+| Availability | 0.10 | 100 when a volunteer window contains `now`, otherwise 0 |
+| Logistics | 0.05 | Claimed weight divided by transport capacity (right-sized transport scores higher) |
+
+Weights are normalized to sum to 1, so callers can pass any non-negative values. Missing keys fall back to the defaults; all-zero weights are rejected. The explanation payload includes each raw score, normalized weight, contribution, and the inputs behind it (`distanceKm`, `claimableServings`, `matchedCategories`, `remainingMinutes`, `claimedWeightKg`).
+
+### Time feasibility and travel
+
+Travel time is derived from the haversine distance and `averageSpeedKmh` (default 25). The matching engine then calls the urgency calculator with `handlingTimeMinutes` (default 10) and `bufferMinutes` (default 15).
+
+### Partial claims
+
+`claimableServings = min(availableServings, requiredServings)`. The claimed weight is proportional: `totalWeightKg × claimableServings / totalServings`. Partial claims are enabled by default and can be disabled with `allowPartialClaims: false`.
+
+### Example
+
+```ts
+import { matchDonationsForRecipient } from "@aahaarloop/matching";
+
+const result = matchDonationsForRecipient(
+  {
+    id: "recipient-1",
+    location: { latitude: -18.8792, longitude: 47.5079 },
+    needs: ["produce", "bakery"],
+    requiredServings: 80,
+    storage: "chilled",
+    transportCapacityKg: 50,
+    volunteerAvailability: [
+      { start: "2026-11-21T09:00:00Z", end: "2026-11-21T12:00:00Z" },
+    ],
+  },
+  [
+    {
+      id: "donation-1",
+      location: { latitude: -18.9, longitude: 47.52 },
+      categories: ["produce"],
+      storage: "ambient",
+      totalServings: 100,
+      availableServings: 100,
+      totalWeightKg: 40,
+      pickupDeadlineAt: "2026-11-21T18:00:00Z",
+    },
+  ],
+  { now: "2026-11-21T10:00:00Z" }
+);
+
+// result.matches[0].claimableServings -> 80
+// result.matches[0].totalScore -> weighted score
+// result.matches[0].explanation -> per-component scores
+```
+
+### Assumptions and limits
+
+- Domain types are local to this package until the Drizzle schema (#4) and recipient needs (#27) define their database shapes.
+- Food categories are opaque strings; the matching engine does not own the taxonomy.
+- Availability checks whether a volunteer is available at `now`. It does not schedule a pickup or search future windows.
+- The logistics score rewards using a larger share of the available capacity; it is not a cost calculation.
+- The engine does not persist claims or update `availableServings`.
 
 ## Tests
 
