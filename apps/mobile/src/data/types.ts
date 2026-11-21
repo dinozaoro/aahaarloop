@@ -61,3 +61,40 @@ export interface LocalMission {
   notes: string | null;
   updatedAt: string;
 }
+
+export type SyncOperationStatus =
+  "pending" | "in_progress" | "completed" | "failed";
+
+export interface QueuedOperation {
+  id: string;
+  deviceId: string;
+  entityType: string;
+  entityId: string | null;
+  operation: string;
+  payload: unknown;
+  status: SyncOperationStatus;
+  attempts: number;
+  lastError: string | null;
+  createdAt: string;
+  nextAttemptAt: string;
+  completedAt: string | null;
+}
+
+export type ConflictResolution =
+  "pending" | "merged" | "overwritten" | "cancelled";
+
+export interface LocalConflict {
+  id: string;
+  operationId: string;
+  entityType: string;
+  entityId: string | null;
+  localVersion: string;
+  remoteVersion: string;
+  resolution: ConflictResolution;
+  resolvedAt: string | null;
+}
+
+export interface VersionedRecord {
+  version: number;
+  updatedAt: string;
+}

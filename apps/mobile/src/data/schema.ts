@@ -60,6 +60,39 @@ export const MIGRATIONS: readonly Migration[] = [
         ON missions (status, window_start)`,
     ],
   },
+  {
+    version: 2,
+    statements: [
+      `CREATE TABLE IF NOT EXISTS operations (
+        id TEXT PRIMARY KEY,
+        device_id TEXT NOT NULL,
+        entity_type TEXT NOT NULL,
+        entity_id TEXT,
+        operation TEXT NOT NULL,
+        payload TEXT,
+        status TEXT NOT NULL,
+        attempts INTEGER NOT NULL DEFAULT 0,
+        last_error TEXT,
+        created_at TEXT NOT NULL,
+        next_attempt_at TEXT NOT NULL,
+        completed_at TEXT
+      )`,
+      `CREATE INDEX IF NOT EXISTS operations_status_created_idx
+        ON operations (status, created_at)`,
+      `CREATE TABLE IF NOT EXISTS conflicts (
+        id TEXT PRIMARY KEY,
+        operation_id TEXT NOT NULL REFERENCES operations(id) ON DELETE CASCADE,
+        entity_type TEXT NOT NULL,
+        entity_id TEXT,
+        local_version TEXT NOT NULL,
+        remote_version TEXT NOT NULL,
+        resolution TEXT NOT NULL DEFAULT 'pending',
+        resolved_at TEXT
+      )`,
+      `CREATE INDEX IF NOT EXISTS conflicts_operation_idx
+        ON conflicts (operation_id)`,
+    ],
+  },
 ];
 
 export const SCHEMA_VERSION = Math.max(...MIGRATIONS.map((m) => m.version));
