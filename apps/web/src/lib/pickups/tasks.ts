@@ -77,6 +77,22 @@ export function createPickupService(
       return assignment;
     },
 
+    start(taskId: string, volunteerId: string): PickupTask {
+      const task = repo.tasks().find((item) => item.id === taskId);
+      if (!task) throw new ApiError("not_found", "Pickup task not found");
+      const assignment = repo
+        .assignments()
+        .find((item) => item.taskId === taskId && item.volunteerId === volunteerId);
+      if (!assignment) throw new ApiError("forbidden", "Only the assignee can start a task");
+      if (task.status !== "assigned") {
+        throw new ApiError("conflict", "Only an assigned task can start");
+      }
+      const started: PickupTask = { ...task, status: "in_progress" };
+      repo.saveTask(started);
+      repo.audit(task.id, "pickup.task.started", volunteerId);
+      return started;
+    },
+
     complete(taskId: string, volunteerId: string): PickupTask {
       const task = repo.tasks().find((item) => item.id === taskId);
       if (!task) throw new ApiError("not_found", "Pickup task not found");
