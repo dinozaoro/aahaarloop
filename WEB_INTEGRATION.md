@@ -34,11 +34,11 @@ Impact uses completed seeded handovers. Meal counts are estimated at 0.3 kg per 
 
 - Google OAuth manages authentication; AahaarLoop does not store a separate password.
 - Role-sensitive API calls require an active organization and server-side authorization.
-- Claim creation requires the `recipient` role, a `recipient_id` equal to `session.user.activeOrganizationId`, and an `idempotency-key` header with `donation_id` and `servings`. The web and mobile clients both send the header; `claims.idempotency_key` is unique in Postgres, so duplicates are rejected across workers even though the claim lock is still in-process.
+- Claim creation requires the `recipient` role, a `recipient_id` equal to `session.user.activeOrganizationId`, and an `idempotency-key` header with `donation_id` and `servings`. The web and mobile clients both send the header; a transactional `SELECT … FOR UPDATE` on the donation row plus the unique `claims.idempotency_key` index make stock decrement and replay safe across workers. No in-process claim lock remains.
 - Donation mutations use the shared `DonationInputSchema`; the wizard creates with `POST /api/donations` and then calls `POST /api/donations/{id}/publish`. Image signing is a separate authenticated request.
-- Favorites are user-scoped: the schema has no organization column, so the active organization is ignored by the adapter.
-- Migration `packages/database/migrations/0001_lucky_speed.sql` (claims idempotency key plus notification preferences) is generated but **not applied**. An operator must run the migrations before using the app.
-- Moderation reports, admin config, telemetry and the in-process idempotency replay cache remain in memory; only domain state lives in Postgres.
+- Favorites are user-and-organization-scoped: `favorites.organization_id` is stored on add and used by reads.
+- Migrations `packages/database/migrations/0001_lucky_speed.sql` (claims idempotency key, notification preferences) and `0002_cultured_energizer.sql` (org-scoped favorites, durable idempotency/telemetry/admin config, moderation report fields) are generated but **not applied**. An operator must run `pnpm --filter @aahaarloop/database migrate` before using the app.
+- Moderation reports and their audit entries, admin config, telemetry and POST replay responses are persisted in Postgres. Moderation audit uses the existing `audit_logs` table; telemetry and replay writes are fire-and-forget and never block a request.
 
 ## Web-owned files
 

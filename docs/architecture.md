@@ -87,8 +87,9 @@ in the UI without a separate hydration step.
 
 ## Data access
 
-Domain state (donations, claims, needs, organizations, notifications, pickups
-and favorites) lives in Postgres, not in process-local stores.
+Domain state (donations, claims, needs, organizations, notifications, pickups,
+favorites, moderation, admin config, telemetry and POST replay responses) lives
+in Postgres, not in process-local stores.
 `apps/web/src/lib/data/dal.ts` is `server-only`: it uses `getDb()` and maps
 Drizzle rows to domain types. `apps/web/src/lib/data/store.ts` and the
 `*-store-repository.ts` adapters are thin async adapters; services await them,
@@ -99,17 +100,20 @@ refresh. No client imports the DAL. HTTP envelopes are unchanged:
 Claim creation requires the `recipient` role, a `recipient_id` matching
 `session.user.activeOrganizationId`, and an `idempotency-key` header (sent by
 both the web UI and the mobile client). `claims.idempotency_key` is unique in
-Postgres; the in-process claim lock remains, but the unique index prevents
-duplicates across workers. Favorites are user-scoped because the schema has no
-organization column.
+Postgres; `commitClaim` locks the donation row with `SELECT … FOR UPDATE` and
+writes the claim, stock decrement and event in one transaction, so the in-process
+claim lock is gone. Favorites are scoped to both the user and the active
+organization.
 
-Migration `packages/database/migrations/0001_lucky_speed.sql` adds
-`claims.idempotency_key` and `notification_preferences`. It is generated but
-**not applied**: an operator must run the migrations before using the app. The
-seed supplies five donations, two needs, two claims and one pickup task. A
-newly onboarded organization has no seeded donations, so claim tests use the
-seeded recipient organization. Moderation reports, admin config, telemetry
-and the in-process idempotency replay cache remain in memory.
+Migrations `packages/database/migrations/0001_lucky_speed.sql` and
+`0002_cultured_energizer.sql` are generated but **not applied**: an operator must
+run `pnpm --filter @aahaarloop/database migrate` before using the app. The seed
+supplies five donations, two needs, two claims and one pickup task. A newly
+onboarded organization has no seeded donations, so claim tests use the seeded
+recipient organization. Moderation audit entries reuse `audit_logs`; admin
+config, telemetry and POST replay responses have their own tables. The config
+snapshot and match cache stay process-local and are refreshed from Postgres at
+startup and on config change.
 
 ## Authentication and authorization
 
