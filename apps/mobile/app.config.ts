@@ -4,8 +4,8 @@ declare const process: { env: Record<string, string | undefined> };
 
 const DEFAULT_API_URL = "http://10.0.2.2:3000";
 // Bump APP_VERSION for user-visible releases and VERSION_CODE for every APK.
-const APP_VERSION = "0.1.0";
-const VERSION_CODE = 1;
+const APP_VERSION = "0.1.1";
+const VERSION_CODE = 2;
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
