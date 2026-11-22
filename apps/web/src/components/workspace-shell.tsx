@@ -1,10 +1,11 @@
 "use client";
 
-import { Bell, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { Logo } from "@/components/logo";
+import { NotificationBell } from "@/components/notification-bell";
 
 export function WorkspaceShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -32,7 +33,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
         </nav>
         <div className="workspace-navigation-actions">
           <span className="workspace-location"><MapPin aria-hidden="true" /> Bengaluru</span>
-          <Link href="/notifications" aria-label="Notifications" className="workspace-icon-link"><Bell aria-hidden="true" /></Link>
+          <NotificationBell />
           <Link href={accountHref} className="workspace-account">Account</Link>
         </div>
       </header>

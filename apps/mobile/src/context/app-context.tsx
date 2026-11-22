@@ -3,8 +3,8 @@ import * as SecureStore from "expo-secure-store";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type PropsWithChildren } from "react";
 import { env } from "@/config/env";
 import { ClaimRepository, DonationRepository, openAppDatabase, type LocalClaim, type LocalDonation } from "@/data";
-import type { ApiDonation, MobileAuthResult } from "@/lib/api";
-import { registerPushToken, getMobileAuthToken } from "@/lib/api";
+import type { ApiClaim, ApiDonation, MobileAuthResult } from "@/lib/api";
+import { apiFetch, registerPushToken, getMobileAuthToken } from "@/lib/api";
 import { flushOfflineRequests, getQueueCounts } from "@/lib/offline";
 import { AccessibilityInfo } from "react-native";
 
@@ -22,6 +22,7 @@ interface AppContextValue {
   getMobileAuthToken: () => Promise<MobileAuthResult>;
   claims: Array<{ id: string; donationId: string; servings: number; status: string }>;
   addClaim: (claim: { id: string; donationId: string; servings: number; status: string }) => void;
+  refreshClaims: () => Promise<void>;
   registerPushToken: (token: string) => Promise<{ success: boolean }>;
 }
 
@@ -49,6 +50,22 @@ export function AppProvider({ children }: PropsWithChildren) {
       setClaims(localClaims.map((claim) => ({ id: claim.id, donationId: claim.donationId, servings: claim.quantity, status: claim.status })));
     } catch {
       // The app can still use the network when local storage is unavailable.
+    }
+  }, []);
+
+  const refreshClaims = useCallback(async () => {
+    try {
+      const { claims: remote } = await apiFetch<{ claims: ApiClaim[] }>("/api/claims");
+      const synced = remote.map((claim) => ({
+        id: claim.id,
+        donationId: claim.donationId,
+        servings: claim.servings,
+        status: claim.status,
+      }));
+      setClaims(synced);
+      await Promise.all(synced.map(persistClaim));
+    } catch {
+      // Cached claims stay visible when the API is unavailable.
     }
   }, []);
 
@@ -96,6 +113,7 @@ export function AppProvider({ children }: PropsWithChildren) {
       }
     })();
     void loadLocalData();
+    void refreshClaims();
     void refreshOffline();
     // Get mobile auth token for native API calls
     void (async () => {
@@ -114,7 +132,7 @@ export function AppProvider({ children }: PropsWithChildren) {
     })();
     const timer = setInterval(() => void refreshOffline(), 30_000);
     return () => clearInterval(timer);
-  }, [loadLocalData, getMobileAuthToken]);
+  }, [loadLocalData, refreshClaims, getMobileAuthToken]);
 
   useEffect(() => {
     if (!preferencesHydrated) return;
@@ -135,6 +153,7 @@ export function AppProvider({ children }: PropsWithChildren) {
     refreshOffline,
     getMobileAuthToken,
     claims,
+    refreshClaims,
     addClaim: (claim) => {
       setClaims((current) => [claim, ...current.filter((item) => item.id !== claim.id)]);
       void persistClaim(claim);
@@ -143,7 +162,7 @@ export function AppProvider({ children }: PropsWithChildren) {
       if (!cachedUser?.id) return { success: false, error: "No user signed in" };
       return await registerPushToken(token, cachedUser.role === "donor" ? "ios" : "android");
     },
-  }), [activeOrganizationId, cacheDonations, cachedDonations, claims, isOnline, pendingCount, refreshOffline, role, cachedUser]);
+  }), [activeOrganizationId, cacheDonations, cachedDonations, claims, isOnline, pendingCount, refreshClaims, refreshOffline, role, cachedUser]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
