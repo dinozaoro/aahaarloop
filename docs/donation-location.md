@@ -27,13 +27,21 @@ The review card shows every field from [step 2](donation-dates.md) and step 3:
 all three dates, the effective deadline, storage, packaging, allergens, dietary
 flags, address, pin coordinates, contact, instructions and the fractional
 setting. Publishing is blocked when step 2 or step 3 is incomplete; a successful
-publish flips the draft to `published` with a timestamp and shows an
+publish persists `published` with a timestamp and shows an
 "Available to recipients" status.
 
 The pure helpers in `apps/web/src/lib/donations` keep validation testable:
 
 - `draft.ts` — the `sessionStorage` draft contract and safe read/write helpers.
 - `location.ts` — Bengaluru address search, pickup validation and publishing.
+
+The draft itself stays in `sessionStorage`, but publishing is now server-backed.
+The form normalizes the draft vocabulary, then POSTs it to `/api/donations` and
+calls `POST /api/donations/{id}/publish` with the returned id. The server
+persists the donation and its publish timestamp in Postgres through the
+server-only DAL; a successful response updates the local draft to mirror the
+published state and refreshes the page. Domain rows are shared rather than
+resetting with the server process.
 
 shortcut: address search uses a fixed list of Bengaluru localities and the map
 pin is a coordinate from that list, not a live geocoding or map SDK; integrate a
