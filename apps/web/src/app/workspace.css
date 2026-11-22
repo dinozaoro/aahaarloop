@@ -337,12 +337,14 @@
 .schematic-map > small { position: absolute; right: 12px; bottom: 10px; color: #8A7772; font-size: 12px; }
 .discover-offer-list .empty-state { border: 0; }
 .impact-page .page-heading p:not(.page-kicker) { margin-top: 16px; }
-.impact-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; border-bottom: 1px solid #E8D4CD; padding: 0 0 20px; }
-.impact-metrics > div { display: grid; gap: 7px; }
-.impact-metrics strong { color: #E12620; font-size: 34px; font-weight: 700; letter-spacing: -.03em; }
+/* bazaar receipt: ledger lines, big serif figures */
+.impact-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border-bottom: 1px dashed #D9BEB4; padding: 0 0 20px; }
+.impact-metrics > div { display: grid; gap: 7px; border-left: 1px dashed #E8D4CD; padding-left: 20px; }
+.impact-metrics > div:first-child { border-left: 0; padding-left: 0; }
+.impact-metrics strong { color: var(--primary); font-family: var(--font-serif), Georgia, serif; font-size: clamp(34px, 3.4vw, 44px); font-weight: 400; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
 .impact-metrics span { color: #70605D; font-size: 12px; }
 .impact-content { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 38px; margin-top: 22px; }
-.impact-goal { align-self: start; border-radius: 9px; background: #FFE5B0; padding: 24px; }
+.impact-goal { align-self: start; border: 1px dashed #D9BEB4; border-radius: 9px; background: #FFFCF9; padding: 24px; }
 .impact-goal h2, .impact-story h2 { margin: 0 0 18px; color: #2C1618; font-size: 18px; font-weight: 700; }
 .impact-goal > strong { color: #E12620; font-size: 12px; }
 .impact-progress { height: 6px; overflow: hidden; margin: 16px 0; border-radius: 6px; background: #F0C99B; }
@@ -350,7 +352,7 @@
 .impact-goal > p { margin: 0 0 16px; color: #70605D; font-size: 12px; line-height: 1.6; }
 .impact-goal > small { color: #70605D; font-size: 12px; line-height: 1.5; }
 .impact-story h2 { margin-bottom: 4px; }
-.impact-story article { border-bottom: 1px solid #E8D4CD; padding: 16px 0; }
+.impact-story article { border-bottom: 1px dashed #E8D4CD; padding: 16px 0; }
 .impact-story time { color: #B51757; font-size: 12px; }
 .impact-story h3 { margin: 13px 0 8px; color: #2C1618; font-size: 12px; font-weight: 700; }
 .impact-story article p { margin: 0; color: #70605D; font-size: 12px; }
@@ -382,7 +384,9 @@
   .filter-pill { min-height: 32px; padding-inline: 9px; font-size: 12px; }
   .discover-search-controls .primary-action { min-height: 38px; padding-inline: 11px; }
   .donation-detail-heading h1 { font-size: 24px; }
-  .impact-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .impact-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 0; }
+  .impact-metrics > div:nth-child(odd) { border-left: 0; padding-left: 0; }
+  .impact-metrics > div:nth-child(even) { padding-left: 16px; }
   .impact-metrics strong { font-size: 27px; }
   .impact-content { grid-template-columns: 1fr; gap: 24px; }
   .recipient-stats { grid-template-columns: repeat(2, 1fr); }

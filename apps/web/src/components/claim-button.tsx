@@ -50,7 +50,17 @@ export function ClaimButton({
         const body = (await response.json().catch(() => null)) as { message?: string } | null;
         throw new Error(body?.message ?? "Claim failed");
       }
-      toast.success("Claim sent");
+      // handover moment: short, auto-dismissed, always offers the next action
+      toast.success("Claim sent to the kitchen", {
+        description: "Track pickup progress under My activity.",
+        action: {
+          label: "View",
+          onClick: () => {
+            router.push("/recipient/claims");
+            router.refresh();
+          },
+        },
+      });
       router.refresh();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Claim failed");

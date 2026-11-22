@@ -131,7 +131,7 @@ select option:checked, select option:hover { background: var(--primary); color: 
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
 }
 
 @media (hover: hover) and (pointer: fine) {
