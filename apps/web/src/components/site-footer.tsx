@@ -37,6 +37,7 @@ export function SiteFooter() {
         <p className={`${landing ? "site-shell py-4" : "site-shell py-4 text-xs text-muted-foreground"}`}>
           {landing ? `© ${new Date().getFullYear()} AahaarLoop. Made for a more generous everyday.` : `© ${new Date().getFullYear()} AahaarLoop · Product preview`}
           {landing ? <span>Rooted in India. Open to possibility.</span> : null}
+          <span>Madagascar · CODEBENDERS ACE BUILDERS Hackathon 2026 · GitHub: <a className="underline underline-offset-2" href="https://github.com/ItokianaRAKT" rel="noreferrer" target="_blank">ItokianaRAKT</a> · <a className="underline underline-offset-2" href="https://github.com/fatratra-png" rel="noreferrer" target="_blank">fatratra-png</a></span>
         </p>
       </div>
     </footer>
