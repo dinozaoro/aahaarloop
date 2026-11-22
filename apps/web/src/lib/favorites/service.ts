@@ -15,9 +15,7 @@ export const favoriteService = {
         .filter((donation) => donation.status === "published" && donation.servingsAvailable > 0)
         .map((donation) => donation.id),
     );
-    // shortcut: favorites are user-scoped in the schema, so the active org is ignored.
-    void organizationId;
-    const rows = await dal.listFavorites(userId);
+    const rows = await dal.listFavorites(userId, organizationId);
     return rows.filter((favorite) => allowed.has(favorite.donationId));
   },
 

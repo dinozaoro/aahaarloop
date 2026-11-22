@@ -5,8 +5,10 @@ import { test } from "node:test";
 // The singleton imports the server-only Postgres DAL, which Node cannot load.
 // Stub just that import with an in-memory repository so the real service is tested.
 const dalStub = `data:text/javascript,${encodeURIComponent(`
-export async function listFavorites(userId) {
-  return (globalThis.__aahaarFavoriteRows ?? []).filter((row) => row.userId === userId);
+export async function listFavorites(userId, organizationId) {
+  return (globalThis.__aahaarFavoriteRows ?? []).filter(
+    (row) => row.userId === userId && row.organizationId === organizationId,
+  );
 }
 export async function addFavorite(userId, organizationId, donationId) {
   const row = { userId, organizationId, donationId, createdAt: "2026-11-21T12:00:00Z" };
@@ -49,10 +51,9 @@ test("favorites are user-scoped and keep the organization recorded at add time",
     (await favoriteService.list(user, "org-one", [donation("donation-one")])).length,
     1,
   );
-  // shortcut: list ignores the active org because favorites are user-scoped in the schema.
   assert.equal(
     (await favoriteService.list(user, "org-two", [donation("donation-one")])).length,
-    1,
+    0,
   );
   assert.equal(
     (await favoriteService.list("other-user", "org-one", [donation("donation-one")])).length,

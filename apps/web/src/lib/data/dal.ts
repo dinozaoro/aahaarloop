@@ -1,6 +1,8 @@
 import "server-only";
 
 import {
+  adminConfig,
+  apiIdempotency,
   claimItems,
   claims,
   donationAllergens,
@@ -19,11 +21,14 @@ import {
   profiles,
   recipientNeeds,
   recipientProfiles,
+  reports,
+  telemetryEvents,
   users,
   volunteerProfiles,
 } from "@aahaarloop/database";
-import { and, asc, desc, eq, inArray, isNull } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, lt } from "drizzle-orm";
 
+import { ApiError } from "@/lib/api/errors";
 import { getDb } from "@/lib/db";
 import type {
   Claim,
@@ -38,11 +43,15 @@ import type {
   PickupTask,
   StorageType,
 } from "@/lib/domain/types";
+import type { IdempotencyRecord } from "@/lib/api/idempotency";
+import type { AdminConfig } from "@/lib/config/admin-config";
 import type { Favorite } from "@/lib/favorites/service";
+import type { AiAnalysis, ModerationReport } from "@/lib/moderation/reports";
 import type {
   Notification,
   NotificationPreferences,
 } from "@/lib/notifications/service";
+import type { TelemetryEvent } from "@/lib/telemetry/events";
 import type { VolunteerProfile } from "@aahaarloop/matching";
 
 const CATEGORY_BY_SLUG: Record<string, FoodCategory> = {
@@ -382,6 +391,74 @@ export async function saveClaim(claim: Claim, actorId: string): Promise<void> {
       occurredAt: new Date(event.at),
     }).onConflictDoNothing();
   }
+}
+
+/** Claims a donation atomically: row lock, stock decrement, claim and audit event. */
+export async function commitClaim(claim: Claim, actorId: string): Promise<Claim> {
+  const db = await getDb();
+  let replayId: string | undefined;
+  await db.transaction(async (tx) => {
+    const inserted = await tx
+      .insert(claims)
+      .values({
+        id: claim.id,
+        donationId: claim.donationId,
+        recipientOrgId: claim.recipientOrgId,
+        claimedByUserId: actorId,
+        status: claim.status,
+        quantity: claim.servings,
+        unit: "servings",
+        idempotencyKey: claim.idempotencyKey ?? null,
+        updatedAt: new Date(),
+      })
+      .onConflictDoNothing({ target: claims.idempotencyKey })
+      .returning({ id: claims.id });
+    if (!inserted.length) {
+      const [existing] = await tx
+        .select({ id: claims.id })
+        .from(claims)
+        .where(eq(claims.idempotencyKey, claim.idempotencyKey ?? ""))
+        .limit(1);
+      replayId = existing?.id;
+      return;
+    }
+
+    const [donation] = await tx
+      .select({ remaining: donations.remainingQuantity, status: donations.status })
+      .from(donations)
+      .where(eq(donations.id, claim.donationId))
+      .for("update");
+    if (!donation || donation.status !== "published" || donation.remaining < claim.servings) {
+      throw new ApiError("conflict", "Requested quantity is not available");
+    }
+    const remaining = donation.remaining - claim.servings;
+    await tx
+      .update(donations)
+      .set({
+        remainingQuantity: remaining,
+        status: remaining === 0 ? "claimed" : "published",
+        updatedAt: new Date(),
+      })
+      .where(eq(donations.id, claim.donationId));
+    const event = claim.history.at(-1);
+    if (event) {
+      await tx.insert(donationEvents).values({
+        id: event.id,
+        donationId: claim.donationId,
+        claimId: claim.id,
+        actorType: "recipient",
+        actorId,
+        toStatus: event.type,
+        reason: event.note ?? null,
+        occurredAt: new Date(event.at),
+      });
+    }
+  });
+  if (replayId) {
+    const replay = await findClaim(replayId);
+    if (replay) return replay;
+  }
+  return claim;
 }
 
 export async function appendDonationEvent(
@@ -736,12 +813,18 @@ export async function findVolunteerProfile(userId: string): Promise<VolunteerPro
   };
 }
 
-export async function listFavorites(userId: string): Promise<readonly Favorite[]> {
+export async function listFavorites(
+  userId: string,
+  organizationId: string,
+): Promise<readonly Favorite[]> {
   const db = await getDb();
-  const rows = await db.select().from(favorites).where(eq(favorites.userId, userId));
+  const rows = await db
+    .select()
+    .from(favorites)
+    .where(and(eq(favorites.userId, userId), eq(favorites.organizationId, organizationId)));
   return rows.map((row) => ({
     userId: row.userId,
-    organizationId: "",
+    organizationId: row.organizationId ?? "",
     donationId: row.donationId,
     createdAt: iso(row.createdAt),
   }));
@@ -753,21 +836,22 @@ export async function addFavorite(
   donationId: string,
 ): Promise<Favorite> {
   const db = await getDb();
-  const [existing] = await db
+  const values = { userId, organizationId, donationId };
+  await db.insert(favorites).values(values).onConflictDoUpdate({
+    target: [favorites.userId, favorites.donationId],
+    set: { organizationId },
+  });
+  const [row] = await db
     .select()
     .from(favorites)
     .where(and(eq(favorites.userId, userId), eq(favorites.donationId, donationId)))
     .limit(1);
-  if (existing) {
-    return {
-      userId,
-      organizationId,
-      donationId,
-      createdAt: iso(existing.createdAt),
-    };
-  }
-  await db.insert(favorites).values({ userId, donationId });
-  return { userId, organizationId, donationId, createdAt: new Date().toISOString() };
+  return {
+    userId,
+    organizationId,
+    donationId,
+    createdAt: iso(row?.createdAt),
+  };
 }
 
 export async function removeFavorite(userId: string, donationId: string): Promise<boolean> {
@@ -843,4 +927,142 @@ export async function saveProfile(input: {
       .set({ notes: input.address.address, updatedAt: new Date() })
       .where(eq(donorProfiles.userId, input.userId));
   }
+}
+
+const IDEMPOTENCY_TTL_MS = 24 * 3600_000;
+
+export async function getIdempotency(key: string): Promise<IdempotencyRecord | undefined> {
+  const db = await getDb();
+  const [row] = await db
+    .select()
+    .from(apiIdempotency)
+    .where(eq(apiIdempotency.key, key))
+    .limit(1);
+  if (!row || row.createdAt.getTime() < Date.now() - IDEMPOTENCY_TTL_MS) return undefined;
+  return {
+    status: row.status,
+    bodyText: row.bodyText,
+    contentType: row.contentType,
+  };
+}
+
+export async function setIdempotency(key: string, record: IdempotencyRecord): Promise<void> {
+  const db = await getDb();
+  await db.delete(apiIdempotency).where(
+    lt(apiIdempotency.createdAt, new Date(Date.now() - IDEMPOTENCY_TTL_MS)),
+  );
+  await db
+    .insert(apiIdempotency)
+    .values({
+      key,
+      status: record.status,
+      bodyText: record.bodyText,
+      contentType: record.contentType,
+    })
+    .onConflictDoUpdate({
+      target: apiIdempotency.key,
+      set: {
+        status: record.status,
+        bodyText: record.bodyText,
+        contentType: record.contentType,
+        createdAt: new Date(),
+      },
+    });
+}
+
+export async function saveTelemetryEvent(event: TelemetryEvent): Promise<void> {
+  const db = await getDb();
+  await db
+    .insert(telemetryEvents)
+    .values({
+      eventId: event.eventId,
+      name: event.name,
+      occurredAt: new Date(event.occurredAt),
+      payload: event.payload,
+    })
+    .onConflictDoNothing();
+}
+
+type ReportRow = typeof reports.$inferSelect;
+
+function toModerationReport(row: ReportRow): ModerationReport {
+  return {
+    id: row.id,
+    targetType: row.targetType as ModerationReport["targetType"],
+    targetId: row.targetId ?? "",
+    reporterId: row.reporterId ?? "",
+    reason: row.reason as ModerationReport["reason"],
+    ...(row.details ? { details: row.details } : {}),
+    status: row.status as ModerationReport["status"],
+    ...(row.aiAnalysis ? { aiAnalysis: row.aiAnalysis as AiAnalysis } : {}),
+    createdAt: iso(row.createdAt),
+    decidedAt: isoOrNull(row.resolvedAt),
+    decidedBy: row.resolvedBy,
+    ...(row.resolutionNote ? { resolutionNote: row.resolutionNote } : {}),
+  };
+}
+
+export async function listModerationReports(): Promise<readonly ModerationReport[]> {
+  const db = await getDb();
+  return (await db.select().from(reports)).map(toModerationReport);
+}
+
+export async function findModerationReport(id: string): Promise<ModerationReport | undefined> {
+  const db = await getDb();
+  const [row] = await db.select().from(reports).where(eq(reports.id, id)).limit(1);
+  return row ? toModerationReport(row) : undefined;
+}
+
+export async function saveModerationReport(report: ModerationReport): Promise<void> {
+  const db = await getDb();
+  const values = {
+    targetType: report.targetType,
+    targetId: report.targetId,
+    reporterId: report.reporterId,
+    reason: report.reason,
+    details: report.details ?? null,
+    status: report.status,
+    aiAnalysis: report.aiAnalysis ?? null,
+    resolutionNote: report.resolutionNote ?? null,
+    resolvedBy: report.decidedBy,
+    resolvedAt: report.decidedAt ? new Date(report.decidedAt) : null,
+    updatedAt: new Date(),
+  };
+  const [existing] = await db
+    .select({ id: reports.id })
+    .from(reports)
+    .where(eq(reports.id, report.id))
+    .limit(1);
+  if (existing) {
+    await db.update(reports).set(values).where(eq(reports.id, report.id));
+  } else {
+    await db.insert(reports).values({
+      id: report.id,
+      createdAt: new Date(report.createdAt),
+      ...values,
+    });
+  }
+}
+
+const ADMIN_CONFIG_KEY = "matching";
+
+export async function loadAdminConfig(): Promise<AdminConfig | undefined> {
+  const db = await getDb();
+  const [row] = await db
+    .select()
+    .from(adminConfig)
+    .where(eq(adminConfig.key, ADMIN_CONFIG_KEY))
+    .limit(1);
+  return row?.value as AdminConfig | undefined;
+}
+
+export async function saveAdminConfig(config: AdminConfig): Promise<void> {
+  const db = await getDb();
+  await db
+    .insert(adminConfig)
+    .values({ key: ADMIN_CONFIG_KEY, value: config })
+    .onConflictDoUpdate({
+      target: adminConfig.key,
+      set: { value: config, updatedAt: new Date() },
+    });
 }

@@ -7,5 +7,5 @@ export async function GET() {
   const denied = await forbidUnlessRole(["admin"]);
   if (denied) return denied;
   // Admin view: includes AI authenticity signals.
-  return Response.json({ data: moderationService.list("admin") });
+  return Response.json({ data: await moderationService.list("admin") });
 }

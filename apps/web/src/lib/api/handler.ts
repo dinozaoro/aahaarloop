@@ -6,10 +6,7 @@ import {
   toErrorResponse,
   type ApiErrorCode,
 } from "./errors.ts";
-import {
-  createIdempotencyStore,
-  type IdempotencyStore,
-} from "./idempotency.ts";
+import { durableIdempotencyStore, type IdempotencyStore } from "./idempotency.ts";
 import type { RateLimitHook } from "./rate-limit.ts";
 import {
   isCrossOriginRequest,
@@ -34,7 +31,7 @@ export type ApiHandler<TBody, TQuery> = (
 export interface HandlerOptions<TBody, TQuery> {
   bodySchema?: ZodType<TBody>;
   querySchema?: ZodType<TQuery>;
-  /** Presence enables POST replay; defaults to an in-memory store. */
+  /** Presence enables POST replay; `true` uses the shared Postgres store. */
   idempotency?: IdempotencyStore | true;
   rateLimit?: RateLimitHook;
   log?: (entry: Record<string, unknown>) => void;
@@ -49,9 +46,7 @@ export function withApiHandler<TBody = unknown, TQuery = unknown>(
   handler: ApiHandler<TBody, TQuery>,
 ): (request: Request) => Promise<Response> {
   const store =
-    options.idempotency === true
-      ? createIdempotencyStore()
-      : options.idempotency;
+    options.idempotency === true ? durableIdempotencyStore : options.idempotency;
   const log = options.log ?? defaultLog;
 
   return async (request: Request): Promise<Response> => {
@@ -105,7 +100,7 @@ export function withApiHandler<TBody = unknown, TQuery = unknown>(
           ? request.headers.get("idempotency-key")
           : null;
       if (store && idempotencyKey) {
-        const hit = store.get(idempotencyKey);
+        const hit = await store.get(idempotencyKey);
         if (hit) {
           return finish(
             new Response(hit.bodyText, {
@@ -157,7 +152,7 @@ export function withApiHandler<TBody = unknown, TQuery = unknown>(
 
       const response = await handler({ body, query }, { requestId, request });
       if (store && idempotencyKey && response.ok) {
-        store.set(idempotencyKey, {
+        await store.set(idempotencyKey, {
           status: response.status,
           bodyText: await response.clone().text(),
           contentType: response.headers.get("content-type"),

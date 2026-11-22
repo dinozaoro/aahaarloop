@@ -6,9 +6,7 @@ import { createClaimService, type ClaimRepository } from "./transaction.ts";
 export const claimRepository: ClaimRepository = {
   findDonation: dal.findDonation,
   findByIdempotencyKey: dal.findClaimByIdempotencyKey,
-  saveDonation: dal.saveDonation,
-  saveClaim: dal.saveClaim,
-  appendEvent: dal.appendDonationEvent,
+  commit: dal.commitClaim,
 };
 
 export const claimService = createClaimService(claimRepository);

@@ -35,9 +35,23 @@ function setup(available = 10) {
   const repo = {
     findDonation: () => state.donation,
     findByIdempotencyKey: (key) => state.claims.find((claim) => claim.idempotencyKey === key),
-    saveDonation: (value) => { state.donation = value; },
-    saveClaim: (value) => { state.claims.push(value); },
-    appendEvent: (_id, type, actor) => { state.events.push({ type, actor }); },
+    // The real commit locks the donation row and re-checks stock inside one transaction.
+    commit: (claim, actor) => {
+      const existing = state.claims.find((item) => item.idempotencyKey === claim.idempotencyKey);
+      if (existing) return existing;
+      if (state.donation.status !== "published" || state.donation.servingsAvailable < claim.servings) {
+        throw new ApiError("conflict", "Requested quantity is not available");
+      }
+      const remaining = state.donation.servingsAvailable - claim.servings;
+      state.donation = {
+        ...state.donation,
+        servingsAvailable: remaining,
+        status: remaining === 0 ? "claimed" : "published",
+      };
+      state.claims.push(claim);
+      state.events.push({ type: "claimed", actor });
+      return claim;
+    },
   };
   return { state, service: createClaimService(repo, () => "2026-11-21T12:00:00Z") };
 }

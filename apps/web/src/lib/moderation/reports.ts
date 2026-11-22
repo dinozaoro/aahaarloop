@@ -65,9 +65,9 @@ export interface ModerationActor {
 }
 
 export interface ModerationRepository {
-  all(): readonly ModerationReport[];
-  find(id: string): ModerationReport | undefined;
-  save(report: ModerationReport): void;
+  all(): Promise<readonly ModerationReport[]>;
+  find(id: string): Promise<ModerationReport | undefined>;
+  save(report: ModerationReport): Promise<void>;
 }
 
 export type ModerationAudit = (input: {
@@ -137,13 +137,12 @@ export function createModerationService(
         decidedAt: null,
         decidedBy: null,
       };
-      repo.save(report);
+      await repo.save(report);
       return report;
     },
 
-    list(viewer: "admin" | "reporter" | "public", reporterId?: string) {
-      return repo
-        .all()
+    async list(viewer: "admin" | "reporter" | "public", reporterId?: string) {
+      return (await repo.all())
         .filter((report) => viewer === "admin" || report.reporterId === reporterId)
         .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
         .map((report) => toReportView(report, viewer));
@@ -158,7 +157,7 @@ export function createModerationService(
       if (actor.role !== "admin") {
         throw new ApiError("forbidden", "Only admins can moderate reports");
       }
-      const report = repo.find(id);
+      const report = await repo.find(id);
       if (!report) throw new ApiError("not_found", "Report not found");
       if (report.status !== "open") {
         throw new ApiError("conflict", "Report has already been decided");
@@ -171,7 +170,7 @@ export function createModerationService(
         decidedBy: actor.id,
         ...(note ? { resolutionNote: note } : {}),
       };
-      repo.save(updated);
+      await repo.save(updated);
       await audit({
         action: `report.${status}`,
         actorId: actor.id,

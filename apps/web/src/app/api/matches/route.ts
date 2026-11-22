@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { ApiError } from "@/lib/api/errors";
 import { withApiHandler } from "@/lib/api/handler";
 import { forbidUnlessRole } from "@/lib/auth/guards";
+import { ensureAdminConfig } from "@/lib/config/admin-config-store";
 import {
   getAdminConfig,
   getConfigVersion,
@@ -36,6 +37,7 @@ onConfigChange(() => cache.invalidateAll());
 export const GET = withApiHandler({ querySchema }, async ({ query }) => {
   const denied = await forbidUnlessRole(["recipient"]);
   if (denied) return denied;
+  await ensureAdminConfig();
 
   const session = await auth();
   const organizationId = session?.user?.activeOrganizationId;

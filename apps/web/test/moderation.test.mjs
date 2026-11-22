@@ -127,8 +127,8 @@ test("list scopes reports to the reporter unless the viewer is an admin", async 
   const { service } = setup();
   await service.submit({ targetType: "donation", targetId: "d1", reporterId: "u1", reason: "spam" });
   await service.submit({ targetType: "donation", targetId: "d2", reporterId: "u2", reason: "spam" });
-  assert.equal(service.list("reporter", "u1").length, 1);
-  assert.equal(service.list("admin").length, 2);
+  assert.equal((await service.list("reporter", "u1")).length, 1);
+  assert.equal((await service.list("admin")).length, 2);
 });
 
 test("the moderation routes enforce the admin role", async () => {
