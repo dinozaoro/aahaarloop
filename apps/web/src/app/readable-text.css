@@ -1,55 +1,5 @@
-/* Keep supporting copy and controls readable while preserving display headings. */
-:where(.landing-page, .landing-header, .landing-footer, .workspace, .account-page, .onboarding-page, .site-shell)
-  :where(p, span, small, time, label, li, dt, dd, th, td, input, select, textarea, button, a, legend, figcaption, em)
-  :not(h1 *):not(h2 *):not(h3 *):not(h4 *):not([aria-hidden="true"] *) {
-  font-size: max(14px, 0.875em) !important;
-}
-
-.landing-header .landing-nav-main > a,
-.landing-header .landing-nav-main > span,
-.landing-header .landing-nav-links > a,
-.landing-header .landing-nav-links > span {
-  font-size: 15px !important;
-}
-
-.workspace-navigation .workspace-link,
-.workspace-navigation-actions > a,
-.workspace-navigation-actions > span {
-  font-size: 14px !important;
-}
-
-.landing-page .landing-eyebrow,
-.landing-page .landing-download-note,
-.landing-page .image-caption,
-.landing-page .food-story-label,
-.landing-page .availability,
-.landing-page .collection-time,
-.landing-page .floating-delivery small,
-.landing-page .food-story figcaption,
-.landing-page .community-ribbon span,
-.landing-page .step-number,
-.landing-page .step-preview-top,
-.landing-page .step-preview-label,
-.landing-page .step-preview-meta,
-.landing-page .ecosystem-role small,
-.landing-page .ecosystem-role em,
-.landing-page .impact-badge,
-.landing-page .impact-metrics dt,
-.landing-page .impact-metrics p,
-.landing-page .impact-disclosure,
-.landing-page .android-install-label,
-.landing-page .android-install-note {
-  font-size: 15px !important;
-}
-
-.impact-page .page-kicker,
-.impact-page .page-heading p:not(.page-kicker),
-.impact-metrics span,
-.impact-goal > strong,
-.impact-goal p,
-.impact-goal small,
-.impact-story time,
-.impact-story h3,
-.impact-story p {
-  font-size: 15px !important;
+/* One calibration point: supporting copy uses the landing hero's 15px body scale.
+   Headings, brand marks and display figures keep their own sizes. */
+body :where(p, span, small, time, label, li, dt, dd, th, td, button, a, legend, figcaption, em):not(h1 *):not(h2 *):not(h3 *):not(h4 *):not([aria-hidden="true"]):not([aria-hidden="true"] *):not(.landing-wordmark, .impact-metrics dd, .stat-strip strong *, .impact-mark *) {
+  font-size: max(15px, 0.875em) !important;
 }

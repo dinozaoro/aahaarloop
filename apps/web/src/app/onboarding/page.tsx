@@ -2,6 +2,7 @@ import { requireUser } from "@/lib/auth/guards";
 import { SELF_ASSIGNABLE_ROLES } from "@/lib/auth/onboarding";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 import { Logo } from "@/components/logo";
 import { completeOnboarding } from "./actions";
@@ -42,7 +43,7 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
             return <label key={role} className="role-option">
               <input type="radio" name="role" value={role} defaultChecked={user.role === role} required />
               <span className="role-option-copy"><strong>{details.title}</strong><span>{details.description}</span><small>{details.audience}</small></span>
-              <span className="role-option-action" aria-hidden="true">Choose role →</span>
+              <span className="role-option-action" aria-hidden="true">Choose role <ArrowRight size={14} /></span>
             </label>;
           })}
         </fieldset>

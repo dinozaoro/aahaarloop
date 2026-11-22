@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Circle, CircleDot } from "lucide-react";
 
 import { DonationDatesForm } from "./donation-dates-form";
 import { WorkspaceShell } from "@/components/workspace-shell";
@@ -15,7 +16,7 @@ export default function DonationDatesPage() {
       <p className="page-kicker">Bengaluru / Demo · Today, 5:45 PM</p>
       <h1>A few details for a reliable pickup.</h1>
       <p className="donation-step-description">Step 2 of 2 · Food details saved as a draft</p>
-      <ol aria-label="Donation steps" className="donation-progress"><li><span aria-hidden="true">○</span> 1&nbsp; Food details</li><li aria-current="step"><span aria-hidden="true">●</span> 2&nbsp; Pickup &amp; handling</li></ol>
+      <ol aria-label="Donation steps" className="donation-progress"><li><Circle aria-hidden="true" size={12} /> 1&nbsp; Food details</li><li aria-current="step"><CircleDot aria-hidden="true" size={12} /> 2&nbsp; Pickup &amp; handling</li></ol>
       <div className="donation-pickup-grid"><div><DonationDatesForm /></div><div id="pickup-location"><DonationLocationForm /></div></div>
     </div></WorkspaceShell>
   );

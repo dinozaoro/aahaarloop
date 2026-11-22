@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ArrowDown, ArrowUpRight, Check } from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUpRight, Check } from "lucide-react";
 
 import { resolveAndroidDownloadUrl } from "@/lib/links";
 
@@ -74,7 +74,7 @@ export default function HomePage() {
   return (
     <div className="landing-page">
       <section id="hero" className="landing-hero" aria-labelledby="hero-title">
-        <p className="landing-eyebrow"><span aria-hidden="true">●</span> A little less waste. A lot more possibility.</p>
+        <p className="landing-eyebrow">A little less waste. A lot more possibility.</p>
         <h1 id="hero-title" className="landing-title">
           <span>Good food deserves</span>
           <em>another destination.</em>
@@ -110,7 +110,7 @@ export default function HomePage() {
             <span className="delivery-check"><Check aria-hidden="true" /></span>
             <span><strong>A better destination.</strong><small>24 meals, shared with care</small></span>
           </article>
-          <figcaption>Kitchen <span aria-hidden="true">→</span> community</figcaption>
+          <figcaption>Kitchen <ArrowRight aria-hidden="true" size={14} /> community</figcaption>
         </figure>
         <div className="image-caption"><span>Good food. New possibilities.</span><span>Illustrative donation journey / 01</span></div>
       </section>

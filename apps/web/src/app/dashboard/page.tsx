@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
-import { ArrowUpRight, Utensils } from "lucide-react";
+import { ArrowUpRight, Plus, Utensils } from "lucide-react";
 
 import { WorkspaceShell } from "@/components/workspace-shell";
 import { SchematicMap } from "@/components/schematic-map";
@@ -55,7 +55,7 @@ export default function DashboardPage() {
       <div className="dashboard-page">
         <div className="page-heading dashboard-heading">
           <div><p className="page-kicker">Bengaluru / Demo · Today, {today}</p><h1>{greeting}, {organization?.contactName.split(" ")[0] ?? "there"}.</h1><p>Here’s what’s moving from your kitchen today.</p></div>
-          <Link href="/donations/new" className="primary-action"><span>＋</span> Post surplus</Link>
+          <Link href="/donations/new" className="primary-action"><Plus aria-hidden="true" /> Post surplus</Link>
         </div>
 
         <section className="dashboard-metrics" aria-label="Donation summary">

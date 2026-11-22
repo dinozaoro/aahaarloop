@@ -2,7 +2,7 @@ import { Breadcrumbs, PageHeader } from "@/components/page-chrome";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DEMO_RECIPIENT_ORG_ID } from "@/lib/data/constants";
 import { getOrganization } from "@/lib/data/store";
-import { MapPin, Phone } from "lucide-react";
+import { ArrowRight, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 import { WorkspaceShell } from "@/components/workspace-shell";
 
@@ -15,7 +15,7 @@ export default function RecipientProfilePage() {
       <PageHeader
         title="Organisation details"
         description="Contact and location information used when coordinating a food pickup."
-        actions={<Link href="/recipient/needs" className="text-sm font-semibold text-primary">Manage food needs →</Link>}
+        actions={<Link href="/recipient/needs" className="text-sm font-semibold text-primary">Manage food needs <ArrowRight aria-hidden="true" size={14} /></Link>}
       />
       {organization ? (
         <Card className="max-w-3xl">
