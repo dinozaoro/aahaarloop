@@ -2,17 +2,12 @@ import type { VolunteerProfile } from "@aahaarloop/matching";
 
 import type { Claim, Donation, Need, Organization } from "@/lib/domain/types";
 
-import { createSeedData } from "./seed";
-
-// Demo persistence: module-level state in the Next.js server process. Every
-// mutation issue replaces this with the database layer; until then the data
-// resets when the server restarts, which the UI states explicitly.
-const seed = createSeedData();
-
-const donations: Donation[] = seed.donations;
-const claims: Claim[] = seed.claims;
-const needs: Need[] = seed.needs;
-const organizations: Organization[] = seed.organizations;
+// In-memory workspace state: starts empty and only contains records created
+// during the current server process.
+const donations: Donation[] = [];
+const claims: Claim[] = [];
+const needs: Need[] = [];
+const organizations: Organization[] = [];
 
 export function getAllDonations(): readonly Donation[] {
   return donations;
@@ -73,11 +68,11 @@ export function getNeedsForOrganization(
   return needs.filter((need) => need.organizationId === organizationId);
 }
 
-export function getVolunteerProfile(): VolunteerProfile {
-  return seed.volunteerProfile;
+export function getVolunteerProfile(): VolunteerProfile | null {
+  return null;
 }
 
-/** Demo write path: replaces the matching in-memory entry, or appends it. */
+/** Write path: replaces the matching in-memory entry, or appends it. */
 export function upsertDonation(donation: Donation): void {
   const index = donations.findIndex((item) => item.id === donation.id);
   if (index === -1) donations.push(donation);
@@ -99,4 +94,3 @@ export function upsertOrganization(organization: Organization): void {
   if (index === -1) organizations.push(organization);
   else organizations[index] = organization;
 }
-

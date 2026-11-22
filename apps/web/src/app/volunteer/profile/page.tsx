@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import {
   TRANSPORT_MODES,
   TRANSPORT_MODE_LABELS,
+  createVolunteerProfile,
   editVolunteerProfile,
   getMatchingVolunteerFields,
   type TransportMode,
@@ -27,11 +28,9 @@ import {
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { getVolunteerProfile } from "@/lib/data/store";
 import { formatDate, formatDateTime } from "@/lib/format";
 
 const STORAGE_KEY = "aahaarloop.volunteer-profile";
-const seedProfile = getVolunteerProfile();
 
 interface WindowForm {
   start: string;
@@ -47,6 +46,16 @@ interface FormState {
   longitude: string;
   windows: WindowForm[];
 }
+
+const EMPTY_FORM: FormState = {
+  displayName: "",
+  transportMode: "bicycle",
+  capacity: "",
+  radiusKm: "",
+  latitude: "",
+  longitude: "",
+  windows: [],
+};
 
 function toDateTimeInput(iso: string): string {
   const date = new Date(iso);
@@ -93,8 +102,8 @@ function fieldError(errors: Record<string, string>, field: string): string {
 }
 
 export default function VolunteerProfilePage() {
-  const [profile, setProfile] = useState(seedProfile);
-  const [form, setForm] = useState(() => formFromProfile(seedProfile));
+  const [profile, setProfile] = useState<VolunteerProfile | null>(null);
+  const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -104,7 +113,7 @@ export default function VolunteerProfilePage() {
         return;
       }
       const saved = JSON.parse(raw) as VolunteerProfile;
-      if (saved?.id === seedProfile.id) {
+      if (saved?.id) {
         // Defer hydration so the effect does not trigger a synchronous render.
         queueMicrotask(() => {
           setProfile(saved);
@@ -127,7 +136,10 @@ export default function VolunteerProfilePage() {
 
   function save() {
     const input = toProfileInput(form);
-    const result = editVolunteerProfile(profile, input, new Date().toISOString());
+    const now = new Date().toISOString();
+    const result = profile
+      ? editVolunteerProfile(profile, input, now)
+      : createVolunteerProfile(input, now);
     if (!result.profile) {
       setErrors(
         Object.fromEntries(result.errors.map((error) => [error.field, error.message])),
@@ -144,13 +156,13 @@ export default function VolunteerProfilePage() {
 
   function reset() {
     window.localStorage.removeItem(STORAGE_KEY);
-    setProfile(seedProfile);
-    setForm(formFromProfile(seedProfile));
+    setProfile(null);
+    setForm(EMPTY_FORM);
     setErrors({});
-    toast.success("Demo profile restored");
+    toast.success("Saved profile cleared");
   }
 
-  const matchingFields = getMatchingVolunteerFields(profile);
+  const matchingFields = profile ? getMatchingVolunteerFields(profile) : null;
   const windowError = Object.entries(errors).find(([field]) =>
     field.startsWith("availability"),
   )?.[1];
@@ -165,8 +177,8 @@ export default function VolunteerProfilePage() {
         title="Volunteer profile"
         description="Set the transport, service area and windows used to decide which pickup missions you can accept."
         actions={
-          <Badge variant={profile.verified ? "success" : "warning"}>
-            {profile.verified ? "Verified" : "Unverified"}
+          <Badge variant={profile?.verified ? "success" : "warning"}>
+            {profile ? (profile.verified ? "Verified" : "Unverified") : "Not saved"}
           </Badge>
         }
       />
@@ -175,7 +187,7 @@ export default function VolunteerProfilePage() {
         <CardContent className="flex flex-wrap items-baseline gap-x-10 gap-y-2">
           <div className="flex items-baseline gap-2">
             <span className="font-display text-3xl font-bold text-primary">
-              {matchingFields.transportCapacityKg} kg
+              {matchingFields ? `${matchingFields.transportCapacityKg} kg` : "—"}
             </span>
             <span className="text-sm text-muted-foreground">
               capacity seen by matching
@@ -183,16 +195,17 @@ export default function VolunteerProfilePage() {
           </div>
           <div className="flex items-baseline gap-2">
             <span className="font-display text-3xl font-bold text-primary">
-              {matchingFields.volunteerAvailability.length}
+              {matchingFields ? matchingFields.volunteerAvailability.length : "—"}
             </span>
             <span className="text-sm text-muted-foreground">
               availability windows
             </span>
           </div>
           <p className="w-full text-sm text-muted-foreground">
-            Last saved {formatDate(new Date(profile.updatedAt).toISOString())}.
-            Verification is set by
-            the platform, not by this form.
+            {profile
+              ? `Last saved ${formatDate(new Date(profile.updatedAt).toISOString())}.`
+              : "No profile saved yet."}
+            {" "}Verification is set by the platform, not by this form.
           </p>
         </CardContent>
       </Card>
@@ -412,7 +425,7 @@ export default function VolunteerProfilePage() {
       <div className="flex flex-wrap gap-3">
         <Button onClick={save}>Save profile</Button>
         <Button variant="ghost" onClick={reset}>
-          Restore demo profile
+          Clear profile
         </Button>
       </div>
 
@@ -422,7 +435,7 @@ export default function VolunteerProfilePage() {
           <CardDescription>The windows currently used for assignment.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
-          {profile.availability.length === 0 ? (
+          {!profile || profile.availability.length === 0 ? (
             <p className="text-sm text-muted-foreground">No windows saved.</p>
           ) : (
             profile.availability.map((window, index) => (

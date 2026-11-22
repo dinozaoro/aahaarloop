@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import {
   ALLERGEN_OPTIONS,
-  DEMO_TIME_ZONE,
+  LOCAL_TIME_ZONE,
   DIETARY_OPTIONS,
   STORAGE_OPTIONS,
   validateDonationDates,
@@ -44,7 +44,7 @@ export function DonationDatesForm() {
       foodExpiryAt: String(data.get("foodExpiryAt") ?? ""),
       bestBeforeAt: String(data.get("bestBeforeAt") ?? ""),
       pickupDeadlineAt: String(data.get("pickupDeadlineAt") ?? ""),
-      timeZone: DEMO_TIME_ZONE,
+      timeZone: LOCAL_TIME_ZONE,
       storage: String(data.get("storage") ?? ""),
       packaging: String(data.get("packaging") ?? ""),
       allergens: data.getAll("allergens").map(String),
@@ -69,7 +69,7 @@ export function DonationDatesForm() {
           <CardHeader>
             <CardTitle>Three different dates</CardTitle>
             <CardDescription>
-              Enter times in {DEMO_TIME_ZONE}; they are stored as UTC
+              Enter times in {LOCAL_TIME_ZONE}; they are stored as UTC
               timestamps.
             </CardDescription>
           </CardHeader>

@@ -21,7 +21,7 @@ export interface ClaimCommand {
 
 /**
  * Serializes mutations so concurrent requests observe the previous decrement.
- * Replaces a `SELECT … FOR UPDATE` row lock while the demo store is in memory.
+ * Replaces a `SELECT … FOR UPDATE` row lock while the store is in memory.
  */
 export function createClaimService(
   repo: ClaimRepository,

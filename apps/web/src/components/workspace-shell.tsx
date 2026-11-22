@@ -37,7 +37,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
       <main id="main" tabIndex={-1} className="workspace-content">{children}</main>
-      <p className="workspace-preview-note">Bengaluru demo · No real donations</p>
+      
     </div>
   );
 }

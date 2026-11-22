@@ -61,20 +61,8 @@ export function LoadingBlock({ label = "Loading" }: { label?: string }) {
     <AsyncState
       status="loading"
       title={label}
-      description="Fetching the latest demo data."
+      description="Fetching the latest data."
     />
-  );
-}
-
-export function DemoBanner() {
-  return (
-    <p
-      role="note"
-      className="rounded-lg border border-warning/40 bg-warning/10 px-4 py-3 text-sm text-accent-foreground"
-    >
-      Demo data: this prototype stores changes in memory and resets when the
-      server restarts.
-    </p>
   );
 }
 

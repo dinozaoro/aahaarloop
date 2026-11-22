@@ -141,40 +141,40 @@ export default function DesignPage() {
         <Card>
           <CardContent className="grid gap-5 sm:grid-cols-2">
             <Field>
-              <FieldLabel htmlFor="demo-name">Food name</FieldLabel>
+              <FieldLabel htmlFor="example-name">Food name</FieldLabel>
               <Input
-                id="demo-name"
+                id="example-name"
                 placeholder="Vegetable biryani"
-                aria-describedby="demo-name-description"
+                aria-describedby="example-name-description"
               />
-              <FieldDescription id="demo-name-description">
+              <FieldDescription id="example-name-description">
                 Shown to recipients in the browse list.
               </FieldDescription>
             </Field>
             <Field>
-              <FieldLabel htmlFor="demo-category">Category</FieldLabel>
-              <Select id="demo-category" defaultValue="produce">
+              <FieldLabel htmlFor="example-category">Category</FieldLabel>
+              <Select id="example-category" defaultValue="produce">
                 <option value="produce">Produce</option>
                 <option value="bakery">Bakery</option>
                 <option value="prepared">Prepared meals</option>
               </Select>
             </Field>
             <Field className="sm:col-span-2">
-              <FieldLabel htmlFor="demo-invalid">Servings</FieldLabel>
+              <FieldLabel htmlFor="example-invalid">Servings</FieldLabel>
               <Input
-                id="demo-invalid"
+                id="example-invalid"
                 defaultValue="0"
                 aria-invalid="true"
-                aria-describedby="demo-invalid-error"
+                aria-describedby="example-invalid-error"
               />
-              <FieldError id="demo-invalid-error">
+              <FieldError id="example-invalid-error">
                 Enter at least one serving.
               </FieldError>
             </Field>
             <Field className="sm:col-span-2">
-              <FieldLabel htmlFor="demo-notes">Notes</FieldLabel>
+              <FieldLabel htmlFor="example-notes">Notes</FieldLabel>
               <Textarea
-                id="demo-notes"
+                id="example-notes"
                 placeholder="Allergens, packaging, handling…"
               />
             </Field>
@@ -269,7 +269,7 @@ export default function DesignPage() {
         </h2>
         <Card className="p-0">
           <Table>
-            <TableCaption>Demo claims, not live data.</TableCaption>
+            <TableCaption>Claims table</TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead>Donation</TableHead>
@@ -279,17 +279,8 @@ export default function DesignPage() {
             </TableHeader>
             <TableBody>
               <TableRow>
-                <TableCell>Vegetable biryani</TableCell>
-                <TableCell>40</TableCell>
-                <TableCell>
-                  <Badge variant="warning">Pending</Badge>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Bakery surplus</TableCell>
-                <TableCell>25</TableCell>
-                <TableCell>
-                  <Badge variant="success">Confirmed</Badge>
+                <TableCell colSpan={3} className="text-center text-muted-foreground">
+                  No claims yet.
                 </TableCell>
               </TableRow>
             </TableBody>

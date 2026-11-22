@@ -72,7 +72,7 @@ export function BrowseExperience({ offers, recipientLocation }: { offers: Offer[
       <label className="filter-pill"><span>Sort</span><select aria-label="Sort donations" value={sort} onChange={(event) => setSort(event.target.value)}><option value="deadline">Pickup deadline</option><option value="nearest">Nearest</option><option value="recent">Recently added</option></select></label>
     </div>
 
-    <div className="discover-results-heading"><span>{visibleOffers.length} nearby {visibleOffers.length === 1 ? "donation" : "donations"} · Bengaluru demo</span><span>List / Map</span></div>
+    <div className="discover-results-heading"><span>{visibleOffers.length} nearby {visibleOffers.length === 1 ? "donation" : "donations"}</span><span>List / Map</span></div>
     <div className="discover-layout">
       <section className="offer-list discover-offer-list" aria-label="Available donations">
         {visibleOffers.length ? visibleOffers.map(({ donation, donorName, distanceKm }) => {
