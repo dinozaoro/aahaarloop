@@ -9,6 +9,8 @@ import {
   foodCategories,
   organizationMembers,
   organizations,
+  pickupAssignments,
+  pickupTasks,
   recipientNeeds,
   users,
 } from "./index.ts";
@@ -62,6 +64,12 @@ export function buildSeedPlan(now: Date = new Date()): SeedStep[] {
     },
     { name: "claims", table: claims, values: data.claims },
     { name: "claimItems", table: claimItems, values: data.claimItems },
+    { name: "pickupTasks", table: pickupTasks, values: data.pickupTasks },
+    {
+      name: "pickupAssignments",
+      table: pickupAssignments,
+      values: data.pickupAssignments,
+    },
     { name: "favorites", table: favorites, values: data.favorites },
   ];
 }

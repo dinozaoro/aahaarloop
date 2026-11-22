@@ -29,6 +29,14 @@ test("demo emails use the reserved .test domain and no real names", () => {
   ]);
 });
 
+test("demo users have realistic fictional names", () => {
+  const data = buildSeedData(NOW);
+  assert.deepEqual(
+    data.users.map((user) => user.name),
+    ["Meera Rao", "Fatima Khan", "Arun Kumar", "Priya Menon"],
+  );
+});
+
 test("all seeded locations are in Bengaluru", () => {
   const data = buildSeedData(NOW);
   const locations = [
@@ -75,6 +83,8 @@ test("all fixed identifiers are unique", () => {
     ...DEMO_IDS.donations,
     ...DEMO_IDS.claims,
     ...DEMO_IDS.needs,
+    DEMO_IDS.pickupTask,
+    DEMO_IDS.pickupAssignment,
   ];
   assert.equal(new Set(ids).size, ids.length);
 });
@@ -93,6 +103,8 @@ test("seed plan inserts parents before children", () => {
     "recipientNeeds",
     "claims",
     "claimItems",
+    "pickupTasks",
+    "pickupAssignments",
     "favorites",
   ]);
 });
@@ -138,4 +150,22 @@ test("claim items reference a seeded donation item", () => {
   for (const item of data.claimItems) {
     assert.ok(itemIds.has(item.donationItemId));
   }
+});
+
+test("applying migrations also seeds the database", async () => {
+  const migrate = await readFile(
+    new URL("../scripts/migrate.mjs", import.meta.url),
+    "utf8",
+  );
+  assert.match(migrate, /await seedDatabase\(db\);/);
+});
+
+test("the volunteer pickup covers the confirmed claim", () => {
+  const data = buildSeedData(NOW);
+  const [task] = data.pickupTasks;
+  const [assignment] = data.pickupAssignments;
+  assert.equal(task.donationId, DEMO_IDS.donations[0]);
+  assert.equal(task.claimId, DEMO_IDS.claims[0]);
+  assert.equal(assignment.taskId, task.id);
+  assert.equal(assignment.volunteerId, DEMO_IDS.volunteerUser);
 });
