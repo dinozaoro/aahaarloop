@@ -247,7 +247,9 @@
 .landing-button-light:hover { background: white; }
 .landing-cta .landing-button { min-height: 48px; font-size: 12px; }
 .android-install-label { margin-top: 5px; color: #2C1618; font-size: 10px; font-weight: 700; }
-.android-install-note { color: rgb(44 22 24 / 75%); font-size: 9px; }
+.android-install-qr { display: grid; width: fit-content; place-items: center; border: 5px solid #fff; border-radius: 8px; background: #fff; }
+.android-install-qr img { display: block; width: 128px; height: 128px; }
+.android-install-note { color: rgb(44 22 24 / 88%); font-size: 12px; line-height: 1.5; }
 .landing-footer { border-top: 1px solid var(--border) !important; background: var(--background) !important; color: var(--foreground); }
 .landing-footer .landing-footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 28px; padding-block: 25px; }
 .landing-footer .landing-footer-inner > div:first-child { display: flex; align-items: center; gap: 18px; }

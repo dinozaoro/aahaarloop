@@ -1,3 +1,6 @@
+export const ANDROID_RELEASES_URL =
+  "https://github.com/dinozaoro/aahaarloop/releases/latest";
+
 export function resolveAndroidDownloadUrl(value: string | undefined) {
   const candidate = value?.trim();
   if (!candidate) return null;
