@@ -3,7 +3,8 @@
 
   <h1>Aahaarloop</h1>
   <p><strong>Good food deserves another destination.</strong></p>
-  <p>A shared food-rescue workspace connecting surplus food with nearby kitchens, shelters and volunteers in Bengaluru.</p>
+  <p>Made in Madagascar dans le cadre du hackathon ACE BUILDERS 2026.</p>
+  <p>A shared food-rescue workspace connecting surplus food with nearby kitchens, shelters and volunteers.</p>
 
   <p>
     <a href="https://aahaarloop.vercel.app/">Open the web app</a> ·
@@ -34,9 +35,9 @@ HTTP API and shared TypeScript rules.
 
 ## See it
 
-|                                                        Home                                                        |                                                     Browse                                                      |
-| :----------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------: |
-| <img src="docs/media/readme/home.jpg" alt="Aahaarloop home page introducing the food rescue platform" width="520"> | <img src="docs/media/readme/browse.jpg" alt="Food discovery page with filters and a Bengaluru map" width="520"> |
+|                                                        Home                                                        |                                                Browse                                                 |
+| :----------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------: |
+| <img src="docs/media/readme/home.jpg" alt="Aahaarloop home page introducing the food rescue platform" width="520"> | <img src="docs/media/readme/browse.jpg" alt="Food discovery page with filters and a map" width="520"> |
 
 |                                                  Sign in                                                  |
 | :-------------------------------------------------------------------------------------------------------: |
@@ -219,5 +220,5 @@ still requires the configured Google OAuth provider. Follow the
 ---
 
 <div align="center">
-  <sub>Built to give good food another destination. Bengaluru, India.</sub>
+  <sub>Made in Madagascar for ACE BUILDERS 2026.</sub>
 </div>
