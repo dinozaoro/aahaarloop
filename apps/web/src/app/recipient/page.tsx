@@ -10,6 +10,7 @@ import { RECIPIENT_ORG_ID } from "@/lib/data/constants";
 import { getAllDonations, getClaimsForOrganization, getNeedsForOrganization, getOrganization } from "@/lib/data/store";
 import { type Donation } from "@/lib/domain/types";
 
+export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Recipient dashboard" };
 
 function distanceKm(a: Donation["location"], b: Donation["location"]) {
@@ -28,23 +29,24 @@ function offerPhoto(title: string) {
   return null;
 }
 
-export default function RecipientPage() {
-  const organization = getOrganization(RECIPIENT_ORG_ID);
+export default async function RecipientPage() {
+  const organization = await getOrganization(RECIPIENT_ORG_ID);
   const now = getCurrentTime();
-  const needs = getNeedsForOrganization(RECIPIENT_ORG_ID).filter((need) => need.status === "active" && new Date(need.deadlineAt).getTime() > now);
-  const claims = [...getClaimsForOrganization(RECIPIENT_ORG_ID)].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
-  const offers = organization ? getAllDonations().filter((donation) => {
+  const needs = (await getNeedsForOrganization(RECIPIENT_ORG_ID)).filter((need) => need.status === "active" && new Date(need.deadlineAt).getTime() > now);
+  const claims = [...await getClaimsForOrganization(RECIPIENT_ORG_ID)].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  const donations = await getAllDonations();
+  const offers = organization ? (await Promise.all(donations.filter((donation) => {
     const distance = distanceKm(organization.location, donation.location);
     return donation.status === "published"
       && donation.servingsAvailable > 0
       && new Date(donation.pickupDeadlineAt).getTime() > now
       && distance <= 25
       && (!needs.length || needs.some((need) => need.category === donation.category));
-  }).map((donation) => ({ donation, distance: distanceKm(organization.location, donation.location), donor: getOrganization(donation.organizationId) }))
+  }).map(async (donation) => ({ donation, distance: distanceKm(organization.location, donation.location), donor: await getOrganization(donation.organizationId) }))))
     .sort((a, b) => a.distance - b.distance) : [];
   const nextPickup = claims.find((claim) => claim.status === "pickup_scheduled");
-  const pickupDonation = nextPickup ? getAllDonations().find((donation) => donation.id === nextPickup.donationId) : undefined;
-  const pickupDonor = pickupDonation ? getOrganization(pickupDonation.organizationId) : undefined;
+  const pickupDonation = nextPickup ? donations.find((donation) => donation.id === nextPickup.donationId) : undefined;
+  const pickupDonor = pickupDonation ? await getOrganization(pickupDonation.organizationId) : undefined;
   const completedServings = claims.filter((claim) => claim.status === "delivered").reduce((sum, claim) => sum + claim.servings, 0);
   const claimedCount = claims.filter((claim) => !["cancelled", "expired"].includes(claim.status)).length;
   const fmt = (value: string) => new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }).format(new Date(value));

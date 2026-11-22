@@ -6,16 +6,16 @@ import type { AdminResource } from "./data.ts";
 export type AdminRow = Record<string, unknown> & { id: string };
 
 /** Aggregates the in-memory stores into flat, display-ready admin rows. */
-export function adminRows(): Record<AdminResource, AdminRow[]> {
+export async function adminRows(): Promise<Record<AdminResource, AdminRow[]>> {
   const users: AdminRow[] = [];
-  const organizations = getOrganizations().map((organization) => ({
+  const organizations = (await getOrganizations()).map((organization) => ({
     id: organization.id,
     name: organization.name,
     kind: organization.kind,
     area: organization.area,
     verified: organization.verified,
   }));
-  const donations = getAllDonations().map((donation) => ({
+  const donations = (await getAllDonations()).map((donation) => ({
     id: donation.id,
     title: donation.title,
     status: donation.status,
@@ -23,14 +23,14 @@ export function adminRows(): Record<AdminResource, AdminRow[]> {
     pickupArea: donation.pickupArea,
     organizationId: donation.organizationId,
   }));
-  const claims = getClaims().map((claim) => ({
+  const claims = (await getClaims()).map((claim) => ({
     id: claim.id,
     donationTitle: claim.donationTitle,
     status: claim.status,
     recipientName: claim.recipientName,
     servings: claim.servings,
   }));
-  const missions = listPickupTasks().map((task) => ({
+  const missions = (await listPickupTasks()).map((task) => ({
     id: task.id,
     donationId: task.donationId,
     status: task.status,

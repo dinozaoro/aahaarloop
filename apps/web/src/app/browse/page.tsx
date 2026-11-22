@@ -6,6 +6,7 @@ import { getAllDonations, getOrganization } from "@/lib/data/store";
 
 import { BrowseExperience } from "./browse-experience";
 
+export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Discover food" };
 
 function distanceInKm(a: { latitude: number; longitude: number }, b: { latitude: number; longitude: number }) {
@@ -19,19 +20,19 @@ function distanceInKm(a: { latitude: number; longitude: number }, b: { latitude:
   return Math.round(distance * 10) / 10;
 }
 
-export default function BrowsePage() {
-  const recipient = getOrganization(RECIPIENT_ORG_ID);
-  const offers = getAllDonations()
+export default async function BrowsePage() {
+  const recipient = await getOrganization(RECIPIENT_ORG_ID);
+  const offers = await Promise.all((await getAllDonations())
     .filter((donation) => donation.servingsAvailable > 0 && donation.status === "published")
-    .map((donation) => {
-      const donor = getOrganization(donation.organizationId);
+    .map(async (donation) => {
+      const donor = await getOrganization(donation.organizationId);
       return {
         donation,
         donorName: donor?.name ?? "Food partner",
         distanceKm: recipient && donor ? distanceInKm(recipient.location, donor.location) : null,
         donorLocation: donor?.location ?? null,
       };
-    });
+    }));
 
   return <WorkspaceShell>
     <div className="page-heading browse-page-heading"><div><p className="page-kicker">Bengaluru · Today, {new Intl.DateTimeFormat("en-IN", { hour: "numeric", minute: "2-digit" }).format(new Date())}</p><h1>Find food. Make room for possibility.</h1><p>Matches based on location, needs and collection times — not an unexplained score.</p></div></div>
