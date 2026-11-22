@@ -3,18 +3,22 @@ import type { ConfigContext, ExpoConfig } from "expo/config";
 declare const process: { env: Record<string, string | undefined> };
 
 const DEFAULT_API_URL = "http://localhost:3000";
+// Bump APP_VERSION for user-visible releases and VERSION_CODE for every APK.
+const APP_VERSION = "0.1.0";
+const VERSION_CODE = 1;
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: "Aahaarloop",
   slug: "aahaarloop",
-  version: "0.1.0",
+  version: APP_VERSION,
   orientation: "portrait",
   scheme: "aahaarloop",
   userInterfaceStyle: "automatic",
   icon: "./assets/images/icon.png",
   android: {
     package: "com.aahaarloop.mobile",
+    versionCode: VERSION_CODE,
     adaptiveIcon: {
       backgroundColor: "#E6F4FE",
       foregroundImage: "./assets/images/android-icon-foreground.png",
