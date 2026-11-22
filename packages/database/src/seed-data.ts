@@ -275,6 +275,11 @@ export function buildSeedData(now: Date = new Date()): SeedData {
         description: "Draft offer kept for the create-donation flow demo.",
         categoryId: meals,
         status: "draft",
+        // an unsent draft keeps the dates it was prepared for: one hour ago
+        foodExpiryAt: plusHours(now, -1),
+        bestBeforeAt: plusHours(now, -1),
+        pickupDeadlineAt: plusHours(now, -1),
+        effectiveDeadlineAt: plusHours(now, -1),
         quantity: 25,
         remainingQuantity: 25,
         quantityUnit: "servings",

@@ -64,7 +64,8 @@ test("published donations cover critical, high, medium and low urgency", () => {
   assert.ok(
     data.donations.some(
       (donation) =>
-        donation.status === "draft" && donation.pickupDeadlineAt === undefined,
+        donation.status === "draft" &&
+        hoursUntil(donation.pickupDeadlineAt) === -1,
     ),
   );
 });
