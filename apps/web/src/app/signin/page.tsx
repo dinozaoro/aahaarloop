@@ -18,7 +18,7 @@ export default function SignInPage() {
       }}>
         <button type="submit" className="account-action account-action-primary">Continue with Google</button>
       </form>
-      <p className="account-footnote">AahaarLoop currently uses Google sign-in. Password sign-in and password reset are not available in this demo.</p>
+      <p className="account-footnote">AahaarLoop currently uses Google sign-in. Password sign-in and password reset are not available.</p>
       <Link className="account-action" href="/browse">Explore the Web preview</Link>
     </div>
     <div className="account-links"><span>New to AahaarLoop?</span><Link className="account-action" href="/register">Create an account</Link></div>

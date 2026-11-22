@@ -22,7 +22,7 @@ const repository: PickupRepository = {
   },
   findVolunteer: (id) => {
     const profile = getVolunteerProfile();
-    return profile.id === id ? profile : undefined;
+    return profile?.id === id ? profile : undefined;
   },
   audit: (taskId, action, actorId) => {
     trail.push({ taskId, action, actorId, at: new Date().toISOString() });

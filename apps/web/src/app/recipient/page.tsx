@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 import { WorkspaceShell } from "@/components/workspace-shell";
 
 function getCurrentTime() { return Date.now(); }
-import { DEMO_RECIPIENT_ORG_ID } from "@/lib/data/constants";
+import { RECIPIENT_ORG_ID } from "@/lib/data/constants";
 import { getAllDonations, getClaimsForOrganization, getNeedsForOrganization, getOrganization } from "@/lib/data/store";
 import { type Donation } from "@/lib/domain/types";
 
@@ -29,10 +29,10 @@ function offerPhoto(title: string) {
 }
 
 export default function RecipientPage() {
-  const organization = getOrganization(DEMO_RECIPIENT_ORG_ID);
+  const organization = getOrganization(RECIPIENT_ORG_ID);
   const now = getCurrentTime();
-  const needs = getNeedsForOrganization(DEMO_RECIPIENT_ORG_ID).filter((need) => need.status === "active" && new Date(need.deadlineAt).getTime() > now);
-  const claims = [...getClaimsForOrganization(DEMO_RECIPIENT_ORG_ID)].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  const needs = getNeedsForOrganization(RECIPIENT_ORG_ID).filter((need) => need.status === "active" && new Date(need.deadlineAt).getTime() > now);
+  const claims = [...getClaimsForOrganization(RECIPIENT_ORG_ID)].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
   const offers = organization ? getAllDonations().filter((donation) => {
     const distance = distanceKm(organization.location, donation.location);
     return donation.status === "published"
@@ -50,12 +50,12 @@ export default function RecipientPage() {
   const fmt = (value: string) => new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }).format(new Date(value));
 
   return <WorkspaceShell><div className="recipient-home">
-    <div className="page-heading recipient-heading"><div><p className="page-kicker">Bengaluru demo · {new Intl.DateTimeFormat("en-IN", { weekday: "long", hour: "numeric", minute: "2-digit" }).format(new Date())}</p><h1>Good evening, {organization?.contactName.split(" ")[0] ?? "there"}.</h1><p>{offers.length ? `A few nearby offers for ${organization?.name ?? "your kitchen"}.` : "Current offers and active needs will appear here."}</p></div><Link href="/browse" className="primary-action">Discover food</Link></div>
+    <div className="page-heading recipient-heading"><div><p className="page-kicker">Bengaluru · {new Intl.DateTimeFormat("en-IN", { weekday: "long", hour: "numeric", minute: "2-digit" }).format(new Date())}</p><h1>Good evening, {organization?.contactName.split(" ")[0] ?? "there"}.</h1><p>{offers.length ? `A few nearby offers for ${organization?.name ?? "your kitchen"}.` : "Current offers and active needs will appear here."}</p></div><Link href="/browse" className="primary-action">Discover food</Link></div>
     <section className="stat-strip recipient-stats" aria-label="Recipient activity summary">
       <div><span>Nearby donations</span><strong>{String(offers.length).padStart(2, "0")}</strong><em>Available and within 25 km</em></div>
       <div><span>Claimed donations</span><strong>{String(claimedCount).padStart(2, "0")}</strong><em>Based on your claims</em></div>
       <div><span>Upcoming pickup</span><strong>{String(claims.filter((claim) => claim.status === "pickup_scheduled").length).padStart(2, "0")}</strong><em>{nextPickup ? fmt(nextPickup.updatedAt) : "No pickup scheduled"}</em></div>
-      <div><span>Meals received · demo</span><strong>{completedServings}</strong><em>Portions in delivered claims</em></div>
+      <div><span>Meals received</span><strong>{completedServings}</strong><em>Portions in delivered claims</em></div>
     </section>
     <nav className="recipient-quick-links" aria-label="Organisation tools"><Link href="/recipient/needs">Manage food needs <ArrowRight aria-hidden="true" size={14} /></Link><Link href="/recipient/profile">Organisation details <ArrowRight aria-hidden="true" size={14} /></Link><Link href="/recipient/claims">My collections <ArrowRight aria-hidden="true" size={14} /></Link></nav>
     {nextPickup ? <section className="recipient-next-pickup"><div><strong>Your next collection is scheduled · {pickupDonation ? fmt(pickupDonation.pickupDeadlineAt) : fmt(nextPickup.updatedAt)}</strong><p>{nextPickup.donationTitle} · {pickupDonor?.name ?? "Local donor"} · {nextPickup.servings} servings</p></div><Link href="/recipient/claims" className="outline-action">Coordinate pickup</Link></section> : null}
@@ -69,6 +69,5 @@ export default function RecipientPage() {
       </article>)}
     </section> : <section className="recipient-empty"><h2>No nearby offers fit the current needs.</h2><p>Review active food needs or check Discover for all available donations.</p><Link href="/recipient/needs">Manage food needs <ArrowRight aria-hidden="true" size={14} /></Link></section>}
     {claims.some((claim) => claim.status === "delivered") ? <p className="recipient-delivery-note">Recent delivery · {claims.find((claim) => claim.status === "delivered")?.servings} servings received.</p> : null}
-    <p className="sample-note">Demo organization and seeded donation data · matches use active food needs, distance and pickup availability.</p>
   </div></WorkspaceShell>;
 }

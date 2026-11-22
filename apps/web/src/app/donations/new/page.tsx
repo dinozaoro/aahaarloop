@@ -10,7 +10,7 @@ export default function NewDonationPage() {
   return (
     <WorkspaceShell><div className="site-shell new-donation-page py-10 sm:py-14">
       <div className="new-donation-heading">
-        <p className="page-kicker">Bengaluru / Demo · Today, 5:45 PM</p>
+        <p className="page-kicker">Bengaluru · New donation</p>
         <h1>Share what’s good.</h1>
         <p>A quick listing now. A better destination next.</p>
       </div>

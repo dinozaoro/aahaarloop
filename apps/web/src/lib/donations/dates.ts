@@ -1,6 +1,6 @@
 import type { StorageType } from "../domain/types.ts";
 
-export const DEMO_TIME_ZONE = "Asia/Kolkata";
+export const LOCAL_TIME_ZONE = "Asia/Kolkata";
 
 export const STORAGE_OPTIONS: readonly StorageType[] = [
   "ambient",
@@ -8,7 +8,7 @@ export const STORAGE_OPTIONS: readonly StorageType[] = [
   "frozen",
 ];
 
-/** The six allergens seeded in the demo database. */
+/** Allergen choices offered when creating a donation. */
 export const ALLERGEN_OPTIONS = [
   "peanut",
   "gluten",

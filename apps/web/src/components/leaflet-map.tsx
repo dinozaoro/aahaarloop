@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import type { LatLngTuple } from "leaflet";
-import { CircleMarker, MapContainer, Polyline, Popup, TileLayer, useMap } from "react-leaflet";
+import { CircleMarker, MapContainer, Popup, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import type { Donation } from "@/lib/domain/types";
 
@@ -61,7 +61,6 @@ export default function LeafletMap({ from, to, fromLabel, toLabel, href, classNa
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
       <RouteViewport start={start} end={end} />
-      {start && end ? <Polyline positions={[start, end]} pathOptions={{ color: ROUTE_COLOR, weight: 3 }} /> : null}
       {start ? <CircleMarker center={start} radius={9} pathOptions={{ color: "#fff", weight: 2, fillColor: ROUTE_COLOR, fillOpacity: 1 }}>
         <Popup>
           <strong>{fromLabel}</strong>

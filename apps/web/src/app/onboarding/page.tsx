@@ -29,7 +29,7 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
   const message = error ? (ERRORS[error] ?? "Please check your details.") : null;
 
   return <div className="onboarding-page">
-    <header className="account-header"><Link href="/" aria-label="AahaarLoop home"><Logo /></Link><span>Bengaluru demo · No real donations</span></header>
+    <header className="account-header"><Link href="/" aria-label="AahaarLoop home"><Logo /></Link><span>Bengaluru</span></header>
     <main id="main" className="onboarding-main">
       <p className="onboarding-kicker">01 / Your place in the loop</p>
       <h1>How would you like to help?</h1>
@@ -60,7 +60,7 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
             <input id="orgName" name="orgName" placeholder="Hope Shelter" minLength={2} maxLength={120} />
             <label htmlFor="joinSlug">Organization slug <span>(for joining)</span></label>
             <input id="joinSlug" name="joinSlug" placeholder="hope-shelter" pattern="[a-z0-9]+(-[a-z0-9]+)*" />
-            <small>Slug joining is a demo mechanism; production needs invite tokens.</small>
+            
           </div>
         </section>
 

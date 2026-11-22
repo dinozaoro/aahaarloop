@@ -27,7 +27,7 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { DEMO_RECIPIENT_ORG_ID } from "@/lib/data/constants";
+import { RECIPIENT_ORG_ID } from "@/lib/data/constants";
 import { getNeedsForOrganization } from "@/lib/data/store";
 import {
   CATEGORY_LABELS,
@@ -178,8 +178,9 @@ function NeedList({
 }
 
 export default function RecipientNeedsPage() {
+  const organizationConfigured = Boolean(RECIPIENT_ORG_ID);
   const [needs, setNeeds] = useState<readonly Need[]>(() => [
-    ...getNeedsForOrganization(DEMO_RECIPIENT_ORG_ID),
+    ...getNeedsForOrganization(RECIPIENT_ORG_ID),
   ]);
   const [now] = useState(() => Date.now());
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -250,7 +251,7 @@ export default function RecipientNeedsPage() {
       setNeeds((current) => [
         {
           id: `need-${crypto.randomUUID()}`,
-          organizationId: DEMO_RECIPIENT_ORG_ID,
+          organizationId: RECIPIENT_ORG_ID,
           category: form.category,
           servings,
           deadlineAt,
@@ -288,12 +289,18 @@ export default function RecipientNeedsPage() {
         title="Recipient needs"
         description="Track what the shelter still needs and what has already been covered. Only active needs steer the matching engine."
         actions={
-          <Button onClick={openCreate}>
+          <Button onClick={openCreate} disabled={!organizationConfigured}>
             <Plus data-icon="inline-start" aria-hidden="true" />
             Add need
           </Button>
         }
       />
+
+      {!organizationConfigured ? (
+        <p className="text-sm text-muted-foreground">
+          No recipient organisation is configured. Set NEXT_PUBLIC_RECIPIENT_ORG_ID to add needs.
+        </p>
+      ) : null}
 
       <Card className="border-primary/30 bg-primary/5 shadow-none">
         <CardContent className="flex flex-wrap items-baseline gap-x-12 gap-y-2">

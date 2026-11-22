@@ -5,7 +5,7 @@ import { ArrowUpRight, Plus, Utensils } from "lucide-react";
 
 import { WorkspaceShell } from "@/components/workspace-shell";
 import { SchematicMap } from "@/components/schematic-map";
-import { DEMO_DONOR_ORG_ID, DEMO_RECIPIENT_ORG_ID } from "@/lib/data/constants";
+import { DONOR_ORG_ID, RECIPIENT_ORG_ID } from "@/lib/data/constants";
 import { getClaimsForDonor, getDonation, getDonationsForOrganization, getOrganization } from "@/lib/data/store";
 import { DONATION_STATUS_LABELS, type Donation } from "@/lib/domain/types";
 
@@ -34,10 +34,10 @@ function distanceInKm(a: Donation["location"], b: Donation["location"]) {
 }
 
 export default function DashboardPage() {
-  const donations = [...getDonationsForOrganization(DEMO_DONOR_ORG_ID)].sort((a, b) => a.pickupDeadlineAt.localeCompare(b.pickupDeadlineAt));
-  const claims = [...getClaimsForDonor(DEMO_DONOR_ORG_ID)].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
-  const organization = getOrganization(DEMO_DONOR_ORG_ID);
-  const nearbyKitchen = getOrganization(DEMO_RECIPIENT_ORG_ID);
+  const donations = [...getDonationsForOrganization(DONOR_ORG_ID)].sort((a, b) => a.pickupDeadlineAt.localeCompare(b.pickupDeadlineAt));
+  const claims = [...getClaimsForDonor(DONOR_ORG_ID)].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  const organization = getOrganization(DONOR_ORG_ID);
+  const nearbyKitchen = getOrganization(RECIPIENT_ORG_ID);
   const active = donations.filter((donation) => ["published", "claimed", "pickup_scheduled"].includes(donation.status));
   const scheduledClaim = claims.find((claim) => claim.status === "pickup_scheduled");
   const scheduledDonation = scheduledClaim ? getDonation(scheduledClaim.donationId) : undefined;
@@ -54,7 +54,7 @@ export default function DashboardPage() {
     <WorkspaceShell>
       <div className="dashboard-page">
         <div className="page-heading dashboard-heading">
-          <div><p className="page-kicker">Bengaluru / Demo · Today, {today}</p><h1>{greeting}, {organization?.contactName.split(" ")[0] ?? "there"}.</h1><p>Here’s what’s moving from your kitchen today.</p></div>
+          <div><p className="page-kicker">Bengaluru · Today, {today}</p><h1>{greeting}, {organization?.contactName.split(" ")[0] ?? "there"}.</h1><p>Here’s what’s moving from your kitchen today.</p></div>
           <Link href="/donations/new" className="primary-action"><Plus aria-hidden="true" /> Post surplus</Link>
         </div>
 
@@ -62,7 +62,7 @@ export default function DashboardPage() {
           <div><strong>{active.length.toString().padStart(2, "0")}</strong><span>Active donations</span></div>
           <div><strong>{awaitingPickup.toString().padStart(2, "0")}</strong><span>Awaiting pickup</span></div>
           <div><strong>{completedThisMonth.toString().padStart(2, "0")}</strong><span>Completed this month</span></div>
-          <div><strong>{rescuedKg.toLocaleString("en-IN")} kg</strong><span>Food rescued · demo</span></div>
+          <div><strong>{rescuedKg.toLocaleString("en-IN")} kg</strong><span>Food rescued</span></div>
         </section>
 
         <div className="dashboard-columns">

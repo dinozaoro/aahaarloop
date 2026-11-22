@@ -16,7 +16,7 @@ export function AccountLayout({
     <div className="account-page">
       <header className="account-header">
         <Link href="/#hero" aria-label="AahaarLoop home"><Logo /></Link>
-        <span>Bengaluru demo · No real donations</span>
+        <span>Bengaluru</span>
       </header>
       <main id="main" className="account-main">
         <section className="account-story" aria-label="A more generous everyday">

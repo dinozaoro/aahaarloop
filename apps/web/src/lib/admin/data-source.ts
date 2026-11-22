@@ -1,5 +1,3 @@
-import { buildSeedData } from "@aahaarloop/database";
-
 import { getAllDonations, getClaims, getOrganizations } from "@/lib/data/store";
 import { listPickupTasks } from "@/lib/pickups/store-repository";
 
@@ -7,24 +5,9 @@ import type { AdminResource } from "./data.ts";
 
 export type AdminRow = Record<string, unknown> & { id: string };
 
-interface SeedUser {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  activeOrganizationId: string | null;
-}
-
-/** Aggregates the demo stores into flat, display-ready admin rows. */
+/** Aggregates the in-memory stores into flat, display-ready admin rows. */
 export function adminRows(): Record<AdminResource, AdminRow[]> {
-  const seed = buildSeedData();
-  const users = (seed.users as SeedUser[]).map((user) => ({
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-    organizationId: user.activeOrganizationId,
-  }));
+  const users: AdminRow[] = [];
   const organizations = getOrganizations().map((organization) => ({
     id: organization.id,
     name: organization.name,

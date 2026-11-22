@@ -30,7 +30,7 @@ export default async function ManageDonationPage({ params }: { params: Promise<{
   const image = foodPhoto(donation.title);
 
   return <WorkspaceShell><div className="manage-donation-page">
-    <div className="page-heading"><div><p className="page-kicker">Bengaluru / Demo</p><h1>{donation.status === "published" ? "Your donation is live." : `Your donation is ${DONATION_STATUS_LABELS[donation.status].toLowerCase()}.`}</h1><p>{donation.title} · {donation.servingsTotal} portions · {donation.weightKg} kg · Reference {donation.id.toUpperCase()}</p></div></div>
+    <div className="page-heading"><div><p className="page-kicker">Bengaluru</p><h1>{donation.status === "published" ? "Your donation is live." : `Your donation is ${DONATION_STATUS_LABELS[donation.status].toLowerCase()}.`}</h1><p>{donation.title} · {donation.servingsTotal} portions · {donation.weightKg} kg · Reference {donation.id.toUpperCase()}</p></div></div>
     <ol className="donation-lifecycle" aria-label="Donation progress">{steps.map((step, index) => <li key={step} className={index <= active ? "done" : ""}><span aria-hidden="true" />{step}</li>)}</ol>
     <div className="manage-donation-layout"><section className="manage-donation-status"><h2>{claim ? claim.status === "pickup_scheduled" ? "Pickup is scheduled" : claim.status === "delivered" ? "Food reached its destination" : claim.status === "pending" ? "A kitchen has requested your food" : "Finding its next destination" : "Finding its next destination"}</h2>
       {image ? <Image className="manage-donation-photo" src={image} width={760} height={240} alt={`${donation.title} prepared food`} /> : null}

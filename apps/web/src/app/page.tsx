@@ -19,9 +19,9 @@ const STEPS = [
     detail: "Restaurants and food businesses list food they cannot use before it goes to waste.",
     className: "step-preview-yellow",
     previewTitle: "New food listing",
-    previewLabel: "What’s available?",
-    previewFood: "Freshly made vegetable biryani",
-    previewMeta: "32 portions · Vegetarian",
+    previewLabel: "Your kitchen · Your details",
+    previewFood: "Surplus food ready to share",
+    previewMeta: "Listing preview",
   },
   {
     number: "02",
@@ -29,9 +29,9 @@ const STEPS = [
     detail: "NGOs, community kitchens and volunteers discover relevant food donations.",
     className: "step-preview-pink",
     previewTitle: "A good match, close by.",
-    previewLabel: "Community kitchen · Indiranagar, Bengaluru · 1.2 km",
-    previewFood: "A match for 32 warm meals",
-    previewMeta: "Nearby donation match",
+    previewLabel: "Nearby community kitchen",
+    previewFood: "A match for your portions",
+    previewMeta: "Match preview",
   },
   {
     number: "03",
@@ -40,16 +40,9 @@ const STEPS = [
     className: "step-preview-peach",
     previewTitle: "Food delivered. Loop complete.",
     previewLabel: "Listed · Collected · Shared",
-    previewFood: "32 more reasons to keep going.",
+    previewFood: "Handover confirmed.",
     previewMeta: "Delivery status",
   },
-] as const;
-
-const IMPACT = [
-  ["2,450", "kg of food rescued", "Good food, kept in the loop."],
-  ["8,167", "meals estimated", "More possibilities at the table."],
-  ["38", "organizations supported", "Stronger local connections."],
-  ["312", "donations completed", "Small acts, brought full circle."],
 ] as const;
 
 function AndroidAction({ inverse = false }: { inverse?: boolean }) {
@@ -100,19 +93,19 @@ export default function HomePage() {
             className="food-story-image"
           />
           <span className="food-story-label">Made to be shared</span>
-          <article className="floating-donation" aria-label="Illustrative donation">
+          <article className="floating-donation" aria-label="Donation preview">
             <span className="availability"><i /> Surplus available</span>
             <h2>A little extra. A lot of good.</h2>
-            <p>Vegetarian thali <span>24 portions</span></p>
-            <span className="collection-time">Collect by 8:30 PM <ArrowUpRight aria-hidden="true" /></span>
+            <p>Details set by the donor</p>
+            <span className="collection-time">Collection time set by the donor <ArrowUpRight aria-hidden="true" /></span>
           </article>
-          <article className="floating-delivery" aria-label="Illustrative delivery status">
+          <article className="floating-delivery" aria-label="Delivery status preview">
             <span className="delivery-check"><Check aria-hidden="true" /></span>
-            <span><strong>A better destination.</strong><small>24 meals, shared with care</small></span>
+            <span><strong>A better destination.</strong><small>Confirmed on handover</small></span>
           </article>
           <figcaption>Kitchen <ArrowRight aria-hidden="true" size={14} /> community</figcaption>
         </figure>
-        <div className="image-caption"><span>Good food. New possibilities.</span><span>Illustrative donation journey / 01</span></div>
+        <div className="image-caption"><span>Good food. New possibilities.</span><span>Donation journey / 01</span></div>
       </section>
 
       <div className="community-ribbon" aria-label="AahaarLoop community">
@@ -186,14 +179,8 @@ export default function HomePage() {
       <section className="impact-section" id="impact" aria-labelledby="impact-title">
         <div className="impact-heading">
           <div><p className="landing-eyebrow">04 / The difference we can make</p><h2 id="impact-title">Every portion adds up.</h2></div>
-          <span className="impact-badge">Illustrative impact · sample data</span>
+          <p>Impact is measured from confirmed handovers in the workspace — no sample figures here.</p>
         </div>
-        <dl className="impact-metrics">
-          {IMPACT.map(([value, label, detail]) => (
-            <div key={label}><dt>{label}</dt><dd>{value}</dd><p>{detail}</p></div>
-          ))}
-        </dl>
-        <p className="impact-disclosure">Sample figures show how impact could be presented. Estimated meals use 0.3 kg per meal; actual portions vary.</p>
       </section>
 
       <section className="landing-cta" id="download" aria-labelledby="cta-title">

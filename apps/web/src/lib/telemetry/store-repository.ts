@@ -1,6 +1,6 @@
 import { createTelemetry, type TelemetryEvent } from "./events.ts";
 
-/** Demo retention: at most 5,000 non-PII events, oldest dropped first. */
+/** Keep at most 5,000 non-PII events, oldest dropped first. */
 const MAX_EVENTS = 5_000;
 const rows: TelemetryEvent[] = [];
 
