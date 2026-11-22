@@ -1,12 +1,13 @@
-.landing-header { position: relative; border-bottom: 1px solid var(--border); background: var(--background); }
-.landing-nav-inner { display: flex; min-height: 104px; align-items: center; justify-content: space-between; gap: 24px; padding-inline: max(24px, calc((100vw - 1312px) / 2)); }
+.landing-header { position: sticky; top: 0; z-index: 40; border-bottom: 1px solid var(--border); background: var(--background); }
+.landing-nav-inner { display: flex; min-height: 72px; align-items: center; justify-content: space-between; gap: 24px; padding-inline: max(24px, calc((100vw - 1312px) / 2)); }
+.landing-nav-inner > a > span { gap: 8px; }
 .landing-wordmark { display: inline-flex; align-items: center; gap: 10px; color: var(--foreground); font-size: 27px; font-weight: 700; letter-spacing: -.055em; text-decoration: none; white-space: nowrap; }
 .landing-wordmark-mark { color: #E12620; font-size: 46px; font-weight: 400; line-height: 1; }
 .landing-nav-main { display: flex; align-items: center; gap: 24px; }
 .landing-nav-main a, .landing-nav-links a { color: var(--foreground); font-size: 14px; text-decoration: none; white-space: nowrap; }
 .landing-nav-main a:hover, .landing-nav-links a:hover { color: var(--primary); }
 .landing-nav-main a:focus-visible, .landing-nav-links a:focus-visible { border-radius: 3px; outline: 2px solid var(--ring); outline-offset: 4px; }
-.landing-nav-app, .landing-nav-android { display: inline-flex; min-height: 52px; align-items: center; justify-content: center; border-radius: 8px; background: var(--primary); padding: 0 20px; color: white !important; font-size: 14px !important; font-weight: 600; text-decoration: none; }
+.landing-nav-app, .landing-nav-android { display: inline-flex; min-height: 2.25rem; align-items: center; justify-content: center; border-radius: 6px; background: var(--primary); padding: 0 12px; color: white !important; font-size: 14px !important; font-weight: 600; text-decoration: none; }
 .landing-nav-android { background: #E12620; }
 .landing-nav-android.is-unavailable { opacity: .55; }
 .landing-nav-links { display: none; }
@@ -104,7 +105,7 @@
 @keyframes donation-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 @keyframes delivery-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
 @media (max-width: 900px) {
-  .landing-nav-inner { min-height: 88px; padding-inline: 24px; }
+  .landing-nav-inner { padding-inline: 24px; }
   .landing-nav-main { gap: 14px; }
   .landing-nav-main > a:not(.landing-nav-app):not(.landing-nav-android) { display: none; }
   .landing-nav-links { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0 24px 14px; }
@@ -118,10 +119,10 @@
   .landing-cta { align-items: flex-start; flex-direction: column; }
 }
 @media (max-width: 620px) {
-  .landing-nav-inner { min-height: 72px; gap: 12px; padding: 12px 20px 8px; }
+  .landing-nav-inner { gap: 12px; padding: 0 20px; }
   .landing-wordmark { gap: 6px; font-size: 21px; }
   .landing-wordmark-mark { font-size: 34px; }
-  .landing-nav-app { min-height: 42px; padding: 0 12px; font-size: 11px !important; }
+  .landing-nav-app { font-size: 11px !important; }
   .landing-nav-main .landing-nav-android { display: none; }
   .landing-nav-links { gap: 10px; padding: 3px 20px 13px; }
   .landing-nav-links a { font-size: 10px; }

@@ -32,9 +32,8 @@ export function SiteHeader() {
     return (
       <header className="landing-header">
         <div className="landing-nav-inner">
-          <Link href="/#hero" aria-label="AahaarLoop home" className="landing-wordmark">
-            <span aria-hidden="true" className="landing-wordmark-mark">↻</span>
-            <span>aahaarloop</span>
+          <Link href="/#hero" aria-label="AahaarLoop home" className="flex shrink-0 rounded-sm">
+            <Logo />
           </Link>
           <nav className="landing-nav-main" aria-label="Main">
             <Link href="#how-it-works">How it works</Link>
