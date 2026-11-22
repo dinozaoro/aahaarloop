@@ -20,8 +20,8 @@ test("eas.json defines reproducible Android build profiles", () => {
 test("Android package and versioning are configured", () => {
   const config = appConfig({ config: {} });
   assert.equal(config.android.package, "com.aahaarloop.mobile");
-  assert.equal(config.version, "0.1.0");
-  assert.equal(config.android.versionCode, 1);
+  assert.equal(config.version, "0.1.1");
+  assert.equal(config.android.versionCode, 2);
   assert.equal(config.ios.bundleIdentifier, "com.aahaarloop.mobile");
 });
 
