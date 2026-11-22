@@ -2,6 +2,7 @@ import {
   ANDROID_APK_DOWNLOAD_URL,
   resolveAndroidDownloadUrl,
 } from "@/lib/links";
+import { StreetScene } from "@/components/landing/street-scene";
 import { ArrowDown, ArrowRight, ArrowUpRight, Check } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
@@ -72,6 +73,7 @@ export default function HomePage() {
   return (
     <div className="landing-page">
       <section id="hero" className="landing-hero" aria-labelledby="hero-title">
+        <StreetScene />
         <p className="landing-eyebrow">
           A little less waste. A lot more possibility.
         </p>
