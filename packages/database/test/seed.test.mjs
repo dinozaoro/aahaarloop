@@ -56,6 +56,9 @@ test("all seeded locations are in Bengaluru", () => {
 
 test("published donations cover critical, high, medium and low urgency", () => {
   const data = buildSeedData(NOW);
+  assert.ok(
+    data.donations.every((donation) => typeof donation.splittable === "boolean"),
+  );
   const offsets = data.donations
     .filter((donation) => donation.status === "published")
     .map((donation) => hoursUntil(donation.pickupDeadlineAt))
@@ -82,6 +85,7 @@ test("all fixed identifiers are unique", () => {
     ...DEMO_IDS.categories,
     ...DEMO_IDS.allergens,
     ...DEMO_IDS.donations,
+    ...DEMO_IDS.donationItems,
     ...DEMO_IDS.claims,
     ...DEMO_IDS.needs,
     DEMO_IDS.pickupTask,
@@ -148,6 +152,9 @@ test("seedDatabase uses conflict-safe inserts and is repeatable", async () => {
 test("claim items reference a seeded donation item", () => {
   const data = buildSeedData(NOW);
   const itemIds = new Set(data.donationItems.map((item) => item.id));
+  assert.deepEqual(data.donationItems.map((item) => item.id), [
+    ...DEMO_IDS.donationItems,
+  ]);
   for (const item of data.claimItems) {
     assert.ok(itemIds.has(item.donationItemId));
   }

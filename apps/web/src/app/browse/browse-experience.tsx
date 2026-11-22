@@ -26,7 +26,7 @@ function foodPhoto(title: string) {
 export function BrowseExperience({ offers, recipientLocation }: { offers: Offer[]; recipientLocation: Location | null }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
-  const [vegetarianOnly, setVegetarianOnly] = useState(true);
+  const [vegetarianOnly, setVegetarianOnly] = useState(false);
   const [radius, setRadius] = useState(5);
   const [portionLimit, setPortionLimit] = useState(100);
   const [pickupToday, setPickupToday] = useState(false);
@@ -38,7 +38,7 @@ export function BrowseExperience({ offers, recipientLocation }: { offers: Offer[
   function clearFilters() {
     setQuery("");
     setCategory("all");
-    setVegetarianOnly(true);
+    setVegetarianOnly(false);
     setRadius(5);
     setPortionLimit(100);
     setPickupToday(false);

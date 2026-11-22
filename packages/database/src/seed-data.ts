@@ -15,6 +15,7 @@ export const DEMO_IDS = {
   categories: [id(21), id(22), id(23), id(24), id(25), id(26)] as const,
   allergens: [id(31), id(32), id(33), id(34), id(35), id(36)] as const,
   donations: [id(41), id(42), id(43), id(44), id(45)] as const,
+  donationItems: [id(71), id(72), id(73), id(74)] as const,
   claims: [id(51), id(52)] as const,
   needs: [id(61), id(62)] as const,
   pickupTask: id(81),
@@ -284,11 +285,12 @@ export function buildSeedData(now: Date = new Date()): SeedData {
         remainingQuantity: 25,
         quantityUnit: "servings",
         storage: "refrigerated",
+        splittable: false,
       },
     ],
     donationItems: [
       {
-        id: id(71),
+        id: DEMO_IDS.donationItems[0],
         donationId: critical,
         name: "Vegetarian thali",
         categoryId: meals,
@@ -299,6 +301,7 @@ export function buildSeedData(now: Date = new Date()): SeedData {
         storage: "refrigerated",
       },
       {
+        id: DEMO_IDS.donationItems[1],
         donationId: high,
         name: "Mixed fruit basket",
         categoryId: fruits,
@@ -308,6 +311,7 @@ export function buildSeedData(now: Date = new Date()): SeedData {
         storage: "ambient",
       },
       {
+        id: DEMO_IDS.donationItems[2],
         donationId: medium,
         name: "Assorted bread",
         categoryId: bakery,
@@ -317,6 +321,7 @@ export function buildSeedData(now: Date = new Date()): SeedData {
         storage: "ambient",
       },
       {
+        id: DEMO_IDS.donationItems[3],
         donationId: low,
         name: "Rice and dal packet",
         categoryId: meals,
