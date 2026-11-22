@@ -74,7 +74,7 @@ export default function HomePage() {
   return (
     <div className="landing-page">
       <section id="hero" className="landing-hero" aria-labelledby="hero-title">
-        <p className="landing-eyebrow"><span aria-hidden="true">●</span> A little less waste. A lot more possibility.</p>
+        <p className="landing-eyebrow">A little less waste. A lot more possibility.</p>
         <h1 id="hero-title" className="landing-title">
           <span>Good food deserves</span>
           <em>another destination.</em>

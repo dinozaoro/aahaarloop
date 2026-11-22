@@ -58,7 +58,7 @@ export function BrowseExperience({ offers, recipientLocation }: { offers: Offer[
   return <>
     <form className="discover-search" onSubmit={(event) => event.preventDefault()}>
       <label htmlFor="discover-query">Search food or donor</label>
-      <div className="discover-search-controls"><span aria-hidden="true">⌕</span><input id="discover-query" placeholder="Try biryani, idli or rice" value={query} onChange={(event) => setQuery(event.target.value)} /><button className="primary-action" type="submit">Search</button></div>
+      <div className="discover-search-controls"><input id="discover-query" placeholder="Try biryani, idli or rice" value={query} onChange={(event) => setQuery(event.target.value)} /><button className="primary-action" type="submit">Search</button></div>
     </form>
 
     <div className="discover-filters" aria-label="Filter donations">

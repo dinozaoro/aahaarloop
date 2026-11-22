@@ -2,7 +2,7 @@
 :where(.landing-page, .landing-header, .landing-footer, .workspace, .account-page, .onboarding-page, .site-shell)
   :where(p, span, small, time, label, li, dt, dd, th, td, input, select, textarea, button, a, legend, figcaption, em)
   :not(h1 *):not(h2 *):not(h3 *):not(h4 *):not([aria-hidden="true"] *) {
-  font-size: max(14px, 0.875em) !important;
+  font-size: max(15px, 0.875em) !important;
 }
 
 .landing-header .landing-nav-main > a,
