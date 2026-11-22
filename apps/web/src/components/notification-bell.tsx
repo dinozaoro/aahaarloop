@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -106,6 +107,9 @@ export function NotificationBell() {
             </li>
           ))}
         </ul>
+        <Link href="/notifications" className="text-sm font-semibold text-primary">
+          View all activity
+        </Link>
       </SheetContent>
     </Sheet>
   );

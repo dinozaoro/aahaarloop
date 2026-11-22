@@ -42,10 +42,10 @@ function setup() {
   return { rows, service: createDonationService(repo, () => "2026-11-21T12:00:00Z") };
 }
 
-test("a donor creates a scoped draft with an audit-ready history", () => {
+test("a donor creates a scoped draft with an audit-ready history", async () => {
   const { service } = setup();
   const input = DonationInputSchema.parse(payload);
-  const donation = service.create(input, "org-1", "user-1");
+  const donation = await service.create(input, "org-1", "user-1");
   assert.equal(donation.organizationId, "org-1");
   assert.equal(donation.status, "draft");
   assert.equal(donation.servingsAvailable, 40);
@@ -53,23 +53,25 @@ test("a donor creates a scoped draft with an audit-ready history", () => {
   assert.deepEqual(donation.events.map((event) => event.type), ["created"]);
 });
 
-test("lists expose only own drafts and only published donations to others", () => {
+test("lists expose only own drafts and only published donations to others", async () => {
   const { service } = setup();
   const input = DonationInputSchema.parse(payload);
-  service.create(input, "org-1", "user-1");
-  const other = service.create(input, "org-2", "user-2");
-  service.publish(other.id, "org-2", "user-2");
+  await service.create(input, "org-1", "user-1");
+  const other = await service.create(input, "org-2", "user-2");
+  await service.publish(other.id, "org-2", "user-2");
 
-  assert.equal(service.list("org-1").length, 1);
-  assert.equal(service.list("org-1")[0].organizationId, "org-1");
-  assert.equal(service.list().length, 1);
-  assert.equal(service.list()[0].id, other.id);
+  const own = await service.list("org-1");
+  assert.equal(own.length, 1);
+  assert.equal(own[0].organizationId, "org-1");
+  const published = await service.list();
+  assert.equal(published.length, 1);
+  assert.equal(published[0].id, other.id);
 });
 
-test("publishing requires a located pin and records the transition", () => {
+test("publishing requires a located pin and records the transition", async () => {
   const { service } = setup();
   const input = DonationInputSchema.parse(payload);
-  const unlocated = service.create(
+  const unlocated = await service.create(
     DonationInputSchema.parse({
       ...payload,
       pickup_location: {
@@ -80,12 +82,12 @@ test("publishing requires a located pin and records the transition", () => {
     "org-1",
     "user-1",
   );
-  assert.throws(
+  await assert.rejects(
     () => service.publish(unlocated.id, "org-1", "user-1"),
     /located pin/,
   );
-  const donation = service.create(input, "org-1", "user-1");
-  const published = service.publish(donation.id, "org-1", "user-1");
+  const donation = await service.create(input, "org-1", "user-1");
+  const published = await service.publish(donation.id, "org-1", "user-1");
   assert.equal(published.status, "published");
   assert.deepEqual(published.events.map((event) => event.type), [
     "created",
@@ -93,16 +95,16 @@ test("publishing requires a located pin and records the transition", () => {
   ]);
 });
 
-test("cross-organization edits and double publishing are rejected", () => {
+test("cross-organization edits and double publishing are rejected", async () => {
   const { service } = setup();
   const input = DonationInputSchema.parse(payload);
-  const donation = service.create(input, "org-1", "user-1");
-  assert.throws(
+  const donation = await service.create(input, "org-1", "user-1");
+  await assert.rejects(
     () => service.update(donation.id, "org-2", "user-2", { title: "Stolen" }),
     /another organization/,
   );
-  service.publish(donation.id, "org-1", "user-1");
-  assert.throws(
+  await service.publish(donation.id, "org-1", "user-1");
+  await assert.rejects(
     () => service.publish(donation.id, "org-1", "user-1"),
     /Only draft/,
   );

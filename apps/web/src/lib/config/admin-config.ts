@@ -124,6 +124,15 @@ export function getConfigVersion(): number {
   return version;
 }
 
+/** Replaces the in-memory snapshot after a durable config has been loaded. */
+export function setAdminConfig(config: AdminConfig): void {
+  const next = validateAdminConfig(config);
+  if (JSON.stringify(next) === JSON.stringify(current)) return;
+  current = next;
+  version += 1;
+  for (const listener of listeners) listener(next);
+}
+
 export function onConfigChange(listener: ConfigListener): () => void {
   listeners.add(listener);
   return () => listeners.delete(listener);
@@ -147,10 +156,6 @@ export function updateAdminConfig(patch: AdminConfigPatch): AdminConfig {
       ...(patch.matchingWeights ?? {}),
     },
   };
-  const next = validateAdminConfig(merged);
-  if (JSON.stringify(next) === JSON.stringify(current)) return current;
-  current = next;
-  version += 1;
-  for (const listener of listeners) listener(next);
-  return next;
+  setAdminConfig(validateAdminConfig(merged));
+  return current;
 }

@@ -1,4 +1,6 @@
+import { auth } from "@/auth";
 import { Breadcrumbs, PageHeader } from "@/components/page-chrome";
+import { ProfileEditForm } from "@/components/profile-edit-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RECIPIENT_ORG_ID } from "@/lib/data/constants";
 import { getOrganization } from "@/lib/data/store";
@@ -6,8 +8,13 @@ import { ArrowRight, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 import { WorkspaceShell } from "@/components/workspace-shell";
 
-export default function RecipientProfilePage() {
-  const organization = getOrganization(RECIPIENT_ORG_ID);
+export const dynamic = "force-dynamic";
+
+export default async function RecipientProfilePage() {
+  const [organization, session] = await Promise.all([
+    getOrganization(RECIPIENT_ORG_ID),
+    auth(),
+  ]);
 
   return (
     <WorkspaceShell><div className="site-shell flex flex-col gap-7 py-10 sm:py-14">
@@ -33,7 +40,15 @@ export default function RecipientProfilePage() {
               <Phone aria-hidden="true" className="mt-0.5 size-4 text-primary" />
               <div><p className="font-medium">Contact</p><p className="mt-1 text-muted-foreground">{organization.contactPhone}</p></div>
             </div>
-            <p className="text-xs leading-5 text-muted-foreground sm:col-span-2">Profile edits are not connected to an account yet.</p>
+            <div className="sm:col-span-2">
+              <ProfileEditForm
+                role={session?.user.role ?? "recipient"}
+                displayName={organization.contactName}
+                phone={organization.contactPhone}
+                organizationName={organization.name}
+                transportCapacityKg={organization.transportCapacityKg}
+              />
+            </div>
           </CardContent>
         </Card>
       ) : <p className="text-sm text-muted-foreground">No recipient organisation is configured.</p>}

@@ -1,27 +1,25 @@
+import * as dal from "@/lib/data/dal";
+import { getDb } from "@/lib/db";
+import { recordAudit } from "@/lib/audit/log";
+
 import {
   createModerationService,
-  type ModerationReport,
   type ModerationRepository,
 } from "./reports.ts";
 
-const rows: ModerationReport[] = [];
-const auditTrail: Array<Record<string, unknown>> = [];
-
 const repository: ModerationRepository = {
-  all: () => rows,
-  find: (id) => rows.find((report) => report.id === id),
-  save: (report) => {
-    const index = rows.findIndex((item) => item.id === report.id);
-    if (index === -1) rows.push(report);
-    else rows[index] = report;
-  },
+  all: dal.listModerationReports,
+  find: dal.findModerationReport,
+  save: dal.saveModerationReport,
 };
 
-export const moderationService = createModerationService(
-  repository,
-  async (input) => {
-    auditTrail.push({ ...input, at: new Date().toISOString() });
-  },
-);
-export const moderationReports = rows;
-export const moderationAuditTrail = auditTrail;
+export const moderationService = createModerationService(repository, async (input) => {
+  await recordAudit(await getDb(), {
+    actorType: "admin",
+    actorId: input.actorId,
+    action: input.action,
+    entityType: input.entityType,
+    entityId: input.entityId,
+    after: input.after,
+  });
+});

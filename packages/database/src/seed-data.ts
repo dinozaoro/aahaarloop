@@ -404,6 +404,10 @@ export function buildSeedData(now: Date = new Date()): SeedData {
         assignedAt: now,
       },
     ],
-    favorites: [{ userId: DEMO_IDS.recipientUser, donationId: low }],
+    favorites: [{
+      userId: DEMO_IDS.recipientUser,
+      donationId: low,
+      organizationId: DEMO_IDS.recipientOrg,
+    }],
   };
 }

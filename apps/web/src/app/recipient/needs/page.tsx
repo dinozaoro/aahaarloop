@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Pencil, Plus } from "lucide-react";
 
@@ -27,8 +27,6 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { RECIPIENT_ORG_ID } from "@/lib/data/constants";
-import { getNeedsForOrganization } from "@/lib/data/store";
 import {
   CATEGORY_LABELS,
   type FoodCategory,
@@ -178,11 +176,26 @@ function NeedList({
 }
 
 export default function RecipientNeedsPage() {
-  const organizationConfigured = Boolean(RECIPIENT_ORG_ID);
-  const [needs, setNeeds] = useState<readonly Need[]>(() => [
-    ...getNeedsForOrganization(RECIPIENT_ORG_ID),
-  ]);
+  const [needs, setNeeds] = useState<readonly Need[]>([]);
+  const [organizationConfigured, setOrganizationConfigured] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [now] = useState(() => Date.now());
+
+  useEffect(() => {
+    void fetch("/api/needs")
+      .then(async (response) => {
+        if (!response.ok) {
+          setOrganizationConfigured(false);
+          return null;
+        }
+        return (await response.json()) as { needs: readonly Need[] };
+      })
+      .then((data) => {
+        if (data) setNeeds(data.needs);
+      })
+      .catch(() => setOrganizationConfigured(false))
+      .finally(() => setLoading(false));
+  }, []);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Need | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
@@ -206,7 +219,28 @@ export default function RecipientNeedsPage() {
     setDialogOpen(true);
   }
 
-  function saveNeed() {
+  async function sendNeed(url: string, method: "POST" | "PATCH", id?: string) {
+    const response = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...(id ? { id } : {}),
+        category: form.category,
+        servings: Number(form.servings),
+        deadline_at: new Date(new Date(form.deadline).getTime()).toISOString(),
+        notes: form.notes.trim(),
+      }),
+    });
+    const body = (await response.json().catch(() => null)) as
+      | { need?: Need; message?: string }
+      | null;
+    if (!response.ok || !body?.need) {
+      throw new Error(body?.message ?? "Need could not be saved");
+    }
+    return body.need;
+  }
+
+  async function saveNeed() {
     const servings = Number(form.servings);
     const deadlineMs = new Date(form.deadline).getTime();
     const nextErrors: Record<string, string> = {};
@@ -225,58 +259,31 @@ export default function RecipientNeedsPage() {
       return;
     }
 
-    const deadlineAt = new Date(deadlineMs).toISOString();
-    const updatedAt = new Date().toISOString();
-    const notes = form.notes.trim();
-
-    if (editing) {
+    try {
+      const saved = await sendNeed(editing ? "/api/needs" : "/api/needs", editing ? "PATCH" : "POST", editing?.id);
       setNeeds((current) =>
-        current.map((need) =>
-          need.id === editing.id
-            ? {
-                ...need,
-                category: form.category,
-                servings,
-                deadlineAt,
-                priority: form.priority,
-                notes,
-                status: deadlineMs > Date.now() ? "active" : need.status,
-                updatedAt,
-              }
-            : need
-        )
+        editing
+          ? current.map((need) => (need.id === saved.id ? saved : need))
+          : [saved, ...current],
       );
-      toast.success("Need updated");
-    } else {
-      setNeeds((current) => [
-        {
-          id: `need-${crypto.randomUUID()}`,
-          organizationId: RECIPIENT_ORG_ID,
-          category: form.category,
-          servings,
-          deadlineAt,
-          priority: form.priority,
-          notes,
-          status: "active",
-          createdAt: updatedAt,
-          updatedAt,
-        },
-        ...current,
-      ]);
-      toast.success("Need added");
+      toast.success(editing ? "Need updated" : "Need added");
+      setDialogOpen(false);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Need could not be saved");
     }
-    setDialogOpen(false);
   }
 
-  function closeNeed(need: Need) {
-    setNeeds((current) =>
-      current.map((entry) =>
-        entry.id === need.id
-          ? { ...entry, status: "closed", updatedAt: new Date().toISOString() }
-          : entry
-      )
-    );
-    toast.success("Need closed");
+  async function closeNeed(need: Need) {
+    try {
+      const response = await fetch(`/api/needs?id=${encodeURIComponent(need.id)}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) throw new Error("Need could not be closed");
+      setNeeds((current) => current.filter((entry) => entry.id !== need.id));
+      toast.success("Need closed");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Need could not be closed");
+    }
   }
 
   return (
@@ -298,8 +305,10 @@ export default function RecipientNeedsPage() {
 
       {!organizationConfigured ? (
         <p className="text-sm text-muted-foreground">
-          No recipient organisation is configured. Set NEXT_PUBLIC_RECIPIENT_ORG_ID to add needs.
+          No recipient organisation is active for this account. Complete onboarding to add needs.
         </p>
+      ) : loading ? (
+        <p className="text-sm text-muted-foreground">Loading needs…</p>
       ) : null}
 
       <Card className="border-primary/30 bg-primary/5 shadow-none">
@@ -406,26 +415,6 @@ export default function RecipientNeedsPage() {
                 <FieldError>{errors.deadline}</FieldError>
               </Field>
             </div>
-
-            <Field>
-              <FieldLabel htmlFor="need-priority">Priority</FieldLabel>
-              <Select
-                id="need-priority"
-                value={form.priority}
-                onChange={(event) =>
-                  setForm({
-                    ...form,
-                    priority: event.target.value as NeedPriority,
-                  })
-                }
-              >
-                {Object.entries(PRIORITY_LABELS).map(([value, label]) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </Select>
-            </Field>
 
             <Field>
               <FieldLabel htmlFor="need-notes">Notes</FieldLabel>

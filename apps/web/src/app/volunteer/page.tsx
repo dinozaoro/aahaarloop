@@ -4,10 +4,11 @@ import type { Metadata } from "next";
 import { WorkspaceShell } from "@/components/workspace-shell";
 import { getVolunteerProfile } from "@/lib/data/store";
 
+export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Volunteer home" };
 
-export default function VolunteerHomePage() {
-  const profile = getVolunteerProfile();
+export default async function VolunteerHomePage() {
+  const profile = await getVolunteerProfile();
   return <WorkspaceShell><div className="volunteer-home">
     <div className="page-heading volunteer-heading"><div><p className="page-kicker">Bengaluru · Volunteer</p><h1>Your next good turn.</h1><p>Short journeys can help good food reach a nearby table.</p></div><Link href="/volunteer/profile" className="primary-action">{profile ? "Update availability" : "Set up profile"}</Link></div>
     <section className="volunteer-assignment-empty"><p className="page-kicker">Assignments</p><h2>No pickup assignments are connected yet.</h2><p>Service area and availability are saved in this browser once you create a profile.</p><Link href="/volunteer/profile" className="outline-action">Review volunteer profile</Link></section>

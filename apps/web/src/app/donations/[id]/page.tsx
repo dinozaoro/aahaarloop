@@ -7,6 +7,7 @@ import { WorkspaceShell } from "@/components/workspace-shell";
 import { getClaimsForDonation, getDonation } from "@/lib/data/store";
 import { DONATION_STATUS_LABELS } from "@/lib/domain/types";
 
+export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Manage donation" };
 
 const steps = ["Posted", "Claimed", "Pickup scheduled", "Collected", "Delivered"];
@@ -21,9 +22,9 @@ function foodPhoto(title: string) {
 
 export default async function ManageDonationPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const donation = getDonation(id);
+  const donation = await getDonation(id);
   if (!donation) notFound();
-  const claims = [...getClaimsForDonation(id)].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  const claims = [...await getClaimsForDonation(id)].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
   const claim = claims[0];
   const status = claim?.status ?? donation.status;
   const active = status === "delivered" ? 4 : status === "picked_up" ? 3 : status === "pickup_scheduled" ? 2 : ["pending", "confirmed"].includes(status) ? 1 : 0;

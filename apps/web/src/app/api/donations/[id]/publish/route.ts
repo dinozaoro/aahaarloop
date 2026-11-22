@@ -14,7 +14,7 @@ export const POST = withApiHandler({}, async (_input, { request }) => {
     throw new ApiError("forbidden", "Only donors can publish donations");
   }
   const id = new URL(request.url).pathname.split("/")[3];
-  const donation = donationService.publish(
+  const donation = await donationService.publish(
     id,
     session.user.activeOrganizationId ?? "",
     session.user.id,

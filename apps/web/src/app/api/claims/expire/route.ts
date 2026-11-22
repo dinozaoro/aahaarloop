@@ -7,5 +7,5 @@ export const runtime = "nodejs";
 export async function POST() {
   const denied = await forbidUnlessRole(["admin"]);
   if (denied) return denied;
-  return Response.json({ expired: claimLifecycle.expire() });
+  return Response.json({ expired: await claimLifecycle.expire() });
 }

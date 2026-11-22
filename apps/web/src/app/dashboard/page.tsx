@@ -9,6 +9,7 @@ import { DONOR_ORG_ID, RECIPIENT_ORG_ID } from "@/lib/data/constants";
 import { getClaimsForDonor, getDonation, getDonationsForOrganization, getOrganization } from "@/lib/data/store";
 import { DONATION_STATUS_LABELS, type Donation } from "@/lib/domain/types";
 
+export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Dashboard" };
 
 const dateTime = (date: string) => new Intl.DateTimeFormat("en-IN", {
@@ -33,15 +34,15 @@ function distanceInKm(a: Donation["location"], b: Donation["location"]) {
   return (2 * 6371 * Math.asin(Math.sqrt(Math.sin(lat / 2) ** 2 + Math.cos(radians(a.latitude)) * Math.cos(radians(b.latitude)) * Math.sin(lon / 2) ** 2))).toFixed(1);
 }
 
-export default function DashboardPage() {
-  const donations = [...getDonationsForOrganization(DONOR_ORG_ID)].sort((a, b) => a.pickupDeadlineAt.localeCompare(b.pickupDeadlineAt));
-  const claims = [...getClaimsForDonor(DONOR_ORG_ID)].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
-  const organization = getOrganization(DONOR_ORG_ID);
-  const nearbyKitchen = getOrganization(RECIPIENT_ORG_ID);
+export default async function DashboardPage() {
+  const donations = [...await getDonationsForOrganization(DONOR_ORG_ID)].sort((a, b) => a.pickupDeadlineAt.localeCompare(b.pickupDeadlineAt));
+  const claims = [...await getClaimsForDonor(DONOR_ORG_ID)].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  const organization = await getOrganization(DONOR_ORG_ID);
+  const nearbyKitchen = await getOrganization(RECIPIENT_ORG_ID);
   const active = donations.filter((donation) => ["published", "claimed", "pickup_scheduled"].includes(donation.status));
   const scheduledClaim = claims.find((claim) => claim.status === "pickup_scheduled");
-  const scheduledDonation = scheduledClaim ? getDonation(scheduledClaim.donationId) : undefined;
-  const pickupRecipient = scheduledClaim ? getOrganization(scheduledClaim.recipientOrgId) : undefined;
+  const scheduledDonation = scheduledClaim ? await getDonation(scheduledClaim.donationId) : undefined;
+  const pickupRecipient = scheduledClaim ? await getOrganization(scheduledClaim.recipientOrgId) : undefined;
   const completedThisMonth = claims.filter((claim) => claim.status === "delivered" && new Date(claim.updatedAt).getMonth() === new Date().getMonth()).length;
   const rescuedKg = claims.filter((claim) => claim.status === "delivered").reduce((sum, claim) => sum + claim.weightKg, 0);
   const awaitingPickup = claims.filter((claim) => ["pending", "confirmed"].includes(claim.status)).length;

@@ -29,11 +29,15 @@ export const POST = withApiHandler({ bodySchema }, async ({ body }) => {
   const actorId = session?.user?.id;
   if (!actorId) throw new ApiError("unauthorized", "Sign in required");
 
+  const [donation, organization] = await Promise.all([
+    getDonation(body.entityId),
+    getOrganization(body.entityId),
+  ]);
   const result = applyAdminAction(
     {
-      findDonation: getDonation,
+      findDonation: () => donation,
       saveDonation: upsertDonation,
-      findOrganization: getOrganization,
+      findOrganization: () => organization,
       saveOrganization: upsertOrganization,
       findClaim: () => undefined,
       audit: async (input) => {

@@ -7,16 +7,18 @@ import { requireRole } from "@/lib/auth/guards";
 import { getAllDonations, getOrganization } from "@/lib/data/store";
 import { favoriteService } from "@/lib/favorites/service";
 
+export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Saved donations" };
 
 export default async function FavoritesPage() {
   const user = await requireRole(["recipient"]);
   const organizationId = user.activeOrganizationId;
+  const allDonations = await getAllDonations();
   const saved = organizationId
-    ? favoriteService.list(user.id, organizationId, getAllDonations())
+    ? await favoriteService.list(user.id, organizationId, allDonations)
     : [];
   const donations = saved
-    .map((favorite) => getAllDonations().find((donation) => donation.id === favorite.donationId))
+    .map((favorite) => allDonations.find((donation) => donation.id === favorite.donationId))
     .filter((donation) => donation?.status === "published");
 
   return (
@@ -27,9 +29,9 @@ export default async function FavoritesPage() {
       </div>
       {donations.length ? (
         <section className="offer-list" aria-label="Saved donations">
-          {donations.map((donation) => donation && <article className="offer-card" key={donation.id}>
-            <div className="offer-content"><span className="food-category">{donation.pickupArea}</span><h2>{donation.title}</h2><p>{getOrganization(donation.organizationId)?.name ?? "Food partner"}</p><div className="offer-meta"><span><b>{donation.servingsAvailable}</b> servings</span><span>Collect by {new Intl.DateTimeFormat("en-IN", { hour: "numeric", minute: "2-digit" }).format(new Date(donation.pickupDeadlineAt))}</span></div><Link href={`/browse/${donation.id}`} className="offer-open">View donation <ArrowRight aria-hidden="true" size={14} /></Link></div>
-          </article>)}
+          {await Promise.all(donations.map(async (donation) => donation && <article className="offer-card" key={donation.id}>
+            <div className="offer-content"><span className="food-category">{donation.pickupArea}</span><h2>{donation.title}</h2><p>{(await getOrganization(donation.organizationId))?.name ?? "Food partner"}</p><div className="offer-meta"><span><b>{donation.servingsAvailable}</b> servings</span><span>Collect by {new Intl.DateTimeFormat("en-IN", { hour: "numeric", minute: "2-digit" }).format(new Date(donation.pickupDeadlineAt))}</span></div><Link href={`/browse/${donation.id}`} className="offer-open">View donation <ArrowRight aria-hidden="true" size={14} /></Link></div>
+          </article>))}
         </section>
       ) : <div className="empty-state"><h2>No saved donations yet.</h2><p>Save an offer from the browse list when you find a good fit.</p><Link href="/browse" className="primary-action">Find surplus <ArrowRight aria-hidden="true" size={14} /></Link></div>}
     </WorkspaceShell>

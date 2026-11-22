@@ -4,18 +4,21 @@ import { test } from "node:test";
 
 const migrationDir = new URL("../migrations/", import.meta.url);
 
-async function initialSql() {
-  const files = (await readdir(migrationDir)).filter((file) =>
-    file.endsWith(".sql"),
+async function allMigrationSql() {
+  const files = (await readdir(migrationDir))
+    .filter((file) => file.endsWith(".sql"))
+    .sort();
+  assert.ok(files.length >= 1, "expected at least one migration");
+  const chunks = await Promise.all(
+    files.map((file) => readFile(new URL(file, migrationDir), "utf8")),
   );
-  assert.equal(files.length, 1, "expected exactly one initial migration");
-  return readFile(new URL(files[0], migrationDir), "utf8");
+  return chunks.join("\n");
 }
 
-test("the initial migration creates all 28 domain tables", async () => {
-  const sql = await initialSql();
+test("the migrations create all 32 domain tables", async () => {
+  const sql = await allMigrationSql();
   const matches = sql.match(/CREATE TABLE "/g) ?? [];
-  assert.equal(matches.length, 28);
+  assert.equal(matches.length, 32);
   for (const table of [
     "users",
     "organizations",
@@ -28,7 +31,7 @@ test("the initial migration creates all 28 domain tables", async () => {
 });
 
 test("the migration creates lifecycle enums", async () => {
-  const sql = await initialSql();
+  const sql = await allMigrationSql();
   for (const type of [
     "user_role",
     "donation_status",
@@ -44,7 +47,7 @@ test("the migration creates lifecycle enums", async () => {
 });
 
 test("the migration enforces non-negative quantities and unique memberships", async () => {
-  const sql = await initialSql();
+  const sql = await allMigrationSql();
   for (const constraint of [
     "donations_quantity_non_negative",
     "donations_remaining_non_negative",
@@ -56,14 +59,16 @@ test("the migration enforces non-negative quantities and unique memberships", as
   }
 });
 
-test("the drizzle journal references the initial migration", async () => {
+test("the drizzle journal covers every migration in order", async () => {
   const journal = JSON.parse(
     await readFile(new URL("meta/_journal.json", migrationDir), "utf8"),
   );
-  assert.equal(journal.entries.length, 1);
-  assert.equal(journal.entries[0].idx, 0);
-  const sqlFile = (await readdir(migrationDir)).find((file) =>
-    file.endsWith(".sql"),
-  );
-  assert.ok(journal.entries[0].tag.includes(sqlFile.replace(".sql", "")));
+  const files = (await readdir(migrationDir))
+    .filter((file) => file.endsWith(".sql"))
+    .sort();
+  assert.equal(journal.entries.length, files.length);
+  journal.entries.forEach((entry, index) => {
+    assert.equal(entry.idx, index);
+    assert.ok(entry.tag.includes(files[index].replace(".sql", "")));
+  });
 });

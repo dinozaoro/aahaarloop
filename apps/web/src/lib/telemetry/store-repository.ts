@@ -1,12 +1,8 @@
-import { createTelemetry, type TelemetryEvent } from "./events.ts";
+import * as dal from "@/lib/data/dal";
 
-/** Keep at most 5,000 non-PII events, oldest dropped first. */
-const MAX_EVENTS = 5_000;
-const rows: TelemetryEvent[] = [];
+import { createTelemetry } from "./events.ts";
 
 export const telemetry = createTelemetry((event) => {
-  rows.push(event);
-  if (rows.length > MAX_EVENTS) rows.splice(0, rows.length - MAX_EVENTS);
+  // Telemetry must never delay or fail the request that emitted it.
+  void dal.saveTelemetryEvent(event).catch(() => {});
 });
-
-export const telemetryEvents = rows;

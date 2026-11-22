@@ -7,8 +7,12 @@ the [ADR index](adr/README.md) for the decisions behind each choice.
 ## Status
 
 - **Implemented:** pnpm/Turborepo workspace, Next.js web shell, Auth.js sign-in
-  and onboarding, server-side RBAC, Drizzle schema and migrations, shared
+  and onboarding, server-side RBAC, Drizzle schema and migrations, a
+  server-only Postgres DAL wired into web pages and HTTP routes, shared
   matching rules, food-recognition interfaces and GitHub Actions CI.
+- **Operator step pending:** `packages/database/migrations/0001_lucky_speed.sql`
+  is generated but not applied. An operator must run the migrations before
+  using the app; see [data access](#data-access).
 - **Designed, not integrated:** map tiles (Leaflet), image uploads
   (Cloudinary), live AI credentials, mobile offline sync and deployment
   pipelines. Schema columns and interfaces exist for these, but no live service
@@ -25,15 +29,17 @@ flowchart LR
   Web[Next.js web app] --> Server[Route handlers and server actions]
   Mobile[Expo mobile app] --> Server
   Server --> Auth[Auth.js and Google]
-  Server --> DB[(Neon PostgreSQL)]
+  Server --> DAL[Server-only data DAL]
+  DAL --> DB[(Neon PostgreSQL)]
   Server --> Match["@aahaarloop/matching"]
   Server --> Food["@aahaarloop/food-recognition"]
   Food --> AI[AI vision provider and Sightengine]
   Web -. planned .-> Map[Leaflet map tiles]
 ```
 
-Only the web app currently talks to the database. The Expo app declares
-`EXPO_PUBLIC_API_URL` for future API calls; it has no data screens yet.
+Only the web app talks to the database, through the server-only DAL. The Expo
+app calls the same HTTP routes via `EXPO_PUBLIC_API_URL` and receives unchanged
+response envelopes; it never connects to Postgres directly.
 
 ## Workspaces
 
@@ -61,22 +67,53 @@ sequenceDiagram
   participant Recipient
 
   Donor->>Web: Create donation and photo
-  Web->>DB: Insert donation and donation_images rows
+  Web->>DB: Insert donation and donation_images rows via DAL
   Web->>Rules: Compute urgency and eligibility
   Rules-->>Web: Score plus hard-filter decision
   Recipient->>Web: Request matching donations
-  Web->>DB: Read published donations and recipient needs
+  Web->>DB: Read published donations and recipient needs via DAL
   Web->>Rules: Rank with needs and logistics
   Rules-->>Web: Explainable ranked list
-  Recipient->>Web: Claim servings
-  Web->>Web: requireClaimFor(recipient organization)
-  Web->>DB: Persist claim and update available servings
+  Recipient->>Web: Claim servings with idempotency-key header
+  Web->>Web: Check recipient role and active organization
+  Web->>DB: Persist claim and update available servings via DAL
 ```
 
 The matching package never mutates state: it receives donor, recipient and
-logistics inputs and returns a decision with reasons. The prototype web UI
-still reads a seeded in-memory store in `apps/web/src/lib/data/store.ts`; the
-persistent tables and claim lifecycle are defined in `packages/database`.
+logistics inputs and returns a decision with reasons. Web pages await DAL
+reads; client actions call HTTP routes. The persistent tables and claim
+lifecycle are defined in `packages/database`, and the seeded rows are visible
+in the UI without a separate hydration step.
+
+## Data access
+
+Domain state (donations, claims, needs, organizations, notifications, pickups,
+favorites, moderation, admin config, telemetry and POST replay responses) lives
+in Postgres, not in process-local stores.
+`apps/web/src/lib/data/dal.ts` is `server-only`: it uses `getDb()` and maps
+Drizzle rows to domain types. `apps/web/src/lib/data/store.ts` and the
+`*-store-repository.ts` adapters are thin async adapters; services await them,
+server pages await DAL reads, and client components call HTTP routes and then
+refresh. No client imports the DAL. HTTP envelopes are unchanged:
+`{ donations }`, `{ data, total, unread }` and `{ tasks }`.
+
+Claim creation requires the `recipient` role, a `recipient_id` matching
+`session.user.activeOrganizationId`, and an `idempotency-key` header (sent by
+both the web UI and the mobile client). `claims.idempotency_key` is unique in
+Postgres; `commitClaim` locks the donation row with `SELECT … FOR UPDATE` and
+writes the claim, stock decrement and event in one transaction, so the in-process
+claim lock is gone. Favorites are scoped to both the user and the active
+organization.
+
+Migrations `packages/database/migrations/0001_lucky_speed.sql` and
+`0002_cultured_energizer.sql` are generated but **not applied**: an operator must
+run `pnpm --filter @aahaarloop/database migrate` before using the app. The seed
+supplies five donations, two needs, two claims and one pickup task. A newly
+onboarded organization has no seeded donations, so claim tests use the seeded
+recipient organization. Moderation audit entries reuse `audit_logs`; admin
+config, telemetry and POST replay responses have their own tables. The config
+snapshot and match cache stay process-local and are refreshed from Postgres at
+startup and on config change.
 
 ## Authentication and authorization
 

@@ -9,9 +9,9 @@ import type {
 } from "../domain/types.ts";
 
 export interface DonationRepository {
-  all(): readonly Donation[];
-  find(id: string): Donation | undefined;
-  save(donation: Donation): void;
+  all(): Promise<readonly Donation[]>;
+  find(id: string): Promise<Donation | undefined>;
+  save(donation: Donation, actor: string): Promise<void>;
 }
 
 const CATEGORIES: readonly string[] = [
@@ -50,8 +50,8 @@ export function createDonationService(
     actor,
   });
 
-  const requireOwned = (id: string, organizationId: string): Donation => {
-    const donation = repo.find(id);
+  const requireOwned = async (id: string, organizationId: string): Promise<Donation> => {
+    const donation = await repo.find(id);
     if (!donation) throw new ApiError("not_found", "Donation not found");
     if (donation.organizationId !== organizationId) {
       throw new ApiError("forbidden", "Donation belongs to another organization");
@@ -60,15 +60,15 @@ export function createDonationService(
   };
 
   return {
-    list(organizationId?: string): readonly Donation[] {
-      const all = repo.all();
+    async list(organizationId?: string): Promise<readonly Donation[]> {
+      const all = await repo.all();
       return organizationId
         ? all.filter((donation) => donation.organizationId === organizationId)
         : all.filter((donation) => donation.status === "published");
     },
 
-    get(id: string, organizationId?: string): Donation {
-      const donation = repo.find(id);
+    async get(id: string, organizationId?: string): Promise<Donation> {
+      const donation = await repo.find(id);
       if (!donation) throw new ApiError("not_found", "Donation not found");
       const owned = organizationId && donation.organizationId === organizationId;
       if (!owned && donation.status !== "published") {
@@ -77,7 +77,7 @@ export function createDonationService(
       return donation;
     },
 
-    create(input: DonationInput, organizationId: string, actor: string): Donation {
+    async create(input: DonationInput, organizationId: string, actor: string): Promise<Donation> {
       if (!organizationId) {
         throw new ApiError("forbidden", "No active organization");
       }
@@ -108,17 +108,17 @@ export function createDonationService(
         updatedAt: now(),
         events: [event("created", actor)],
       };
-      repo.save(donation);
+      await repo.save(donation, actor);
       return donation;
     },
 
-    update(
+    async update(
       id: string,
       organizationId: string,
       actor: string,
       patch: DonationPatch,
-    ): Donation {
-      const donation = requireOwned(id, organizationId);
+    ): Promise<Donation> {
+      const donation = await requireOwned(id, organizationId);
       if (donation.status !== "draft" && donation.status !== "published") {
         throw new ApiError("conflict", "Only draft or published donations can be edited");
       }
@@ -128,12 +128,12 @@ export function createDonationService(
         updatedAt: now(),
         events: [...donation.events, event("edited", actor)],
       };
-      repo.save(updated);
+      await repo.save(updated, actor);
       return updated;
     },
 
-    publish(id: string, organizationId: string, actor: string): Donation {
-      const donation = requireOwned(id, organizationId);
+    async publish(id: string, organizationId: string, actor: string): Promise<Donation> {
+      const donation = await requireOwned(id, organizationId);
       if (donation.status !== "draft") {
         throw new ApiError("conflict", "Only draft donations can be published");
       }
@@ -149,7 +149,7 @@ export function createDonationService(
         updatedAt: now(),
         events: [...donation.events, event("published", actor)],
       };
-      repo.save(published);
+      await repo.save(published, actor);
       return published;
     },
   };

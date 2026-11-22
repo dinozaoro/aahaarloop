@@ -64,8 +64,8 @@ test("notify creates one notification per recipient and marks unread", async () 
   assert.equal(created.length, 2);
   assert.deepEqual(created.map((item) => item.userId), ["u1", "u2"]);
   assert.ok(created.every((item) => item.readAt === null));
-  assert.equal(service.list("u1").unread, 1);
-  assert.equal(service.list("u2").total, 1);
+  assert.equal((await service.list("u1")).unread, 1);
+  assert.equal((await service.list("u2")).total, 1);
 });
 
 test("disabled event types are not delivered", async () => {
@@ -86,7 +86,7 @@ test("duplicate notifications for one user and entity are suppressed", async () 
   );
   assert.equal(first.length, 1);
   assert.equal(second.length, 0);
-  assert.equal(service.list("u1").total, 1);
+  assert.equal((await service.list("u1")).total, 1);
 });
 
 test("duplicates are allowed again after the dedupe window", async () => {
@@ -98,17 +98,17 @@ test("duplicates are allowed again after the dedupe window", async () => {
   await service.notify(input({ recipients: ["u1"] }));
   time += 2000;
   assert.equal((await service.notify(input({ recipients: ["u1"] }))).length, 1);
-  assert.equal(service.list("u1").total, 2);
+  assert.equal((await service.list("u1")).total, 2);
 });
 
 test("read state persists, is per-user and cannot be forged across users", async () => {
   const { service } = setup();
   const [notification] = await service.notify(input({ recipients: ["u1"] }));
-  const read = service.markRead(notification.id, "u1");
+  const read = await service.markRead(notification.id, "u1");
   assert.notEqual(read.readAt, null);
-  assert.equal(service.list("u1", { unreadOnly: true }).total, 0);
-  assert.throws(() => service.markRead(notification.id, "u2"), /another user/);
-  assert.equal(service.markAllRead("u1"), 0);
+  assert.equal((await service.list("u1", { unreadOnly: true })).total, 0);
+  await assert.rejects(() => service.markRead(notification.id, "u2"), /another user/);
+  assert.equal(await service.markAllRead("u1"), 0);
 });
 
 test("preferences choose the delivery adapter", async () => {
@@ -117,7 +117,7 @@ test("preferences choose the delivery adapter", async () => {
   await service.notify(input({ recipients: ["u1"] }));
   assert.equal(sent.length, 1);
   assert.equal(sent[0].userId, "u1");
-  const next = service.updatePreferences("u1", {
+  const next = await service.updatePreferences("u1", {
     enabled: { pickup_assigned: false },
   });
   assert.equal(next.channel, "email");

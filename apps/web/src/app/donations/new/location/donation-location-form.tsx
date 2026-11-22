@@ -30,13 +30,17 @@ import {
   validatePickupLocation,
   type BengaluruLocality,
 } from "@/lib/donations/location";
+import { draftToDonationInput } from "@/lib/donations/draft-to-api";
 import { formatDateTime } from "@/lib/format";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
+import { toast } from "sonner";
 
 type Errors = Record<string, string>;
 
 export function DonationLocationForm() {
+  const router = useRouter();
   const [draft, setDraft] = useState<DonationDraft | null>(null);
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<BengaluruLocality | null>(null);
@@ -79,11 +83,31 @@ export function DonationLocationForm() {
     }
   }
 
-  function publish() {
+  async function publish() {
     const current = draft ?? readDraft(sessionStorage);
     const result = publishDraft(current);
     setPublishErrors(result.errors);
-    if (result.donation) {
+    const input = draftToDonationInput(current);
+    if (!result.donation || !input) return;
+
+    try {
+      const created = await fetch("/api/donations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+      });
+      if (!created.ok) {
+        const body = (await created.json().catch(() => null)) as { message?: string } | null;
+        throw new Error(body?.message ?? "Donation could not be saved");
+      }
+      const { id } = (await created.json()) as { id: string };
+      const published = await fetch(`/api/donations/${id}/publish`, {
+        method: "POST",
+      });
+      if (!published.ok) {
+        const body = (await published.json().catch(() => null)) as { message?: string } | null;
+        throw new Error(body?.message ?? "Donation could not be published");
+      }
       const updated: DonationDraft = {
         ...current,
         status: "published",
@@ -91,6 +115,10 @@ export function DonationLocationForm() {
       };
       writeDraft(sessionStorage, updated);
       setDraft(updated);
+      toast.success("Donation published");
+      router.refresh();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Publish failed");
     }
   }
 
@@ -340,7 +368,7 @@ export function DonationLocationForm() {
                   .
                 </p>
               ) : (
-                <Button type="button" onClick={publish}>
+                <Button type="button" onClick={() => void publish()}>
                   Publish donation
                 </Button>
               )}

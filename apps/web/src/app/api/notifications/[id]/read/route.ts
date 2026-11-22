@@ -8,5 +8,5 @@ export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user?.id) throw new ApiError("unauthorized", "Sign in required");
   const id = new URL(request.url).pathname.split("/")[3];
-  return Response.json(notificationService.markRead(id, session.user.id));
+  return Response.json(await notificationService.markRead(id, session.user.id));
 }

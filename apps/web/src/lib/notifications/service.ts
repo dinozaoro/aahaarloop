@@ -49,10 +49,10 @@ export interface NotificationAdapter {
 }
 
 export interface NotificationRepository {
-  all(): readonly Notification[];
-  save(notification: Notification): void;
-  preferences(userId: string): NotificationPreferences;
-  savePreferences(userId: string, preferences: NotificationPreferences): void;
+  all(userId?: string): Promise<readonly Notification[]>;
+  save(notification: Notification): Promise<void>;
+  preferences(userId: string): Promise<NotificationPreferences>;
+  savePreferences(userId: string, preferences: NotificationPreferences): Promise<void>;
 }
 
 export interface NotifyInput {
@@ -83,11 +83,10 @@ export function createNotificationService(
     async notify(input: NotifyInput): Promise<Notification[]> {
       const created: Notification[] = [];
       for (const userId of new Set(input.recipients)) {
-        const prefs = repo.preferences(userId);
+        const prefs = await repo.preferences(userId);
         if (!prefs.enabled[input.type]) continue;
         const dedupeKey = `${input.type}:${input.entityId}:${userId}`;
-        const duplicate = repo
-          .all()
+        const duplicate = (await repo.all(userId))
           .some(
             (item) =>
               item.dedupeKey === dedupeKey &&
@@ -109,7 +108,7 @@ export function createNotificationService(
           sentAt: null,
           createdAt: now(),
         };
-        repo.save(notification);
+        await repo.save(notification);
         const adapter = adapters[prefs.channel];
         if (adapter) await adapter.send(notification);
         created.push(notification);
@@ -117,14 +116,13 @@ export function createNotificationService(
       return created;
     },
 
-    list(
+    async list(
       userId: string,
       filters: { unreadOnly?: boolean; page?: number; pageSize?: number } = {},
     ) {
       const page = Math.max(1, filters.page ?? 1);
       const pageSize = Math.min(100, Math.max(1, filters.pageSize ?? 20));
-      const own = repo
-        .all()
+      const own = (await repo.all(userId))
         .filter(
           (item) =>
             item.userId === userId && (!filters.unreadOnly || item.readAt === null),
@@ -139,45 +137,45 @@ export function createNotificationService(
       };
     },
 
-    markRead(id: string, userId: string): Notification {
-      const notification = repo.all().find((item) => item.id === id);
+    async markRead(id: string, userId: string): Promise<Notification> {
+      const notification = (await repo.all(userId)).find((item) => item.id === id);
       if (!notification) throw new ApiError("not_found", "Notification not found");
       if (notification.userId !== userId) {
         throw new ApiError("forbidden", "Notification belongs to another user");
       }
       const read = { ...notification, readAt: now() };
-      repo.save(read);
+      await repo.save(read);
       return read;
     },
 
-    markAllRead(userId: string): number {
+    async markAllRead(userId: string): Promise<number> {
       let count = 0;
-      for (const item of repo.all()) {
+      for (const item of await repo.all(userId)) {
         if (item.userId === userId && item.readAt === null) {
-          repo.save({ ...item, readAt: now() });
+          await repo.save({ ...item, readAt: now() });
           count++;
         }
       }
       return count;
     },
 
-    getPreferences(userId: string): NotificationPreferences {
+    async getPreferences(userId: string): Promise<NotificationPreferences> {
       return repo.preferences(userId);
     },
 
-    updatePreferences(
+    async updatePreferences(
       userId: string,
       patch: {
         channel?: NotificationChannel;
         enabled?: Partial<Record<NotificationType, boolean>>;
       },
-    ): NotificationPreferences {
-      const current = repo.preferences(userId);
+    ): Promise<NotificationPreferences> {
+      const current = await repo.preferences(userId);
       const next: NotificationPreferences = {
         channel: patch.channel ?? current.channel,
         enabled: { ...current.enabled, ...(patch.enabled ?? {}) },
       };
-      repo.savePreferences(userId, next);
+      await repo.savePreferences(userId, next);
       return next;
     },
   };

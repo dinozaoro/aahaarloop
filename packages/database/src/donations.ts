@@ -182,12 +182,16 @@ export const favorites = pgTable(
     donationId: uuid("donation_id")
       .notNull()
       .references(() => donations.id, { onDelete: "cascade" }),
+    organizationId: uuid("organization_id").references(() => organizations.id, {
+      onDelete: "cascade",
+    }),
   },
   (table) => [
     uniqueIndex("favorites_user_donation_unique").on(
       table.userId,
       table.donationId,
     ),
+    index("favorites_user_org_idx").on(table.userId, table.organizationId),
   ],
 );
 

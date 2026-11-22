@@ -43,8 +43,10 @@ export const claims = pgTable(
     confirmedAt: timestamp("confirmed_at", { withTimezone: true }),
     cancelledAt: timestamp("cancelled_at", { withTimezone: true }),
     cancelReason: text("cancel_reason"),
+    idempotencyKey: text("idempotency_key"),
   },
   (table) => [
+    uniqueIndex("claims_idempotency_key_unique").on(table.idempotencyKey),
     index("claims_donation_status_idx").on(table.donationId, table.status),
     index("claims_recipient_status_idx").on(table.recipientOrgId, table.status),
     index("claims_status_expiry_idx").on(table.status, table.expiresAt),

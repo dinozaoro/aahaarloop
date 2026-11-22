@@ -19,9 +19,21 @@ function setup(available = 10) {
   const repo = {
     findDonation: () => state.donation,
     findByIdempotencyKey: (key) => state.claims.find((claim) => claim.idempotencyKey === key),
-    saveDonation: (donation) => { state.donation = donation; },
-    saveClaim: (claim) => { state.claims.push(claim); },
-    appendEvent: () => {},
+    commit: (claim) => {
+      const existing = state.claims.find((item) => item.idempotencyKey === claim.idempotencyKey);
+      if (existing) return existing;
+      if (state.donation.servingsAvailable < claim.servings) {
+        throw new Error("Requested quantity is not available");
+      }
+      const remaining = state.donation.servingsAvailable - claim.servings;
+      state.donation = {
+        ...state.donation,
+        servingsAvailable: remaining,
+        status: remaining === 0 ? "claimed" : "published",
+      };
+      state.claims.push(claim);
+      return claim;
+    },
   };
   return { state, service: createClaimService(repo, () => "2026-11-21T12:00:00Z") };
 }

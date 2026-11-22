@@ -20,7 +20,7 @@ export async function GET(_request: Request, { params }: Params) {
     return Response.json({ error: "Unknown resource" }, { status: 400 });
   }
   try {
-    const row = resourceDetail(adminRows()[resource as AdminResource], id);
+    const row = resourceDetail((await adminRows())[resource as AdminResource], id);
     return Response.json(row);
   } catch {
     return Response.json({ error: "Not found" }, { status: 404 });

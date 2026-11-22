@@ -20,7 +20,7 @@ export async function GET(request: Request, { params }: Params) {
     return Response.json({ error: "Unknown resource" }, { status: 400 });
   }
   const url = new URL(request.url);
-  const result = queryResource(resource as AdminResource, adminRows()[resource as AdminResource], {
+  const result = queryResource(resource as AdminResource, (await adminRows())[resource as AdminResource], {
     search: url.searchParams.get("search") ?? undefined,
     status: url.searchParams.get("status") ?? undefined,
     page: Number(url.searchParams.get("page") ?? 1),

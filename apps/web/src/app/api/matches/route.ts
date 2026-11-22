@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { ApiError } from "@/lib/api/errors";
 import { withApiHandler } from "@/lib/api/handler";
 import { forbidUnlessRole } from "@/lib/auth/guards";
+import { ensureAdminConfig } from "@/lib/config/admin-config-store";
 import {
   getAdminConfig,
   getConfigVersion,
@@ -36,13 +37,14 @@ onConfigChange(() => cache.invalidateAll());
 export const GET = withApiHandler({ querySchema }, async ({ query }) => {
   const denied = await forbidUnlessRole(["recipient"]);
   if (denied) return denied;
+  await ensureAdminConfig();
 
   const session = await auth();
   const organizationId = session?.user?.activeOrganizationId;
   if (!organizationId) {
     throw new ApiError("forbidden", "No active recipient organization");
   }
-  const organization = getOrganization(organizationId);
+  const organization = await getOrganization(organizationId);
   if (!organization) throw new ApiError("not_found", "Organization not found");
 
   const key = [
@@ -58,8 +60,8 @@ export const GET = withApiHandler({ querySchema }, async ({ query }) => {
 
   const ranked = rankMatches(
     organization,
-    getNeedsForOrganization(organizationId),
-    getAllDonations(),
+    await getNeedsForOrganization(organizationId),
+    await getAllDonations(),
     query,
     new Date().toISOString(),
     toMatchingConfig(getAdminConfig()),

@@ -27,7 +27,7 @@ export const GET = withApiHandler(
   async () => {
     const user = await currentActor();
     const own = user.role === "donor" ? user.activeOrganizationId : undefined;
-    return Response.json({ donations: donationService.list(own ?? undefined) });
+    return Response.json({ donations: await donationService.list(own ?? undefined) });
   },
 );
 
@@ -38,7 +38,7 @@ export const POST = withApiHandler(
     if (user.role !== "donor" && user.role !== "admin") {
       throw new ApiError("forbidden", "Only donors can create donations");
     }
-    const donation = donationService.create(
+    const donation = await donationService.create(
       body,
       user.activeOrganizationId ?? "",
       user.id,

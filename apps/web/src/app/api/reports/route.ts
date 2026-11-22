@@ -14,7 +14,7 @@ const reportLimit = createRateLimiter({ maxRequests: 10, windowMs: 60_000 });
 
 const schema = z.object({
   targetType: z.enum(["donation", "user"]),
-  targetId: z.string().min(1),
+  targetId: z.string().uuid(),
   reason: z.enum(REPORT_REASONS),
   details: z.string().max(2000).optional(),
 });
@@ -36,5 +36,5 @@ export async function GET() {
   const session = await auth();
   if (!session?.user?.id) throw new ApiError("unauthorized", "Sign in required");
   // Reporter view: AI authenticity is stripped by toReportView.
-  return Response.json({ data: moderationService.list("reporter", session.user.id) });
+  return Response.json({ data: await moderationService.list("reporter", session.user.id) });
 }

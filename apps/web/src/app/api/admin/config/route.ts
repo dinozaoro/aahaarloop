@@ -1,9 +1,11 @@
 import { z } from "zod";
 
 import { forbidUnlessRole } from "@/lib/auth/guards";
+import { ensureAdminConfig, persistAdminConfig } from "@/lib/config/admin-config-store";
 import {
   getAdminConfig,
   getConfigVersion,
+  setAdminConfig,
   updateAdminConfig,
 } from "@/lib/config/admin-config";
 import { withApiHandler } from "@/lib/api/handler";
@@ -13,6 +15,7 @@ export const runtime = "nodejs";
 export async function GET() {
   const denied = await forbidUnlessRole(["admin"]);
   if (denied) return denied;
+  await ensureAdminConfig();
   return Response.json({ config: getAdminConfig(), version: getConfigVersion() });
 }
 
@@ -43,6 +46,14 @@ const patchSchema = z.object({
 export const PATCH = withApiHandler({ bodySchema: patchSchema }, async ({ body }) => {
   const denied = await forbidUnlessRole(["admin"]);
   if (denied) return denied;
+  await ensureAdminConfig();
+  const previous = getAdminConfig();
   const config = updateAdminConfig(body);
+  try {
+    await persistAdminConfig(config);
+  } catch (error) {
+    setAdminConfig(previous);
+    throw error;
+  }
   return Response.json({ config, version: getConfigVersion() });
 });
