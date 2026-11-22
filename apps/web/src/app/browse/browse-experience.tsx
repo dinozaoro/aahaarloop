@@ -1,5 +1,6 @@
 "use client";
 
+import { foodPhoto } from "@/lib/food-photo";
 import Image from "next/image";
 import Link from "next/link";
 import { Utensils } from "lucide-react";
@@ -14,14 +15,6 @@ type Location = Donation["location"];
 type Offer = { donation: Donation; donorName: string; distanceKm: number | null; donorLocation: Location | null };
 const categories = Object.keys(CATEGORY_LABELS) as Donation["category"][];
 const formatDistance = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 1 });
-
-function foodPhoto(title: string) {
-  const name = title.toLocaleLowerCase("en-IN");
-  if (name.includes("biryani")) return "/images/food-biryani.png";
-  if (name.includes("idli")) return "/images/food-idli.png";
-  if (name.includes("fruit")) return "/images/food-fruit-packs.png";
-  return null;
-}
 
 export function BrowseExperience({ offers, recipientLocation }: { offers: Offer[]; recipientLocation: Location | null }) {
   const [query, setQuery] = useState("");

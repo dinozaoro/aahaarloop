@@ -1,3 +1,4 @@
+import { foodPhoto } from "@/lib/food-photo";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -11,14 +12,6 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Manage donation" };
 
 const steps = ["Posted", "Claimed", "Pickup scheduled", "Collected", "Delivered"];
-
-function foodPhoto(title: string) {
-  const name = title.toLocaleLowerCase("en-IN");
-  if (name.includes("biryani")) return "/images/food-biryani.png";
-  if (name.includes("idli")) return "/images/food-idli.png";
-  if (name.includes("fruit")) return "/images/food-fruit-packs.png";
-  return null;
-}
 
 export default async function ManageDonationPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

@@ -63,14 +63,14 @@ export function ServiceWorkerStatus() {
   return (
     <div
       role="status"
-      className="fixed bottom-4 right-4 z-50 flex max-w-sm flex-col gap-2 rounded-2xl bg-[#063a2a] px-4 py-3 text-sm text-[#fffbed] shadow-lg"
+      className="fixed bottom-4 right-4 z-50 flex max-w-sm flex-col gap-2 rounded-2xl bg-primary px-4 py-3 text-sm text-white shadow-lg"
     >
       {updateAvailable ? (
         <div className="flex items-center gap-3">
           <span>A new version is ready.</span>
           <button
             type="button"
-            className="rounded-full bg-[#fffbed] px-3 py-1 font-semibold text-[#063a2a]"
+            className="rounded-full bg-white px-3 py-1 font-semibold text-primary"
             onClick={() =>
               registrationRef.current?.waiting?.postMessage("SKIP_WAITING")
             }

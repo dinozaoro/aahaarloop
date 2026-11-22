@@ -1,3 +1,4 @@
+import { foodPhoto } from "@/lib/food-photo";
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
@@ -18,14 +19,6 @@ const dateTime = (date: string) => new Intl.DateTimeFormat("en-IN", {
   hour: "numeric",
   minute: "2-digit",
 }).format(new Date(date));
-
-function foodPhoto(title: string) {
-  const name = title.toLocaleLowerCase("en-IN");
-  if (name.includes("biryani")) return "/images/food-biryani.png";
-  if (name.includes("chapati") || name.includes("dal")) return "/images/indian-table-current.jpg";
-  if (name.includes("fruit")) return "/images/food-fruit-packs.png";
-  return null;
-}
 
 function distanceInKm(a: Donation["location"], b: Donation["location"]) {
   const radians = (degrees: number) => degrees * Math.PI / 180;

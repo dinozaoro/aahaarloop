@@ -61,7 +61,7 @@ export function InstallPrompt() {
   return (
     <div
       role="status"
-      className="fixed bottom-4 left-4 z-50 flex items-center gap-3 rounded-full bg-[#063a2a] px-4 py-2.5 text-sm text-[#fffbed] shadow-lg"
+      className="fixed bottom-4 left-4 z-50 flex items-center gap-3 rounded-full bg-primary px-4 py-2.5 text-sm text-white shadow-lg"
     >
       <button type="button" onClick={install} className="font-semibold">
         Install AahaarLoop
