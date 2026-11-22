@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ArrowRight } from "lucide-react";
 import { WorkspaceShell } from "@/components/workspace-shell";
 import { DEMO_DONOR_ORG_ID } from "@/lib/data/constants";
 import { getClaimsForDonor, getOrganization } from "@/lib/data/store";
@@ -33,7 +34,7 @@ export default function ImpactPage() {
     </section>
     <div className="impact-content">
       <section className="impact-goal"><h2>A little closer, every day.</h2><strong>{kgFormat.format(monthKg)} / {MONTHLY_GOAL_KG} kg monthly goal</strong><div className="impact-progress" role="progressbar" aria-label="Monthly food rescue goal" aria-valuemin={0} aria-valuemax={MONTHLY_GOAL_KG} aria-valuenow={Math.min(monthKg, MONTHLY_GOAL_KG)}><span style={{ width: `${Math.min(100, monthKg / MONTHLY_GOAL_KG * 100)}%` }} /></div><p>{monthDelivered.length} completed {monthDelivered.length === 1 ? "handover" : "handovers"} recorded this month.</p><small>Meals are estimated at 0.3 kg per meal and rounded. Actual portions vary; these preview figures are not verified impact.</small></section>
-      <section className="impact-story"><h2>The story behind the numbers</h2>{delivered.length ? delivered.slice(0, 5).map((claim) => { const recipient = getOrganization(claim.recipientOrgId); return <article key={claim.id}><time>{time(claim.updatedAt)}</time><h3>{claim.donationTitle} → {recipient?.name ?? claim.recipientName}</h3><p>{kgFormat.format(claim.weightKg)} kg rescued · {claim.servings} portions</p></article>; }) : <p className="dashboard-empty">Completed handovers will appear here.</p>}</section>
+      <section className="impact-story"><h2>The story behind the numbers</h2>{delivered.length ? delivered.slice(0, 5).map((claim) => { const recipient = getOrganization(claim.recipientOrgId); return <article key={claim.id}><time>{time(claim.updatedAt)}</time><h3>{claim.donationTitle} <ArrowRight aria-hidden="true" size={14} /> {recipient?.name ?? claim.recipientName}</h3><p>{kgFormat.format(claim.weightKg)} kg rescued · {claim.servings} portions</p></article>; }) : <p className="dashboard-empty">Completed handovers will appear here.</p>}</section>
     </div>
   </div></WorkspaceShell>;
 }

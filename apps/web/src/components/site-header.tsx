@@ -12,7 +12,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import { Menu } from "lucide-react";
+import { ArrowUpRight, Menu } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { resolveAndroidDownloadUrl } from "@/lib/links";
@@ -40,7 +40,7 @@ export function SiteHeader() {
             <Link href="#how-it-works">How it works</Link>
             <Link href="#impact">Our impact</Link>
             <Link href="#community">About</Link>
-            <Link className="landing-nav-app" href="/browse">Open Web App <span aria-hidden="true">↗</span></Link>
+            <Link className="landing-nav-app" href="/browse">Open Web App <ArrowUpRight aria-hidden="true" size={14} /></Link>
             {androidUrl ? (
               <a className="landing-nav-android" href={androidUrl}>Download Android</a>
             ) : (
