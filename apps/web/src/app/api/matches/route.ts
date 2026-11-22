@@ -19,6 +19,7 @@ import {
   createMatchCache,
   rankMatches,
 } from "@/lib/matching/ranked-matches";
+import { telemetry } from "@/lib/telemetry/store-repository";
 
 export const runtime = "nodejs";
 
@@ -64,5 +65,14 @@ export const GET = withApiHandler({ querySchema }, async ({ query }) => {
     toMatchingConfig(getAdminConfig()),
   );
   cache.set(key, ranked);
+  void telemetry.track(
+    "donation_matched",
+    {
+      matchCount: ranked.total,
+      excludedCount: ranked.excluded.length,
+      topScore: ranked.data[0]?.totalScore ?? 0,
+    },
+    { eventId: `donation_matched:${key}` },
+  );
   return Response.json(ranked);
 });

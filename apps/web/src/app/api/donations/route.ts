@@ -7,6 +7,7 @@ import { withApiHandler } from "@/lib/api/handler";
 import { createRateLimiter } from "@/lib/api/rate-limit";
 import { getDb } from "@/lib/db";
 import { donationService } from "@/lib/donations/store-repository";
+import { telemetry } from "@/lib/telemetry/store-repository";
 import { z } from "zod";
 
 export const runtime = "nodejs";
@@ -41,6 +42,16 @@ export const POST = withApiHandler(
       body,
       user.activeOrganizationId ?? "",
       user.id,
+    );
+    void telemetry.track(
+      "donation_created",
+      {
+        category: donation.category,
+        servings: donation.servingsTotal,
+        storage: donation.storage,
+        hasPhoto: Boolean(donation.photoName),
+      },
+      { eventId: `donation_created:${donation.id}` },
     );
     try {
       await recordAudit(await getDb(), {
