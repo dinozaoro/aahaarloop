@@ -24,6 +24,9 @@ transitions, past/current/future dates and duplicate selections.
 Storage is limited to ambient, chilled or frozen. Allergens and dietary flags
 are multi-select checkboxes; unknown values are rejected by the validator.
 
-shortcut: the draft stays in client state until the persistence issue lands, so
-navigating away discards step 2; wire it to the donation store when step 3 is
-implemented.
+A valid step 2 result is written to the donation draft in `sessionStorage`
+before the form links to [step 3](donation-location.md). The draft survives
+reloads in the same tab but clears when the tab closes.
+
+shortcut: the draft is a browser-only prototype, not a database row; wire it to
+the donation store before using real donation data.

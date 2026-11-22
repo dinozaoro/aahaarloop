@@ -21,6 +21,7 @@ Monorepo for the Aahaarloop surplus-food platform.
 - `docs/rbac.md` — server-side role checks, IDOR protection and admin bootstrap.
 - `docs/ci.md` — CI jobs, blocking checks and the commit trailer policy.
 - `docs/donation-dates.md` — use-by vs best-before, timezone handling and allergens.
+- `docs/donation-location.md` — Bengaluru address search, map pin, review and publish.
 - `docs/architecture.md` — system context, containers, data flow and deployment; links to the [ADRs](docs/adr/README.md).
 
 Each app owns its UI: web never imports React Native UI, mobile never imports web UI. Both apps consume only platform-neutral TypeScript from `packages/shared` and `packages/matching`.

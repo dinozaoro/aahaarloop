@@ -1,7 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -26,7 +26,10 @@ import {
   validateDonationDates,
   type DonationDateResult,
 } from "@/lib/donations/dates";
+import { readDraft, writeDraft } from "@/lib/donations/draft";
 import { formatDateTime } from "@/lib/format";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
 import { useState, type FormEvent } from "react";
 
 const labelFor = (value: string) => value.replace(/-/g, " ");
@@ -37,18 +40,26 @@ export function DonationDatesForm() {
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    setResult(
-      validateDonationDates({
-        foodExpiryAt: String(data.get("foodExpiryAt") ?? ""),
-        bestBeforeAt: String(data.get("bestBeforeAt") ?? ""),
-        pickupDeadlineAt: String(data.get("pickupDeadlineAt") ?? ""),
-        timeZone: DEMO_TIME_ZONE,
-        storage: String(data.get("storage") ?? ""),
-        packaging: String(data.get("packaging") ?? ""),
-        allergens: data.getAll("allergens").map(String),
-        dietTags: data.getAll("dietTags").map(String),
-      }),
-    );
+    const next = validateDonationDates({
+      foodExpiryAt: String(data.get("foodExpiryAt") ?? ""),
+      bestBeforeAt: String(data.get("bestBeforeAt") ?? ""),
+      pickupDeadlineAt: String(data.get("pickupDeadlineAt") ?? ""),
+      timeZone: DEMO_TIME_ZONE,
+      storage: String(data.get("storage") ?? ""),
+      packaging: String(data.get("packaging") ?? ""),
+      allergens: data.getAll("allergens").map(String),
+      dietTags: data.getAll("dietTags").map(String),
+    });
+    if (next.values) {
+      const draft = readDraft(sessionStorage);
+      writeDraft(sessionStorage, {
+        ...draft,
+        dates: next.values,
+        status: "draft",
+        publishedAt: null,
+      });
+    }
+    setResult(next);
   }
 
   return (
@@ -243,9 +254,12 @@ export function DonationDatesForm() {
                 </Badge>
               ))}
             </p>
-            <p className="text-muted-foreground">
-              Pickup location and publishing arrive in step 3.
-            </p>
+            <Link
+              href="/donations/new/location"
+              className={cn(buttonVariants(), "w-fit")}
+            >
+              Continue to pickup details
+            </Link>
           </CardContent>
         </Card>
       ) : null}

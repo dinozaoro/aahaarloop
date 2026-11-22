@@ -30,9 +30,9 @@ const STEPS = [
   },
   {
     title: "Pickup location and publish",
-    description: "Address, map pin, review and publishing arrive next.",
-    state: "Upcoming",
-    href: null,
+    description: "Address, map pin, review and publishing before going live.",
+    state: "Continue",
+    href: "/donations/new/location",
   },
 ];
 
