@@ -4,7 +4,7 @@ import {
   DEFAULT_SAFETY_BUFFER_MINUTES,
   toEpochMs,
 } from "./urgency.ts";
-import type { Instant, UrgencyLevel } from "./urgency.ts";
+import type { Instant, UrgencyLevel, UrgencyThresholds } from "./urgency.ts";
 import type { Need } from "./needs.ts";
 import { getActiveNeeds } from "./needs.ts";
 
@@ -81,6 +81,8 @@ export interface MatchingConfig {
   handlingTimeMinutes?: number;
   /** Safety buffer passed to the urgency calculation. Defaults to 15. */
   bufferMinutes?: number;
+  /** Urgency level boundaries passed to the calculation. */
+  urgencyThresholds?: UrgencyThresholds;
   /** When false, a donation must cover the full need. Defaults to true. */
   allowPartialClaims?: boolean;
 }
@@ -169,6 +171,7 @@ interface ResolvedConfig {
   averageSpeedKmh: number;
   handlingTimeMinutes: number;
   bufferMinutes: number;
+  urgencyThresholds: UrgencyThresholds | undefined;
   allowPartialClaims: boolean;
 }
 
@@ -265,6 +268,7 @@ function resolveConfig(config: MatchingConfig | undefined): ResolvedConfig {
       input.bufferMinutes ?? DEFAULT_SAFETY_BUFFER_MINUTES,
       "bufferMinutes",
     ),
+    urgencyThresholds: input.urgencyThresholds,
     allowPartialClaims: input.allowPartialClaims ?? true,
   };
 }
@@ -412,6 +416,7 @@ export function matchDonationsForRecipient(
       travelTimeMinutes,
       handlingTimeMinutes: config.handlingTimeMinutes,
       bufferMinutes: config.bufferMinutes,
+      thresholds: config.urgencyThresholds,
     });
 
     if (urgency.status === "expired") {

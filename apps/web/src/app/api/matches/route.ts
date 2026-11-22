@@ -5,6 +5,12 @@ import { ApiError } from "@/lib/api/errors";
 import { withApiHandler } from "@/lib/api/handler";
 import { forbidUnlessRole } from "@/lib/auth/guards";
 import {
+  getAdminConfig,
+  getConfigVersion,
+  onConfigChange,
+  toMatchingConfig,
+} from "@/lib/config/admin-config";
+import {
   getAllDonations,
   getNeedsForOrganization,
   getOrganization,
@@ -24,6 +30,7 @@ const querySchema = z.object({
 });
 
 const cache = createMatchCache(30_000);
+onConfigChange(() => cache.invalidateAll());
 
 export const GET = withApiHandler({ querySchema }, async ({ query }) => {
   const denied = await forbidUnlessRole(["recipient"]);
@@ -39,6 +46,7 @@ export const GET = withApiHandler({ querySchema }, async ({ query }) => {
 
   const key = [
     organizationId,
+    getConfigVersion(),
     query.category ?? "",
     query.minScore ?? "",
     query.page,
@@ -52,6 +60,8 @@ export const GET = withApiHandler({ querySchema }, async ({ query }) => {
     getNeedsForOrganization(organizationId),
     getAllDonations(),
     query,
+    new Date().toISOString(),
+    toMatchingConfig(getAdminConfig()),
   );
   cache.set(key, ranked);
   return Response.json(ranked);

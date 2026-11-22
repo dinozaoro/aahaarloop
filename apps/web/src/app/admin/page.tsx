@@ -14,9 +14,14 @@ export default async function AdminPage() {
       <header className="space-y-1">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h1 className="text-2xl font-semibold">Admin dashboard</h1>
-          <Link href="/admin/reports" className={buttonVariants({ variant: "outline", size: "sm" })}>
-            Moderation queue
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            <Link href="/admin/config" className={buttonVariants({ variant: "outline", size: "sm" })}>
+              Configuration
+            </Link>
+            <Link href="/admin/reports" className={buttonVariants({ variant: "outline", size: "sm" })}>
+              Moderation queue
+            </Link>
+          </div>
         </div>
         <p className="text-sm text-muted-foreground">
           Search and inspect users, organizations, donations, claims and missions.
