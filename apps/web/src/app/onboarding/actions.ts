@@ -7,14 +7,15 @@ import {
 } from "@aahaarloop/database";
 
 import { unstable_update } from "@/auth";
+import { safeCallbackUrl } from "@/lib/auth/callbacks";
 import { requireUser } from "@/lib/auth/guards";
 import {
   isSelfAssignableRole,
   organizationTypeForRole,
+  organizationNameOrDefault,
   parseOrganizationMode,
   uniqueOrganizationSlug,
   validateJoinSlug,
-  validateOrganizationName,
 } from "@/lib/auth/onboarding";
 import { getDb } from "@/lib/db";
 import { eq, sql } from "drizzle-orm";
@@ -43,7 +44,7 @@ export async function completeOnboarding(formData: FormData) {
   if (mode === "create") {
     let name: string;
     try {
-      name = validateOrganizationName(formData.get("orgName"));
+      name = organizationNameOrDefault(formData.get("orgName"));
     } catch {
       fail("invalid-name");
     }
@@ -96,5 +97,5 @@ export async function completeOnboarding(formData: FormData) {
   await unstable_update({
     user: { role, activeOrganizationId: organizationId },
   });
-  redirect("/dashboard");
+  redirect(safeCallbackUrl(formData.get("callbackUrl"), "/dashboard"));
 }

@@ -33,6 +33,20 @@ export function BrowseExperience({ offers, recipientLocation }: { offers: Offer[
   const [storage, setStorage] = useState("all");
   const [noAllergens, setNoAllergens] = useState(false);
   const [sort, setSort] = useState("deadline");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  function clearFilters() {
+    setQuery("");
+    setCategory("all");
+    setVegetarianOnly(true);
+    setRadius(5);
+    setPortionLimit(100);
+    setPickupToday(false);
+    setStorage("all");
+    setNoAllergens(false);
+    setSort("deadline");
+    setSelectedId(null);
+  }
 
   const visibleOffers = useMemo(() => {
     const search = query.trim().toLocaleLowerCase("en-IN");
@@ -54,12 +68,12 @@ export function BrowseExperience({ offers, recipientLocation }: { offers: Offer[
         : a.donation.pickupDeadlineAt.localeCompare(b.donation.pickupDeadlineAt));
   }, [offers, query, category, vegetarianOnly, radius, portionLimit, pickupToday, storage, noAllergens, sort]);
 
-  const selected = visibleOffers[0];
+  const selected = visibleOffers.find(({ donation }) => donation.id === selectedId) ?? visibleOffers[0];
   return <>
-    <form className="discover-search" onSubmit={(event) => event.preventDefault()}>
+    <div className="discover-search">
       <label htmlFor="discover-query">Search food or donor</label>
-      <div className="discover-search-controls"><input id="discover-query" placeholder="Try biryani, idli or rice" value={query} onChange={(event) => setQuery(event.target.value)} /><button className="primary-action" type="submit">Search</button></div>
-    </form>
+      <div className="discover-search-controls"><input id="discover-query" placeholder="Try biryani, idli or rice" value={query} onChange={(event) => setQuery(event.target.value)} /></div>
+    </div>
 
     <div className="discover-filters" aria-label="Filter donations">
       <label className={`filter-pill filter-pill-check${vegetarianOnly ? " selected" : ""}`}><input type="checkbox" checked={vegetarianOnly} onChange={(event) => setVegetarianOnly(event.target.checked)} /> Vegetarian</label>
@@ -70,9 +84,13 @@ export function BrowseExperience({ offers, recipientLocation }: { offers: Offer[
       <label className="filter-pill"><span>Storage</span><select aria-label="Storage handling" value={storage} onChange={(event) => setStorage(event.target.value)}><option value="all">Any</option><option value="chilled">Chilled</option><option value="ambient">Ambient</option></select></label>
       <label className={`filter-pill filter-pill-check${noAllergens ? " selected" : ""}`}><input type="checkbox" checked={noAllergens} onChange={(event) => setNoAllergens(event.target.checked)} /> No listed allergens</label>
       <label className="filter-pill"><span>Sort</span><select aria-label="Sort donations" value={sort} onChange={(event) => setSort(event.target.value)}><option value="deadline">Pickup deadline</option><option value="nearest">Nearest</option><option value="recent">Recently added</option></select></label>
+      <button type="button" className="filter-pill filter-pill-reset" onClick={clearFilters}>Clear filters</button>
     </div>
 
-    <div className="discover-results-heading"><span>{visibleOffers.length} nearby {visibleOffers.length === 1 ? "donation" : "donations"}</span><span>List / Map</span></div>
+    <div className="discover-results-heading">
+      <span>{visibleOffers.length} nearby {visibleOffers.length === 1 ? "donation" : "donations"}</span>
+      {visibleOffers.length ? <label className="filter-pill"><span>Show on map</span><select aria-label="Show on map" value={selected?.donation.id ?? ""} onChange={(event) => setSelectedId(event.target.value)}>{visibleOffers.map(({ donation }) => <option key={donation.id} value={donation.id}>{donation.title}</option>)}</select></label> : null}
+    </div>
     <div className="discover-layout">
       <section className="offer-list discover-offer-list" aria-label="Available donations">
         {visibleOffers.length ? visibleOffers.map(({ donation, donorName, distanceKm }) => {
@@ -83,7 +101,7 @@ export function BrowseExperience({ offers, recipientLocation }: { offers: Offer[
             </Link>
             <div className="discover-offer-copy"><h2><Link href={`/browse/${donation.id}`}>{donation.title}</Link></h2><p>{donorName} · {donation.pickupArea}</p><strong>{donation.servingsAvailable} portions · {donation.weightKg} kg</strong><span>Collect by {new Intl.DateTimeFormat("en-IN", { weekday: "short", hour: "numeric", minute: "2-digit" }).format(new Date(donation.pickupDeadlineAt))}</span><small>{distanceKm === null ? "Distance unavailable" : `${formatDistance.format(distanceKm)} km · fits your pickup window`}</small><FavoriteButton donationId={donation.id} /></div>
           </article>;
-        }) : <div className="empty-state"><h2>No offers match these filters.</h2><p>Widen the pickup distance or clear a filter to see available food.</p></div>}
+        }) : <div className="empty-state"><h2>No offers match these filters.</h2><p>Widen the pickup distance or clear a filter to see available food.</p><button type="button" className="primary-action" onClick={clearFilters}>Clear filters</button></div>}
       </section>
 
       <SchematicMap from={selected?.donorLocation ?? null} to={recipientLocation} fromLabel={selected?.donation.pickupArea ?? "Food donor"} toLabel="Community kitchen" href={selected ? `/browse/${selected.donation.id}` : "/browse"} />

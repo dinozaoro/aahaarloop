@@ -15,6 +15,7 @@ export default function ProfileScreen() {
     setActiveOrganizationId,
     cachedUser,
     registerPushToken,
+    signOut,
   } = useApp();
   const [permission, setPermission] = useState("");
   const [pushTokenStatus, setPushTokenStatus] = useState<"idle" | "registering" | "success" | "error">("idle");
@@ -89,10 +90,10 @@ export default function ProfileScreen() {
           {cachedUser ? (
             `Signed in as ${cachedUser.id.substring(0, 8)}... • Role: ${role}`
           ) : (
-            "Using local app state until mobile authentication is configured. " +
-              "Sign in via the web app to enable full native API access."
+            "Checking your session..."
           )}
         </Text>
+        <Button label="Sign out" kind="secondary" onPress={() => void signOut()} />
       </Card>
 
       <View style={profileStyles.links}>
@@ -113,7 +114,7 @@ export default function ProfileScreen() {
 }
 const profileStyles = {
   header: { gap: 8 },
-  eyebrow: { color: colors.action, fontSize: 11, fontWeight: "900", letterSpacing: 1.2 },
+  eyebrow: { color: colors.action, fontSize: 12, fontWeight: "900", letterSpacing: 1.2 },
   card: { gap: 16 },
   label: { color: colors.ink, fontSize: 13, fontWeight: "800" },
   pills: { flexDirection: "row", gap: 8, flexWrap: "wrap" },

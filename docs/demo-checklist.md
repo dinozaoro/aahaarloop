@@ -27,7 +27,8 @@ first, then the install step ([demo script](./demo-script.md)).
 - [ ] QR code scans to the latest GitHub Release and the APK installs on Android.
 - [ ] `/api/health/db` returns `{"ok":true}` on the deployed app.
 - [ ] `/api/ai/models` returns `available:false` gracefully (no credits; no paid call).
-- [ ] Google sign-in reaches onboarding with the correct role.
+- [ ] Google sign-in reaches onboarding with the correct role; a returning user lands on `/dashboard` instead.
+- [ ] Fresh APK install opens the mobile sign-in gate; Google handoff returns the user to the app with the right role.
 - [ ] Cloudinary upload succeeds from the donation form.
 
 ## Judging criteria map

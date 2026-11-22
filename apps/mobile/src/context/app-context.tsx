@@ -20,6 +20,10 @@ interface AppContextValue {
   cacheDonations: (donations: ApiDonation[]) => Promise<void>;
   refreshOffline: () => Promise<void>;
   getMobileAuthToken: () => Promise<MobileAuthResult>;
+  authReady: boolean;
+  hasSession: boolean;
+  completeSignIn: (cookie: string) => Promise<void>;
+  signOut: () => Promise<void>;
   claims: Array<{ id: string; donationId: string; servings: number; status: string }>;
   addClaim: (claim: { id: string; donationId: string; servings: number; status: string }) => void;
   refreshClaims: () => Promise<void>;
@@ -37,7 +41,8 @@ export function AppProvider({ children }: PropsWithChildren) {
   const [claims, setClaims] = useState<AppContextValue["claims"]>([]);
   const [cachedUser, setCachedUser] = useState<{ id: string; role: Role; activeOrganizationId: string } | null>(null);
   const [preferencesHydrated, setPreferencesHydrated] = useState(false);
-  const [mobileAuthToken, setMobileAuthToken] = useState<string | null>(null);
+  const [authReady, setAuthReady] = useState(false);
+  const [session, setSession] = useState<string | null>(null);
 
   const loadLocalData = useCallback(async () => {
     try {
@@ -100,34 +105,48 @@ export function AppProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     void (async () => {
       try {
-        const [storedRole, storedOrganization] = await Promise.all([
+        const [storedRole, storedOrganization, storedSession] = await Promise.all([
           SecureStore.getItemAsync("aahaarloop.role"),
           SecureStore.getItemAsync("aahaarloop.organization"),
+          SecureStore.getItemAsync("aahaarloop.session"),
         ]);
         if (storedRole === "donor" || storedRole === "recipient" || storedRole === "volunteer") setRole(storedRole);
         if (storedOrganization) setActiveOrganizationId(storedOrganization);
+        setSessionCookie(storedSession ?? null);
+        setSession(storedSession ?? null);
       } catch {
         // Preferences are optional; the app remains usable without SecureStore.
       } finally {
         setPreferencesHydrated(true);
+        setAuthReady(true);
       }
     })();
     void loadLocalData();
     void refreshClaims();
     void refreshOffline();
-    // Get mobile auth token for native API calls
+    const timer = setInterval(() => void refreshOffline(), 30_000);
+    return () => clearInterval(timer);
+  }, [loadLocalData, refreshOffline]);
+
+  useEffect(() => {
+    if (!session) {
+      setCachedUser(null);
+      return;
+    }
     void (async () => {
       try {
         const authResult = await getMobileAuthToken();
-        setMobileAuthToken(authResult.user.id);
+        const userRole = authResult.user.role;
+        const roleFromServer = userRole === "donor" || userRole === "recipient" || userRole === "volunteer" ? userRole : null;
+        if (roleFromServer) setRole(roleFromServer);
+        if (authResult.user.activeOrganizationId) setActiveOrganizationId(authResult.user.activeOrganizationId);
         setCachedUser({
           id: authResult.user.id,
-          role: authResult.user.role ? (authResult.user.role === "donor" ? "donor" : authResult.user.role === "recipient" ? "recipient" : "volunteer") : "recipient",
-          activeOrganizationId: authResult.user.activeOrganizationId || "",
+          role: roleFromServer ?? "recipient",
+          activeOrganizationId: authResult.user.activeOrganizationId ?? "",
         });
       } catch (err) {
-        // Auth token not available yet; the app can still function with offline/local data.
-        console.warn("Mobile auth token unavailable:", err);
+        console.warn("Mobile session unavailable:", err);
       }
     })();
     const timer = setInterval(() => void refreshOffline(), 30_000);
@@ -139,6 +158,23 @@ export function AppProvider({ children }: PropsWithChildren) {
     void SecureStore.setItemAsync("aahaarloop.role", role);
     void SecureStore.setItemAsync("aahaarloop.organization", activeOrganizationId);
   }, [activeOrganizationId, preferencesHydrated, role]);
+
+  const completeSignIn = useCallback(async (cookie: string) => {
+    await SecureStore.setItemAsync("aahaarloop.session", cookie);
+    setSessionCookie(cookie);
+    setSession(cookie);
+  }, []);
+
+  const signOut = useCallback(async () => {
+    try {
+      await SecureStore.deleteItemAsync("aahaarloop.session");
+    } catch {
+      // Clearing in-memory state is enough when SecureStore is unavailable.
+    }
+    setSessionCookie(null);
+    setSession(null);
+    setCachedUser(null);
+  }, []);
 
   const value = useMemo<AppContextValue>(() => ({
     role,
@@ -152,6 +188,10 @@ export function AppProvider({ children }: PropsWithChildren) {
     cacheDonations,
     refreshOffline,
     getMobileAuthToken,
+    authReady,
+    hasSession: session !== null,
+    completeSignIn,
+    signOut,
     claims,
     refreshClaims,
     addClaim: (claim) => {

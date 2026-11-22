@@ -51,7 +51,7 @@ Preview APKs are built with EAS and published as GitHub Releases; see
 [docs/eas-build.md](../../docs/eas-build.md) and
 [docs/apk-release.md](../../docs/apk-release.md). The demo-booth QR code is
 [`assets/install-qr.png`](./assets/install-qr.png) — it points to the latest
-release and is regenerated as documented in the release workflow page.
+APK download and is regenerated as documented in the release workflow page.
 
 ## Checks
 
