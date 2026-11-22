@@ -12,6 +12,7 @@ export class ApiError extends Error {
   }
 }
 
+/** Interface for a mobile API donation. */
 export interface ApiDonation {
   id: string;
   title: string;
@@ -32,6 +33,7 @@ export interface ApiDonation {
   updatedAt?: string;
 }
 
+/** Interface for a mobile API claim. */
 export interface ApiClaim {
   id: string;
   donationId: string;
@@ -41,17 +43,43 @@ export interface ApiClaim {
   createdAt?: string;
 }
 
-type ApiRequestOptions = RequestInit & { idempotencyKey?: string };
+/** Result of getting a mobile auth token. */
+export interface MobileAuthResult {
+  user: {
+    id: string;
+    email?: string | null;
+    name?: string | null;
+    image?: string | null;
+    role?: string | null;
+    activeOrganizationId?: string | null;
+  };
+}
 
+/** Options for API requests. */
+type ApiRequestOptions = RequestInit & {
+  idempotencyKey?: string;
+  /** Optional bearer token for authenticated requests. */
+  authToken?: string;
+};
+
+/** Fetch from the API with optional auth token and error handling. */
 export async function apiFetch<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
   const headers = new Headers(options.headers);
   headers.set("Accept", "application/json");
+
+  // Set authorization header if token provided
+  if (options.authToken) {
+    headers.set("Authorization", `Bearer ${options.authToken}`);
+  }
+
   if (options.body && !headers.has("Content-Type")) headers.set("Content-Type", "application/json");
-  if (options.idempotencyKey) headers.set("idempotency-key", options.idempotencyKey);
+
+  const base = env.apiUrl.replace(/\/$/, "");
+  const url = `${base}${path}`;
 
   let response: Response;
   try {
-    response = await fetch(`${env.apiUrl.replace(/\/$/, "")}${path}`, {
+    response = await fetch(url, {
       ...options,
       headers,
       credentials: "include",
@@ -78,13 +106,47 @@ export async function apiFetch<T>(path: string, options: ApiRequestOptions = {})
   return payload as T;
 }
 
+/** Check if the error is an offline/network error (no credentials sent). */
 export function isOfflineError(error: unknown): boolean {
   return error instanceof ApiError && error.status === 0;
 }
 
+/** Format a deadline date string for display. */
 export function formatDeadline(value?: string): string {
   if (!value) return "Pickup time to be confirmed";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleString(undefined, { weekday: "short", hour: "numeric", minute: "2-digit" });
+}
+
+/** Get a mobile auth token from the API. */
+export async function getMobileAuthToken(): Promise<MobileAuthResult> {
+  const response = await fetch(`${env.apiUrl}/api/mobile-token`, {
+    credentials: "include",
+  });
+  if (!response.ok) {
+    const text = await response.text();
+    throw new ApiError(text || "Failed to get auth token", response.status);
+  }
+  return response.json() as Promise<MobileAuthResult>;
+}
+
+/** Register a push notification token for the current user. */
+export async function registerPushToken(token: string, platform: "ios" | "android" = "android"): Promise<{ success: boolean }> {
+  const response = await fetch(`${env.apiUrl}/api/push-token`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(env.apiUrl.includes("localhost") || env.apiUrl.includes("10.0.2.2")
+        ? {}
+        : { "x-expo-token": token }),
+    },
+    body: JSON.stringify({ token, platform }),
+    credentials: "include",
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new ApiError(data.message || "Failed to register push token", response.status);
+  }
+  return { success: true };
 }
