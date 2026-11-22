@@ -11,6 +11,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: "Aahaarloop",
   slug: "aahaarloop",
+  owner: "bashfulfah",
   version: APP_VERSION,
   orientation: "portrait",
   scheme: "aahaarloop",
@@ -49,5 +50,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   extra: {
     apiUrl: process.env.EXPO_PUBLIC_API_URL ?? DEFAULT_API_URL,
+    eas: {
+      projectId: "03c2891d-3e5f-46e3-8b97-0188eab20cdf",
+    },
   },
 });
