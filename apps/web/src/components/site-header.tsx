@@ -56,7 +56,7 @@ export function SiteHeader() {
     );
   }
 
-  if (["/dashboard", "/browse", "/donations", "/claims", "/impact", "/notifications", "/profile", "/settings", "/recipient", "/volunteer", "/signin", "/register", "/recover", "/onboarding", "/install"].some((path) => pathname === path || pathname.startsWith(`${path}/`)) || pathname.startsWith("/donations/new")) return null;
+  if (["/dashboard", "/browse", "/donations", "/claims", "/impact", "/notifications", "/profile", "/settings", "/recipient", "/volunteer", "/signin", "/register", "/recover", "/onboarding", "/install", "/admin"].some((path) => pathname === path || pathname.startsWith(`${path}/`)) || pathname.startsWith("/donations/new")) return null;
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-background/95">

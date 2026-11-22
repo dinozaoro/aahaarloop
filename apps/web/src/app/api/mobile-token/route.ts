@@ -1,20 +1,6 @@
 import { auth } from "@/auth";
-import { getDb } from "@/lib/db";
-import { provisionGoogleUser } from "@/lib/auth/provision";
 
-export async function GET(request: Request) {
-  // Only accept requests from the mobile app's allowed origins
-  const origin = request.headers.get("origin");
-  const allowedOrigins = [
-    "http://10.0.2.2:3000", // Android emulator
-    "http://localhost:3000",
-    "https://aahaarloop.vercel.app",
-  ];
-
-  if (origin && allowedOrigins.includes(origin)) {
-    request.headers.set("origin", origin);
-  }
-
+export async function GET() {
   const session = await auth();
 
   if (!session?.user?.id) {

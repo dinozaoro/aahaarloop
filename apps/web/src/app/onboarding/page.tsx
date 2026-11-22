@@ -2,6 +2,8 @@ import { requireUser } from "@/lib/auth/guards";
 import { SELF_ASSIGNABLE_ROLES } from "@/lib/auth/onboarding";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { safeCallbackUrl } from "@/lib/auth/callbacks";
 import { ArrowRight } from "lucide-react";
 
 import { Logo } from "@/components/logo";
@@ -23,19 +25,22 @@ const ERRORS: Record<string, string> = {
   "not-found": "No organization has that slug. Check it or create one.",
 };
 
-export default async function OnboardingPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+export default async function OnboardingPage({ searchParams }: { searchParams: Promise<{ error?: string; callbackUrl?: string }> }) {
   const user = await requireUser();
-  const { error } = await searchParams;
+  const { error, callbackUrl } = await searchParams;
+  const callback = safeCallbackUrl(callbackUrl, "");
+  if (user.activeOrganizationId && !callback) redirect("/dashboard");
   const message = error ? (ERRORS[error] ?? "Please check your details.") : null;
 
   return <div className="onboarding-page">
     <header className="account-header"><Link href="/" aria-label="AahaarLoop home"><Logo /></Link><span>Bengaluru</span></header>
-    <main id="main" className="onboarding-main">
+    <div className="onboarding-main">
       <p className="onboarding-kicker">01 / Your place in the loop</p>
       <h1>How would you like to help?</h1>
       <p className="onboarding-intro">Choose a starting role. You can request another role from your profile later.</p>
       <p className="onboarding-signed-in">Signed in as {user.email}</p>
       <form action={completeOnboarding} className="onboarding-form">
+        {callback ? <input type="hidden" name="callbackUrl" value={callback} /> : null}
         <fieldset className="role-options">
           <legend className="sr-only">Choose your role</legend>
           {SELF_ASSIGNABLE_ROLES.map((role) => {
@@ -68,6 +73,6 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
         <button type="submit" className="account-action account-action-primary onboarding-submit">Finish setup</button>
       </form>
       <p className="onboarding-disclosure">Only your role and organization name are saved by this setup flow. Contact, pickup and food-handling details are not collected here.</p>
-    </main>
+    </div>
   </div>;
 }

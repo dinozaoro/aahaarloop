@@ -18,7 +18,7 @@ export function AccountLayout({
         <Link href="/#hero" aria-label="AahaarLoop home"><Logo /></Link>
         <span>Bengaluru</span>
       </header>
-      <main id="main" className="account-main">
+      <div className="account-main">
         <section className="account-story" aria-label="A more generous everyday">
           <p className="account-kicker">Good food, full circle</p>
           <h2>A little extra.<br />A better destination.</h2>
@@ -30,7 +30,7 @@ export function AccountLayout({
           <p className="account-description">{description}</p>
           {children}
         </section>
-      </main>
+      </div>
     </div>
   );
 }

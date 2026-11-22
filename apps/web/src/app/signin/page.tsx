@@ -1,4 +1,5 @@
-import { signIn } from "@/auth";
+import { auth, signIn } from "@/auth";
+import { safeCallbackUrl } from "@/lib/auth/callbacks";
 import { AccountLayout } from "@/components/account-layout";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -9,12 +10,15 @@ export const metadata: Metadata = {
   alternates: { canonical: "/signin" },
 };
 
-export default function SignInPage() {
+export default async function SignInPage({ searchParams }: { searchParams: Promise<{ callbackUrl?: string }> }) {
+  const { callbackUrl } = await searchParams;
+  const session = await auth();
+  const redirectTo = safeCallbackUrl(callbackUrl, session?.user?.needsOnboarding ? "/onboarding" : "/dashboard");
   return <AccountLayout title="Welcome back." description="Sign in to pick up where you left off.">
     <div className="account-actions">
       <form action={async () => {
         "use server";
-        await signIn("google", { redirectTo: "/onboarding" });
+        await signIn("google", { redirectTo });
       }}>
         <button type="submit" className="account-action account-action-primary">Continue with Google</button>
       </form>

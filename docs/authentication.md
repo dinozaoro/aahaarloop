@@ -26,8 +26,11 @@ trusted proxy and set `NEXT_PUBLIC_APP_URL` to the canonical URL.
 
 ## Flow
 
-1. `/signin` posts to the `signIn("google", { redirectTo: "/onboarding" })`
-   server action. The route handler lives at `/api/auth/[...nextauth]`.
+1. `/signin` posts to a `signIn("google", ...)` server action. First-time users
+   go to `/onboarding`; returning users go straight to `/dashboard`. An optional
+   `callbackUrl` (same-origin only) overrides either destination, which is how
+   the mobile handoff returns to the app. The route handler lives at
+   `/api/auth/[...nextauth]`.
 2. On first sign-in, the `jwt` callback provisions a `users` row and a
    `profiles` row from Google's email, name and avatar, then stores our user id,
    role and active organization in the JWT. Inserts are conflict-safe.
@@ -39,6 +42,17 @@ trusted proxy and set `NEXT_PUBLIC_APP_URL` to the canonical URL.
    `unstable_update`. The refresh re-reads the role and organization from the
    database, so client-supplied session data is never trusted.
 5. `signOut()` clears the JWT.
+
+### Mobile sign-in gate
+
+The native app starts on a sign-in screen instead of the tabs. Both buttons
+open `/api/mobile/handoff` in the browser, which requires a session and an
+active organization (sending new users through Google sign-in and onboarding),
+then redirects to the allowlisted `aahaarloop://auth` deep link with the session
+cookie. The app stores that cookie in `expo-secure-store`, attaches it to API
+requests, and loads the role/organization from `/api/mobile-token`. Sign out in
+the profile tab clears the stored session and returns to the gate. The handoff
+never accepts an arbitrary `returnTo`, and `callbackUrl` is same-origin only.
 
 The admin role exists in the schema and in stored sessions but is **never**
 offered in onboarding: `parseOnboardingRole` rejects it. Admin assignment is an

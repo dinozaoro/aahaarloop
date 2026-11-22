@@ -7,6 +7,7 @@ import {
 } from "@aahaarloop/database";
 
 import { unstable_update } from "@/auth";
+import { safeCallbackUrl } from "@/lib/auth/callbacks";
 import { requireUser } from "@/lib/auth/guards";
 import {
   isSelfAssignableRole,
@@ -96,5 +97,5 @@ export async function completeOnboarding(formData: FormData) {
   await unstable_update({
     user: { role, activeOrganizationId: organizationId },
   });
-  redirect("/dashboard");
+  redirect(safeCallbackUrl(formData.get("callbackUrl"), "/dashboard"));
 }

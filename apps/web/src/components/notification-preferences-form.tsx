@@ -24,15 +24,18 @@ const TYPE_LABELS: Record<NotificationType, string> = {
 export function NotificationPreferencesForm() {
   const [preferences, setPreferences] = useState<NotificationPreferences | null>(null);
   const [saved, setSaved] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     void fetch("/api/notifications/preferences")
-      .then((response) => (response.ok ? response.json() : null))
-      .then((data) => {
-        if (data) setPreferences(data);
+      .then((response) => {
+        if (!response.ok) throw new Error("Preferences unavailable");
+        return response.json();
       })
-      .catch(() => undefined);
-  }, []);
+      .then((data) => { setPreferences(data); setFailed(false); })
+      .catch(() => setFailed(true));
+  }, [attempt]);
 
   async function save(next: NotificationPreferences) {
     const response = await fetch("/api/notifications/preferences", {
@@ -46,14 +49,15 @@ export function NotificationPreferencesForm() {
     }
   }
 
-  if (!preferences) return <main className="mx-auto max-w-2xl px-4 py-10">Loading preferences…</main>;
+  if (failed) return <div className="space-y-3"><p className="text-sm text-muted-foreground">Could not load notification preferences.</p><Button onClick={() => setAttempt((value) => value + 1)}>Retry</Button></div>;
+  if (!preferences) return <div className="mx-auto max-w-2xl px-4 py-10">Loading preferences…</div>;
 
   return (
-    <main className="mx-auto max-w-2xl space-y-6 px-4 py-10">
+    <div className="mx-auto max-w-2xl space-y-6 px-4 py-10">
       <header className="space-y-1"><h1 className="text-2xl font-semibold">Notification preferences</h1><p className="text-sm text-muted-foreground">Choose how and when Aahaar Loop notifies you. In-app notifications are always stored.</p></header>
-      <section className="space-y-3 rounded-lg border border-border p-4"><h2 className="text-lg font-medium">Delivery channel</h2><div className="flex flex-wrap gap-2" role="group" aria-label="Delivery channel">{(["in_app", "email", "push"] as NotificationChannel[]).map((channel) => <Button key={channel} variant={preferences.channel === channel ? "default" : "outline"} onClick={() => void save({ ...preferences, channel })}>{channel === "in_app" ? "In-app" : channel === "email" ? "Email" : "Push"}</Button>)}</div></section>
+      <section className="space-y-3 rounded-lg border border-border p-4"><h2 className="text-lg font-medium">Delivery channel</h2><div className="flex flex-wrap gap-2" role="group" aria-label="Delivery channel">{(["in_app", "email", "push"] as NotificationChannel[]).map((channel) => <Button key={channel} variant={preferences.channel === channel ? "default" : "outline"} aria-pressed={preferences.channel === channel} onClick={() => void save({ ...preferences, channel })}>{channel === "in_app" ? "In-app" : channel === "email" ? "Email" : "Push"}</Button>)}</div></section>
       <section className="space-y-3 rounded-lg border border-border p-4"><h2 className="text-lg font-medium">Events</h2><ul className="divide-y divide-border">{NOTIFICATION_TYPES.map((type) => <li key={type} className="flex items-center justify-between gap-4 py-3"><span className="text-sm">{TYPE_LABELS[type]}</span><label className="flex items-center gap-2"><input type="checkbox" checked={preferences.enabled[type]} onChange={(event) => void save({ ...preferences, enabled: { ...preferences.enabled, [type]: event.target.checked } })} /><span className="text-sm text-muted-foreground">Enabled</span></label></li>)}</ul></section>
       {saved && <Badge variant="secondary">Preferences saved</Badge>}
-    </main>
+    </div>
   );
 }
