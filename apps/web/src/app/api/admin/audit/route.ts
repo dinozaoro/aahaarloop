@@ -1,13 +1,14 @@
 import { auditLogs } from "@aahaarloop/database";
 
+import { withApiHandler } from "@/lib/api/handler";
 import { forbidUnlessRole } from "@/lib/auth/guards";
 import { getDb } from "@/lib/db";
 import { desc } from "drizzle-orm";
 
 export const runtime = "nodejs";
 
-/** Admin-only audit trail; demonstrates server-side RBAC on a route handler. */
-export async function GET() {
+/** Admin-only audit trail; demonstrates RBAC and the shared API wrapper. */
+export const GET = withApiHandler({}, async () => {
   const denied = await forbidUnlessRole(["admin"]);
   if (denied) return denied;
 
@@ -28,4 +29,4 @@ export async function GET() {
     .limit(50);
 
   return Response.json({ entries });
-}
+});
