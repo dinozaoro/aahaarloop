@@ -55,6 +55,12 @@ export interface MobileAuthResult {
   };
 }
 
+// Auth.js session cookie handed off by the web app after Google sign-in.
+let sessionCookie: string | null = null;
+export function setSessionCookie(cookie: string | null) {
+  sessionCookie = cookie;
+}
+
 /** Options for API requests. */
 type ApiRequestOptions = RequestInit & {
   idempotencyKey?: string;
@@ -66,6 +72,7 @@ type ApiRequestOptions = RequestInit & {
 export async function apiFetch<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
   const headers = new Headers(options.headers);
   headers.set("Accept", "application/json");
+  if (sessionCookie) headers.set("Cookie", sessionCookie);
 
   // Set authorization header if token provided
   if (options.authToken) {
@@ -121,14 +128,7 @@ export function formatDeadline(value?: string): string {
 
 /** Get a mobile auth token from the API. */
 export async function getMobileAuthToken(): Promise<MobileAuthResult> {
-  const response = await fetch(`${env.apiUrl}/api/mobile-token`, {
-    credentials: "include",
-  });
-  if (!response.ok) {
-    const text = await response.text();
-    throw new ApiError(text || "Failed to get auth token", response.status);
-  }
-  return response.json() as Promise<MobileAuthResult>;
+  return apiFetch<MobileAuthResult>("/api/mobile-token");
 }
 
 /** Register a push notification token for the current user. */
@@ -137,6 +137,7 @@ export async function registerPushToken(token: string, platform: "ios" | "androi
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      ...(sessionCookie ? { Cookie: sessionCookie } : {}),
       ...(env.apiUrl.includes("localhost") || env.apiUrl.includes("10.0.2.2")
         ? {}
         : { "x-expo-token": token }),
