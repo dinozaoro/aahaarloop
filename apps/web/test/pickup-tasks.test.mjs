@@ -44,40 +44,42 @@ function setup(profile = volunteer()) {
   return { state, service: createPickupService(repo, () => "2026-11-21T12:00:00Z") };
 }
 
-test("one task is generated per claim requiring pickup", () => {
+test("one task is generated per claim requiring pickup", async () => {
   const { state, service } = setup();
-  const task = service.generateForClaim(claim, donation);
+  const task = await service.generateForClaim(claim, donation);
   assert.equal(state.tasks.length, 1);
-  assert.equal(service.generateForClaim(claim, donation).id, task.id);
+  assert.equal((await service.generateForClaim(claim, donation)).id, task.id);
   assert.equal(state.trail[0].action, "pickup.task.created");
 });
 
-test("assignment honours capacity, distance and availability", () => {
+test("assignment honours capacity, distance and availability", async () => {
   const { service } = setup();
-  const task = service.generateForClaim(claim, donation);
-  assert.equal(service.assign(task.id, "v1", "admin-1").status, "assigned");
+  const task = await service.generateForClaim(claim, donation);
+  assert.equal((await service.assign(task.id, "v1", "admin-1")).status, "assigned");
 
   const tooSmall = setup(volunteer({ id: "v2", transportCapacityKg: 2 }));
-  assert.throws(
-    () => tooSmall.service.assign(tooSmall.service.generateForClaim(claim, donation).id, "v2", "admin"),
+  const smallTask = await tooSmall.service.generateForClaim(claim, donation);
+  await assert.rejects(
+    () => tooSmall.service.assign(smallTask.id, "v2", "admin"),
     /capacity or availability/,
   );
   const tooFar = setup(volunteer({
     id: "v3",
     serviceArea: { center: { latitude: 13.5, longitude: 78.5 }, radiusKm: 1 },
   }));
-  assert.throws(
-    () => tooFar.service.assign(tooFar.service.generateForClaim(claim, donation).id, "v3", "admin"),
+  const farTask = await tooFar.service.generateForClaim(claim, donation);
+  await assert.rejects(
+    () => tooFar.service.assign(farTask.id, "v3", "admin"),
     /service area|capacity or availability/,
   );
 });
 
-test("double assignment is rejected and status changes are audited", () => {
+test("double assignment is rejected and status changes are audited", async () => {
   const { state, service } = setup();
-  const task = service.generateForClaim(claim, donation);
-  service.assign(task.id, "v1", "admin-1");
-  assert.throws(() => service.assign(task.id, "v1", "admin-2"), /already assigned/);
-  assert.equal(service.complete(task.id, "v1").status, "completed");
+  const task = await service.generateForClaim(claim, donation);
+  await service.assign(task.id, "v1", "admin-1");
+  await assert.rejects(() => service.assign(task.id, "v1", "admin-2"), /already assigned/);
+  assert.equal((await service.complete(task.id, "v1")).status, "completed");
   assert.deepEqual(state.trail.map((entry) => entry.action), [
     "pickup.task.created",
     "pickup.task.assigned",

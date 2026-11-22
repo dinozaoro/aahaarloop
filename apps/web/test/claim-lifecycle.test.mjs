@@ -39,38 +39,38 @@ const recipient = { id: "user-1", role: "recipient", organizationId: "org-recipi
 const donor = { id: "user-2", role: "donor", organizationId: "org-donor" };
 const admin = { id: "admin-1", role: "admin", organizationId: null };
 
-test("cancelling releases the exact quantity once", () => {
+test("cancelling releases the exact quantity once", async () => {
   const { state, lifecycle } = setup();
-  const closed = lifecycle.cancel("c1", recipient, "No longer needed");
+  const closed = await lifecycle.cancel("c1", recipient, "No longer needed");
   assert.equal(closed.status, "cancelled");
   assert.equal(state.donation.servingsAvailable, 10);
   assert.equal(state.donation.status, "published");
   assert.equal(state.events.length, 1);
-  assert.throws(() => lifecycle.cancel("c1", recipient, "again"), /Only open claims/);
+  await assert.rejects(() => lifecycle.cancel("c1", recipient, "again"), /Only open claims/);
   assert.equal(state.donation.servingsAvailable, 10);
   assert.equal(state.events.length, 1);
 });
 
-test("a donor cannot cancel after pickup, an admin still can", () => {
+test("a donor cannot cancel after pickup, an admin still can", async () => {
   const before = setup("pickup_scheduled");
-  assert.equal(before.lifecycle.cancel("c1", donor, "late").status, "cancelled");
+  assert.equal((await before.lifecycle.cancel("c1", donor, "late")).status, "cancelled");
   const after = setup("picked_up");
-  assert.throws(() => after.lifecycle.cancel("c1", donor, "too late"), /cannot be cancelled/);
-  assert.throws(() => after.lifecycle.cancel("c1", recipient, "too late"), /cannot be cancelled/);
-  assert.throws(() => after.lifecycle.cancel("c1", admin, "override"), /Only open claims/);
+  await assert.rejects(() => after.lifecycle.cancel("c1", donor, "too late"), /cannot be cancelled/);
+  await assert.rejects(() => after.lifecycle.cancel("c1", recipient, "too late"), /cannot be cancelled/);
+  await assert.rejects(() => after.lifecycle.cancel("c1", admin, "override"), /Only open claims/);
 });
 
-test("expired open claims release their quantity exactly once", () => {
+test("expired open claims release their quantity exactly once", async () => {
   const { state, lifecycle } = setup("confirmed", "2026-11-21T11:00:00Z");
-  const expired = lifecycle.expire();
+  const expired = await lifecycle.expire();
   assert.equal(expired.length, 1);
   assert.equal(state.donation.servingsAvailable, 10);
-  assert.equal(lifecycle.expire().length, 0);
+  assert.equal((await lifecycle.expire()).length, 0);
   assert.equal(state.donation.servingsAvailable, 10);
   assert.equal(state.events.length, 1);
 });
 
-test("cancellation requires a reason", () => {
+test("cancellation requires a reason", async () => {
   const { lifecycle } = setup();
-  assert.throws(() => lifecycle.cancel("c1", recipient, "  "), /reason is required/);
+  await assert.rejects(() => lifecycle.cancel("c1", recipient, "  "), /reason is required/);
 });

@@ -2,11 +2,11 @@ import { ApiError } from "../api/errors.ts";
 import type { Claim, ClaimItemPortion, Donation } from "../domain/types.ts";
 
 export interface ClaimRepository {
-  findDonation(id: string): Donation | undefined;
-  findByIdempotencyKey(key: string): Claim | undefined;
-  saveDonation(donation: Donation): void;
-  saveClaim(claim: Claim): void;
-  appendEvent(donationId: string, type: "claimed" | "edited", actor: string): void;
+  findDonation(id: string): Promise<Donation | undefined>;
+  findByIdempotencyKey(key: string): Promise<Claim | undefined>;
+  saveDonation(donation: Donation, actor: string): Promise<void>;
+  saveClaim(claim: Claim, actor: string): Promise<void>;
+  appendEvent(donationId: string, type: "claimed" | "edited", actor: string): Promise<void>;
 }
 
 export interface ClaimCommand {
@@ -20,8 +20,8 @@ export interface ClaimCommand {
 }
 
 /**
- * Serializes mutations so concurrent requests observe the previous decrement.
- * Replaces a `SELECT … FOR UPDATE` row lock while the store is in memory.
+ * Serializes mutations within one worker; the claims unique index stops a
+ * second worker from creating the same claim.
  */
 export function createClaimService(
   repo: ClaimRepository,
@@ -39,11 +39,11 @@ export function createClaimService(
 
   return {
     create(command: ClaimCommand): Promise<Claim> {
-      return locked(() => {
-        const replay = repo.findByIdempotencyKey(command.idempotencyKey);
+      return locked(async () => {
+        const replay = await repo.findByIdempotencyKey(command.idempotencyKey);
         if (replay) return replay;
 
-        const donation = repo.findDonation(command.donationId);
+        const donation = await repo.findDonation(command.donationId);
         if (!donation) throw new ApiError("not_found", "Donation not found");
         if (donation.status !== "published") {
           throw new ApiError("conflict", "Donation is not available for claiming");
@@ -95,9 +95,9 @@ export function createClaimService(
           status: remaining === 0 ? "claimed" : donation.status,
           updatedAt: at,
         };
-        repo.saveClaim(claim);
-        repo.saveDonation(updated);
-        repo.appendEvent(donation.id, "claimed", command.actorId);
+        await repo.saveClaim(claim, command.actorId);
+        await repo.saveDonation(updated, command.actorId);
+        await repo.appendEvent(donation.id, "claimed", command.actorId);
         return claim;
       });
     },

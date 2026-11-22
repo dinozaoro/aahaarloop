@@ -119,24 +119,24 @@ test("the API wrapper rejects cross-origin writes but allows reads", async () =>
   assert.equal(read.status, 200);
 });
 
-test("IDOR: a donation in another organization cannot be read, edited or published", () => {
+test("IDOR: a donation in another organization cannot be read, edited or published", async () => {
   const { service } = donationSetup();
-  const donation = service.create(DonationInputSchema.parse(donationInput), "org-a", "user-a");
+  const donation = await service.create(DonationInputSchema.parse(donationInput), "org-a", "user-a");
 
-  assert.throws(() => service.get(donation.id, "org-b"), /not found/);
-  assert.throws(
+  await assert.rejects(() => service.get(donation.id, "org-b"), /not found/);
+  await assert.rejects(
     () => service.update(donation.id, "org-b", "attacker", { title: "stolen" }),
     /another organization/,
   );
-  assert.throws(
+  await assert.rejects(
     () => service.publish(donation.id, "org-b", "attacker"),
     /another organization/,
   );
 
   // The rightful organization still has full access.
-  assert.equal(service.get(donation.id, "org-a").id, donation.id);
+  assert.equal((await service.get(donation.id, "org-a")).id, donation.id);
   assert.equal(
-    service.update(donation.id, "org-a", "user-a", { title: "Fixed" }).title,
+    (await service.update(donation.id, "org-a", "user-a", { title: "Fixed" })).title,
     "Fixed",
   );
 });

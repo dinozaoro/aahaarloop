@@ -2,16 +2,16 @@ import { ApiError } from "../api/errors.ts";
 import type { Claim, Donation } from "../domain/types.ts";
 
 export interface ClaimLifecycleRepository {
-  allClaims(): readonly Claim[];
-  findClaim(id: string): Claim | undefined;
-  findDonation(id: string): Donation | undefined;
-  saveClaim(claim: Claim): void;
-  saveDonation(donation: Donation): void;
+  allClaims(): Promise<readonly Claim[]>;
+  findClaim(id: string): Promise<Claim | undefined>;
+  findDonation(id: string): Promise<Donation | undefined>;
+  saveClaim(claim: Claim, actor: string): Promise<void>;
+  saveDonation(donation: Donation, actor: string): Promise<void>;
   appendEvent(
     donationId: string,
     type: "cancelled" | "expired",
     actor: string,
-  ): void;
+  ): Promise<void>;
 }
 
 export interface LifecycleActor {
@@ -35,25 +35,25 @@ export function createClaimLifecycle(
   repo: ClaimLifecycleRepository,
   now: () => string = () => new Date().toISOString(),
 ) {
-  const release = (
+  const release = async (
     claim: Claim,
     status: "cancelled" | "expired",
     actor: LifecycleActor,
     reason?: string,
-  ): Claim => {
+  ): Promise<Claim> => {
     if (!OPEN_STATUSES.has(claim.status)) return claim;
-    const donation = repo.findDonation(claim.donationId);
+    const donation = await repo.findDonation(claim.donationId);
     if (!donation) throw new ApiError("not_found", "Donation not found");
     const restored = Math.min(
       donation.servingsTotal,
       donation.servingsAvailable + claim.servings,
     );
-    repo.saveDonation({
+    await repo.saveDonation({
       ...donation,
       servingsAvailable: restored,
       status: donation.status === "claimed" && restored > 0 ? "published" : donation.status,
       updatedAt: now(),
-    });
+    }, actor.id);
     const closed: Claim = {
       ...claim,
       status,
@@ -64,17 +64,17 @@ export function createClaimLifecycle(
         { id: crypto.randomUUID(), at: now(), type: status, actor: actor.id, note: reason },
       ],
     };
-    repo.saveClaim(closed);
-    repo.appendEvent(claim.donationId, status, actor.id);
+    await repo.saveClaim(closed, actor.id);
+    await repo.appendEvent(claim.donationId, status, actor.id);
     return closed;
   };
 
   return {
-    cancel(claimId: string, actor: LifecycleActor, reason: string): Claim {
+    async cancel(claimId: string, actor: LifecycleActor, reason: string): Promise<Claim> {
       if (!reason.trim()) throw new ApiError("validation_error", "A cancel reason is required");
-      const claim = repo.findClaim(claimId);
+      const claim = await repo.findClaim(claimId);
       if (!claim) throw new ApiError("not_found", "Claim not found");
-      const donation = repo.findDonation(claim.donationId);
+      const donation = await repo.findDonation(claim.donationId);
       if (!donation) throw new ApiError("not_found", "Donation not found");
       if (!mayCancel(claim, donation, actor)) {
         throw new ApiError("forbidden", "This claim cannot be cancelled by this actor");
@@ -85,17 +85,26 @@ export function createClaimLifecycle(
       return release(claim, "cancelled", actor, reason.trim());
     },
 
-    expire(): Claim[] {
+    async expire(): Promise<Claim[]> {
       const current = Date.parse(now());
-      const expired = repo.allClaims().filter(
+      const all = await repo.allClaims();
+      const expired = all.filter(
         (claim) =>
           OPEN_STATUSES.has(claim.status) &&
           claim.expiresAt != null &&
           Date.parse(claim.expiresAt) <= current,
       );
-      return expired.map((claim) =>
-        release(claim, "expired", { id: "system", role: "system", organizationId: null }),
-      );
+      const result: Claim[] = [];
+      for (const claim of expired) {
+        result.push(
+          await release(claim, "expired", {
+            id: "system",
+            role: "system",
+            organizationId: null,
+          }),
+        );
+      }
+      return result;
     },
   };
 }

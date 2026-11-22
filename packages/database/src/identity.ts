@@ -3,6 +3,7 @@ import {
   check,
   index,
   integer,
+  jsonb,
   numeric,
   pgTable,
   text,
@@ -36,6 +37,17 @@ export const users = pgTable(
     index("users_active_org_idx").on(table.activeOrganizationId),
   ],
 );
+
+/** Per-user notification channel and enabled types. */
+export const notificationPreferences = pgTable("notification_preferences", {
+  ...baseColumns,
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" })
+    .unique(),
+  channel: text("channel").notNull().default("in_app"),
+  enabled: jsonb("enabled").$type<Record<string, boolean>>().notNull(),
+});
 
 /** Additional human-facing details that are not part of authentication. */
 export const profiles = pgTable("profiles", {
