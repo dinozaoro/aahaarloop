@@ -105,9 +105,13 @@ export const reports = pgTable(
     claimId: uuid("claim_id").references(() => claims.id, {
       onDelete: "set null",
     }),
+    targetType: text("target_type").notNull().default("donation"),
+    targetId: uuid("target_id"),
     reason: text("reason").notNull(),
     details: text("details"),
     status: reportStatus("status").notNull().default("open"),
+    aiAnalysis: jsonb("ai_analysis"),
+    resolutionNote: text("resolution_note"),
     resolvedBy: uuid("resolved_by").references(() => users.id, {
       onDelete: "set null",
     }),
@@ -116,6 +120,7 @@ export const reports = pgTable(
   (table) => [
     index("reports_status_idx").on(table.status),
     index("reports_donation_idx").on(table.donationId),
+    index("reports_target_idx").on(table.targetType, table.targetId),
   ],
 );
 
@@ -174,3 +179,31 @@ export const impactRecords = pgTable(
     check("impact_records_value_non_negative", sql`${table.value} >= 0`),
   ],
 );
+
+/** Replayable POST response, shared by every worker. */
+export const apiIdempotency = pgTable("api_idempotency", {
+  key: text("key").primaryKey(),
+  status: integer("status").notNull(),
+  bodyText: text("body_text").notNull(),
+  contentType: text("content_type"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+/** Non-PII product events, deduplicated by event id. */
+export const telemetryEvents = pgTable("telemetry_events", {
+  eventId: text("event_id").primaryKey(),
+  name: text("name").notNull(),
+  occurredAt: timestamp("occurred_at", { withTimezone: true }).notNull(),
+  payload: jsonb("payload").notNull(),
+});
+
+/** Single-row document holding the admin-tunable matching configuration. */
+export const adminConfig = pgTable("admin_config", {
+  key: text("key").primaryKey(),
+  value: jsonb("value").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});

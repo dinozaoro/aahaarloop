@@ -15,6 +15,13 @@
       "when": 1795343364465,
       "tag": "0001_lucky_speed",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795346402003,
+      "tag": "0002_cultured_energizer",
+      "breakpoints": true
     }
   ]
 }
