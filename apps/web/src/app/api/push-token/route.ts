@@ -1,5 +1,4 @@
-import { getSession } from "@/auth";
-import { getDb } from "@/lib/db";
+import { auth } from "@/auth";
 import { z } from "zod";
 
 const pushTokenSchema = z.object({
@@ -14,12 +13,12 @@ export async function POST(request: Request) {
 
     if (!result.success) {
       return new Response(
-        JSON.stringify({ error: "Invalid push token data", issues: result.error.format().issues }),
+        JSON.stringify({ error: "Invalid push token data" }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    const session = await getSession();
+    const session = await auth();
 
     if (!session?.user?.id) {
       return new Response(

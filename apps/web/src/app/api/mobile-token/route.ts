@@ -1,11 +1,6 @@
-import { getSession } from "@/auth";
+import { auth } from "@/auth";
 import { getDb } from "@/lib/db";
 import { provisionGoogleUser } from "@/lib/auth/provision";
-import { z } from "zod";
-
-const mobileTokenSchema = z.object({
-  purpose: z.literal("mobile-api"),
-});
 
 export async function GET(request: Request) {
   // Only accept requests from the mobile app's allowed origins
@@ -20,7 +15,7 @@ export async function GET(request: Request) {
     request.headers.set("origin", origin);
   }
 
-  const session = await getSession();
+  const session = await auth();
 
   if (!session?.user?.id) {
     return new Response(
@@ -32,43 +27,8 @@ export async function GET(request: Request) {
     );
   }
 
-  // Provision/ensure the identity exists in the database
-  const account = session.accounts?.[0];
-  if (account?.provider === "google" && session.user?.email) {
-    try {
-      const identity = await provisionGoogleUser(await getDb(), {
-        email: session.user.email,
-        name: session.user.name,
-        image: session.user.image,
-      });
-      // Update token with database identity
-      const newSession = await (await import("next-auth")).getSession({
-        ...session,
-        user: { ...session.user, ...identity },
-      });
-      // Return the identity info
-      return new Response(
-        JSON.stringify({
-          user: {
-            id: newSession.user?.id,
-            email: newSession.user?.email,
-            name: newSession.user?.name,
-            image: newSession.user?.image,
-            role: newSession.user?.role,
-            activeOrganizationId: newSession.user?.activeOrganizationId,
-          },
-        }),
-        {
-          status: 200,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-    } catch (err) {
-      console.error("Provision error:", err);
-    }
-  }
-
-  // Return basic user info
+  // The session already has the provisioned identity from auth.js callbacks
+  // Return the user identity info
   return new Response(
     JSON.stringify({
       user: {
