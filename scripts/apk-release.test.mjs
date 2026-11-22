@@ -57,7 +57,7 @@ test("workflow publishes the APK, checksum and install notes as a Release", () =
 });
 
 test("secrets are referenced, never embedded, with least-privilege permissions", () => {
-  assert.match(workflow, /token: \$\{\{ secrets\.EXPO_TOKEN \}\}/);
+  assert.match(workflow, /token: \$\{\{ secrets\.EXPO_TOKEN \|\| secrets\.EAS_TOKEN \}\}/);
   assert.match(workflow, /GITHUB_TOKEN: \$\{\{ github\.token \}\}/);
   assert.match(workflow, /permissions:\s*\n\s*contents: write/);
   assert.doesNotMatch(workflow, /token:\s*["']?[A-Za-z0-9_-]{20,}/);
