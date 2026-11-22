@@ -42,7 +42,7 @@ export const GET = withApiHandler({ querySchema }, async ({ query }) => {
   if (!organizationId) {
     throw new ApiError("forbidden", "No active recipient organization");
   }
-  const organization = getOrganization(organizationId);
+  const organization = await getOrganization(organizationId);
   if (!organization) throw new ApiError("not_found", "Organization not found");
 
   const key = [
@@ -58,8 +58,8 @@ export const GET = withApiHandler({ querySchema }, async ({ query }) => {
 
   const ranked = rankMatches(
     organization,
-    getNeedsForOrganization(organizationId),
-    getAllDonations(),
+    await getNeedsForOrganization(organizationId),
+    await getAllDonations(),
     query,
     new Date().toISOString(),
     toMatchingConfig(getAdminConfig()),

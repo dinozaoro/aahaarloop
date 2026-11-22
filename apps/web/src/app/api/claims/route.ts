@@ -7,6 +7,7 @@ import { withApiHandler } from "@/lib/api/handler";
 import { createRateLimiter } from "@/lib/api/rate-limit";
 import { forbidUnlessRole } from "@/lib/auth/guards";
 import { getDb } from "@/lib/db";
+import { getClaimsForDonor, getClaimsForOrganization } from "@/lib/data/store";
 import { claimService } from "@/lib/claims/store-repository";
 import { telemetry } from "@/lib/telemetry/store-repository";
 import { z } from "zod";
@@ -14,6 +15,21 @@ import { z } from "zod";
 export const runtime = "nodejs";
 
 const createLimit = createRateLimiter({ maxRequests: 20, windowMs: 60_000 });
+
+export const GET = withApiHandler({}, async () => {
+  const session = await auth();
+  const user = session?.user;
+  if (!user?.id || !user.activeOrganizationId) {
+    return Response.json({ claims: [] });
+  }
+  const own = user.role === "donor"
+    ? await getClaimsForDonor(user.activeOrganizationId)
+    : user.role === "recipient"
+      ? await getClaimsForOrganization(user.activeOrganizationId)
+      : [];
+  return Response.json({ claims: own });
+});
+
 const PartialClaimSchema = ClaimInputSchema.extend({
   items: z
     .array(

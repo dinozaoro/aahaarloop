@@ -11,7 +11,7 @@ export const runtime = "nodejs";
 export async function GET() {
   const denied = await forbidUnlessRole(["volunteer", "admin"]);
   if (denied) return denied;
-  return Response.json({ tasks: listPickupTasks() });
+  return Response.json({ tasks: await listPickupTasks() });
 }
 
 export const POST = withApiHandler(
@@ -19,10 +19,10 @@ export const POST = withApiHandler(
   async ({ body }) => {
     const denied = await forbidUnlessRole(["admin", "recipient"]);
     if (denied) return denied;
-    const claim = getClaim(body.claimId);
+    const claim = await getClaim(body.claimId);
     if (!claim) throw new ApiError("not_found", "Claim not found");
-    const donation = getDonation(claim.donationId);
+    const donation = await getDonation(claim.donationId);
     if (!donation) throw new ApiError("not_found", "Donation not found");
-    return Response.json(pickupService.generateForClaim(claim, donation), { status: 201 });
+    return Response.json(await pickupService.generateForClaim(claim, donation), { status: 201 });
   },
 );

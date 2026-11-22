@@ -11,7 +11,7 @@ export const runtime = "nodejs";
 export async function GET() {
   const session = await auth();
   if (!session?.user?.id) throw new ApiError("unauthorized", "Sign in required");
-  return Response.json(notificationService.getPreferences(session.user.id));
+  return Response.json(await notificationService.getPreferences(session.user.id));
 }
 
 const patchSchema = z.object({
@@ -23,6 +23,6 @@ export const PATCH = withApiHandler({ bodySchema: patchSchema }, async ({ body }
   const session = await auth();
   if (!session?.user?.id) throw new ApiError("unauthorized", "Sign in required");
   return Response.json(
-    notificationService.updatePreferences(session.user.id, body),
+    await notificationService.updatePreferences(session.user.id, body),
   );
 });

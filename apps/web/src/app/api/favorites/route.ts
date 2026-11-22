@@ -17,7 +17,9 @@ export async function GET() {
   if (!session?.user?.id || !organizationId) {
     throw new ApiError("forbidden", "No active recipient organization");
   }
-  return Response.json(favoriteService.list(session.user.id, organizationId, getAllDonations()));
+  return Response.json(
+    await favoriteService.list(session.user.id, organizationId, await getAllDonations()),
+  );
 }
 
 const favoriteSchema = z.object({
@@ -33,13 +35,13 @@ export const POST = withApiHandler({ bodySchema: favoriteSchema }, async ({ body
   if (!session?.user?.id || !organizationId) {
     throw new ApiError("forbidden", "No active recipient organization");
   }
-  const donation = getAllDonations().find((item) => item.id === body.donationId);
+  const donation = (await getAllDonations()).find((item) => item.id === body.donationId);
   if (!donation || donation.status !== "published") {
     throw new ApiError("not_found", "Donation is not available");
   }
   if (body.favorite) {
-    return Response.json(favoriteService.add(session.user.id, organizationId, body.donationId), { status: 201 });
+    return Response.json(await favoriteService.add(session.user.id, organizationId, body.donationId), { status: 201 });
   }
-  favoriteService.remove(session.user.id, body.donationId);
+  await favoriteService.remove(session.user.id, body.donationId);
   return Response.json({ donationId: body.donationId, favorite: false });
 });

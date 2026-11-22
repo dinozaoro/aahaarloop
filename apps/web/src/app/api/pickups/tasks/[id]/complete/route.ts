@@ -10,7 +10,7 @@ export const POST = async (request: Request) => {
   if (denied) return denied;
   const session = await auth();
   const taskId = new URL(request.url).pathname.split("/")[3];
-  const completed = pickupService.complete(taskId, session?.user?.id ?? "volunteer");
+  const completed = await pickupService.complete(taskId, session?.user?.id ?? "volunteer");
   void telemetry.track(
     "donation_delivered",
     { weightKg: completed.weightKg },

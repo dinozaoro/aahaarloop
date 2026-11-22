@@ -18,7 +18,7 @@ export async function GET(_request: Request, { params }: Params) {
   const user = session.user;
   const own = user.role === "donor" ? user.activeOrganizationId : undefined;
   try {
-    return Response.json(donationService.get(id, own ?? undefined));
+    return Response.json(await donationService.get(id, own ?? undefined));
   } catch (error) {
     if (error instanceof ApiError) {
       return Response.json(
@@ -48,7 +48,7 @@ export const PATCH = withApiHandler(
       throw new ApiError("forbidden", "Only donors can edit donations");
     }
     const id = new URL(request.url).pathname.split("/")[3];
-    const donation = donationService.update(
+    const donation = await donationService.update(
       id,
       session.user.activeOrganizationId ?? "",
       session.user.id,

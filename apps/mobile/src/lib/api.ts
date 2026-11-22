@@ -66,6 +66,9 @@ type ApiRequestOptions = RequestInit & {
 export async function apiFetch<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
   const headers = new Headers(options.headers);
   headers.set("Accept", "application/json");
+  if (options.idempotencyKey) {
+    headers.set("idempotency-key", options.idempotencyKey);
+  }
 
   // Set authorization header if token provided
   if (options.authToken) {

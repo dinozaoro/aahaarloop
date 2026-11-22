@@ -2,95 +2,86 @@ import type { VolunteerProfile } from "@aahaarloop/matching";
 
 import type { Claim, Donation, Need, Organization } from "@/lib/domain/types";
 
-// In-memory workspace state: starts empty and only contains records created
-// during the current server process.
-const donations: Donation[] = [];
-const claims: Claim[] = [];
-const needs: Need[] = [];
-const organizations: Organization[] = [];
+import * as dal from "./dal.ts";
 
-export function getAllDonations(): readonly Donation[] {
-  return donations;
+/** Thin async façade kept so existing pages and repositories share one DAL. */
+export function getAllDonations(): Promise<readonly Donation[]> {
+  return dal.listDonations();
 }
 
-export function getDonation(id: string): Donation | undefined {
-  return donations.find((donation) => donation.id === id);
+export function getDonation(id: string): Promise<Donation | undefined> {
+  return dal.findDonation(id);
 }
 
-export function getDonationsForOrganization(
+export async function getDonationsForOrganization(
   organizationId: string,
-): readonly Donation[] {
-  return donations.filter(
+): Promise<readonly Donation[]> {
+  return (await dal.listDonations()).filter(
     (donation) => donation.organizationId === organizationId,
   );
 }
 
-export function getClaims(): readonly Claim[] {
-  return claims;
+export function getClaims(): Promise<readonly Claim[]> {
+  return dal.listClaims();
 }
 
-export function getClaim(id: string): Claim | undefined {
-  return claims.find((claim) => claim.id === id);
+export function getClaim(id: string): Promise<Claim | undefined> {
+  return dal.findClaim(id);
 }
 
-export function getClaimsForDonation(donationId: string): readonly Claim[] {
-  return claims.filter((claim) => claim.donationId === donationId);
+export async function getClaimsForDonation(donationId: string): Promise<readonly Claim[]> {
+  return (await dal.listClaims()).filter((claim) => claim.donationId === donationId);
 }
 
-export function getClaimsForOrganization(
+export async function getClaimsForOrganization(
   organizationId: string,
-): readonly Claim[] {
-  return claims.filter((claim) => claim.recipientOrgId === organizationId);
+): Promise<readonly Claim[]> {
+  return (await dal.listClaims()).filter(
+    (claim) => claim.recipientOrgId === organizationId,
+  );
 }
 
-export function getClaimsForDonor(
+export async function getClaimsForDonor(
   donorOrganizationId: string,
-): readonly Claim[] {
+): Promise<readonly Claim[]> {
   const donationIds = new Set(
-    getDonationsForOrganization(donorOrganizationId).map(
+    (await getDonationsForOrganization(donorOrganizationId)).map(
       (donation) => donation.id,
     ),
   );
-  return claims.filter((claim) => donationIds.has(claim.donationId));
+  return (await dal.listClaims()).filter((claim) => donationIds.has(claim.donationId));
 }
 
-export function getOrganization(id: string): Organization | undefined {
-  return organizations.find((organization) => organization.id === id);
+export function getOrganization(id: string): Promise<Organization | undefined> {
+  return dal.findOrganization(id);
 }
 
-export function getOrganizations(): readonly Organization[] {
-  return organizations;
+export function getOrganizations(): Promise<readonly Organization[]> {
+  return dal.listOrganizations();
 }
 
 export function getNeedsForOrganization(
   organizationId: string,
-): readonly Need[] {
-  return needs.filter((need) => need.organizationId === organizationId);
+): Promise<readonly Need[]> {
+  return dal.listNeeds(organizationId);
 }
 
-export function getVolunteerProfile(): VolunteerProfile | null {
-  return null;
+export function getVolunteerProfile(userId?: string): Promise<VolunteerProfile | undefined> {
+  return userId ? dal.findVolunteerProfile(userId) : Promise.resolve(undefined);
 }
 
-/** Write path: replaces the matching in-memory entry, or appends it. */
-export function upsertDonation(donation: Donation): void {
-  const index = donations.findIndex((item) => item.id === donation.id);
-  if (index === -1) donations.push(donation);
-  else donations[index] = donation;
+export function upsertDonation(donation: Donation, actor = "system"): Promise<void> {
+  return dal.saveDonation(donation, actor);
 }
 
-export function upsertClaim(claim: Claim): void {
-  const index = claims.findIndex((item) => item.id === claim.id);
-  if (index === -1) claims.push(claim);
-  else claims[index] = claim;
+export function upsertClaim(claim: Claim, actor = "system"): Promise<void> {
+  return dal.saveClaim(claim, actor);
 }
 
-export function findClaimByIdempotencyKey(key: string): Claim | undefined {
-  return claims.find((claim) => claim.idempotencyKey === key);
+export function findClaimByIdempotencyKey(key: string): Promise<Claim | undefined> {
+  return dal.findClaimByIdempotencyKey(key);
 }
 
-export function upsertOrganization(organization: Organization): void {
-  const index = organizations.findIndex((item) => item.id === organization.id);
-  if (index === -1) organizations.push(organization);
-  else organizations[index] = organization;
+export function upsertOrganization(organization: Organization): Promise<void> {
+  return dal.saveOrganization(organization);
 }

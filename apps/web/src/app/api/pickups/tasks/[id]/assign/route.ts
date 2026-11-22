@@ -12,6 +12,6 @@ export const POST = async (request: Request) => {
   const session = await auth();
   const taskId = new URL(request.url).pathname.split("/")[3];
   const { volunteerId } = z.object({ volunteerId: z.string().min(1) }).parse(await request.json());
-  const assignment = pickupService.assign(taskId, volunteerId, session?.user?.id ?? "admin");
+  const assignment = await pickupService.assign(taskId, volunteerId, session?.user?.id ?? "admin");
   return Response.json(assignment, { status: 201 });
 };

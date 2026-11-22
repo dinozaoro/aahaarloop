@@ -17,7 +17,7 @@ export const POST = withApiHandler({ bodySchema }, async ({ body }, { request })
   const session = await auth();
   if (!session?.user?.id) throw new ApiError("unauthorized", "Sign in required");
   const id = new URL(request.url).pathname.split("/")[3];
-  const claim = claimLifecycle.cancel(
+  const claim = await claimLifecycle.cancel(
     id,
     {
       id: session.user.id,
