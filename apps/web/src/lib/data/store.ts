@@ -53,6 +53,7 @@ export async function getClaimsForDonor(
 }
 
 export function getOrganization(id: string): Promise<Organization | undefined> {
+  if (!id.trim()) return Promise.resolve(undefined);
   return dal.findOrganization(id);
 }
 
