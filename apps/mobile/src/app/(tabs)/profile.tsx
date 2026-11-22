@@ -114,7 +114,7 @@ export default function ProfileScreen() {
 }
 const profileStyles = {
   header: { gap: 8 },
-  eyebrow: { color: colors.action, fontSize: 11, fontWeight: "900", letterSpacing: 1.2 },
+  eyebrow: { color: colors.action, fontSize: 12, fontWeight: "900", letterSpacing: 1.2 },
   card: { gap: 16 },
   label: { color: colors.ink, fontSize: 13, fontWeight: "800" },
   pills: { flexDirection: "row", gap: 8, flexWrap: "wrap" },

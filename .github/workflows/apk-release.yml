@@ -87,8 +87,10 @@ jobs:
 
           APK_NAME="aahaarloop-${RELEASE_TAG}.apk"
           APK_PATH="$RUNNER_TEMP/$APK_NAME"
+          LATEST_APK_PATH="$RUNNER_TEMP/aahaarloop.apk"
           curl -fL --retry 3 "$APK_URL" -o "$APK_PATH"
           test -s "$APK_PATH"
+          cp "$APK_PATH" "$LATEST_APK_PATH"
 
           CHECKSUM=$(sha256sum "$APK_PATH" | awk '{print $1}')
           echo "$CHECKSUM  $APK_NAME" > "$APK_PATH.sha256"
@@ -97,6 +99,7 @@ jobs:
           echo "artifact_url=$APK_URL" >> "$GITHUB_OUTPUT"
           echo "apk_name=$APK_NAME" >> "$GITHUB_OUTPUT"
           echo "apk_path=$APK_PATH" >> "$GITHUB_OUTPUT"
+          echo "latest_apk_path=$LATEST_APK_PATH" >> "$GITHUB_OUTPUT"
           echo "checksum=$CHECKSUM" >> "$GITHUB_OUTPUT"
 
       - name: Generate release and install notes
@@ -119,6 +122,7 @@ jobs:
           body_path: RELEASE_NOTES.md
           files: |
             ${{ steps.build.outputs.apk_path }}
+            ${{ steps.build.outputs.latest_apk_path }}
             ${{ steps.build.outputs.apk_path }}.sha256
             INSTALL.md
         env:

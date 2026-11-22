@@ -20,8 +20,8 @@ test("eas.json defines reproducible Android build profiles", () => {
 test("Android package and versioning are configured", () => {
   const config = appConfig({ config: {} });
   assert.equal(config.android.package, "com.aahaarloop.mobile");
-  assert.equal(config.version, "0.1.1");
-  assert.equal(config.android.versionCode, 2);
+  assert.equal(config.version, "0.1.2");
+  assert.equal(config.android.versionCode, 3);
   assert.equal(config.ios.bundleIdentifier, "com.aahaarloop.mobile");
 });
 
@@ -32,6 +32,8 @@ test("referenced native assets exist so a preview build can resolve them", async
     config.android.adaptiveIcon.foregroundImage,
     config.android.adaptiveIcon.backgroundImage,
     config.android.adaptiveIcon.monochromeImage,
+    "./assets/images/aahaaroop.png",
+    "./assets/images/splash-icon.png",
   ];
   for (const asset of assets) {
     await access(new URL(asset, import.meta.url));

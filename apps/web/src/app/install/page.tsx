@@ -1,5 +1,8 @@
 import { WorkspaceShell } from "@/components/workspace-shell";
-import { ANDROID_RELEASES_URL, resolveAndroidDownloadUrl } from "@/lib/links";
+import {
+  ANDROID_APK_DOWNLOAD_URL,
+  resolveAndroidDownloadUrl,
+} from "@/lib/links";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,7 +13,7 @@ export default function InstallPage() {
   const androidUrl = resolveAndroidDownloadUrl(
     process.env.NEXT_PUBLIC_ANDROID_APK_URL,
   );
-  const downloadUrl = androidUrl ?? ANDROID_RELEASES_URL;
+  const downloadUrl = androidUrl ?? ANDROID_APK_DOWNLOAD_URL;
   return (
     <WorkspaceShell>
       <div className="install-page">
@@ -27,7 +30,7 @@ export default function InstallPage() {
           <section className="install-instructions">
             <h2>Android app</h2>
             <ol>
-              <li>Download the APK from the official AahaarLoop release.</li>
+              <li>Download the APK directly to your Android device.</li>
               <li>Open the downloaded package on your Android device.</li>
               <li>
                 Allow installation when Android asks about apps from this
@@ -36,7 +39,7 @@ export default function InstallPage() {
               <li>Open AahaarLoop and sign in with Google.</li>
             </ol>
             <a href={downloadUrl} className="primary-action">
-              {androidUrl ? "Download APK" : "Open latest APK release"}
+              Download APK
             </a>
             <Link
               href="/browse"
@@ -47,20 +50,19 @@ export default function InstallPage() {
           </section>
           <aside className="install-qr">
             <a
-              href={ANDROID_RELEASES_URL}
-              aria-label="Open the latest Android APK release on GitHub"
+              href={downloadUrl}
+              aria-label="Download the AahaarLoop Android APK"
             >
               <Image
                 src="/images/android-install-qr.png"
-                alt="QR code linking to the latest AahaarLoop Android release"
+                alt="QR code to download AahaarLoop for Android"
                 width={176}
                 height={176}
               />
             </a>
             <h2>Scan to get the Android app</h2>
             <p>
-              The latest release page includes the APK and a safe installation
-              guide.
+              Scan to download the APK directly, then open it to install.
             </p>
           </aside>
         </div>

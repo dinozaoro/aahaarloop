@@ -59,6 +59,14 @@ export function validateOrganizationName(value: unknown): string {
   return name;
 }
 
+export function organizationNameOrDefault(value: unknown): string {
+  if (typeof value === "string" && value.trim() === "") {
+    return "My organization";
+  }
+  if (value === null || value === undefined) return "My organization";
+  return validateOrganizationName(value);
+}
+
 export function validateJoinSlug(value: unknown): string {
   if (typeof value !== "string")
     throw new Error("Organization slug is required.");

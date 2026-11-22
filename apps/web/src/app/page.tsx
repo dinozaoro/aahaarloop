@@ -1,4 +1,7 @@
-import { ANDROID_RELEASES_URL, resolveAndroidDownloadUrl } from "@/lib/links";
+import {
+  ANDROID_APK_DOWNLOAD_URL,
+  resolveAndroidDownloadUrl,
+} from "@/lib/links";
 import { ArrowDown, ArrowRight, ArrowUpRight, Check } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
@@ -51,11 +54,11 @@ function AndroidAction({ inverse = false }: { inverse?: boolean }) {
   const configuredUrl = resolveAndroidDownloadUrl(
     process.env.NEXT_PUBLIC_ANDROID_APK_URL,
   );
-  const href = configuredUrl ?? ANDROID_RELEASES_URL;
+  const href = configuredUrl ?? ANDROID_APK_DOWNLOAD_URL;
   const className = inverse
     ? "landing-button landing-button-dark"
     : "landing-button landing-button-primary";
-  const label = configuredUrl ? "Download for Android" : "Get the Android app";
+  const label = "Download for Android";
 
   return (
     <a className={className} href={href}>
@@ -66,10 +69,6 @@ function AndroidAction({ inverse = false }: { inverse?: boolean }) {
 }
 
 export default function HomePage() {
-  const hasConfiguredAndroidUrl = Boolean(
-    resolveAndroidDownloadUrl(process.env.NEXT_PUBLIC_ANDROID_APK_URL),
-  );
-
   return (
     <div className="landing-page">
       <section id="hero" className="landing-hero" aria-labelledby="hero-title">
@@ -94,9 +93,7 @@ export default function HomePage() {
           </Link>
         </div>
         <p className="landing-download-note">
-          {hasConfiguredAndroidUrl
-            ? "Direct APK install · No Play Store needed"
-            : "Open the official release page for the APK and install guide"}
+          Download the APK directly · No Play Store needed
         </p>
 
         <figure className="food-story">
@@ -311,18 +308,18 @@ export default function HomePage() {
           <span className="android-install-label">Install with your phone</span>
           <a
             className="android-install-qr"
-            href={ANDROID_RELEASES_URL}
-            aria-label="Open the latest Android APK release on GitHub"
+            href={ANDROID_APK_DOWNLOAD_URL}
+            aria-label="Download the AahaarLoop Android APK"
           >
             <Image
               src="/images/android-install-qr.png"
-              alt="QR code for the latest AahaarLoop Android release"
+              alt="QR code to download AahaarLoop for Android"
               width={128}
               height={128}
             />
           </a>
           <span className="android-install-note">
-            Scan to open the latest APK and install guide.
+            Scan to download the Android APK directly.
           </span>
         </div>
       </section>

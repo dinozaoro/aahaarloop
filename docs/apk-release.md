@@ -58,10 +58,10 @@ manual step is the remaining acceptance item for the release.
 ## Demo-booth QR code
 
 `apps/mobile/assets/install-qr.png` (and its `.svg` twin) encode
-`https://github.com/dinozaoro/aahaarloop/releases/latest`, which always resolves
-to the newest GitHub Release containing the APK and `INSTALL.md`. Print the PNG
-at the booth: scanning it opens the latest release page on a phone, where the
-APK is attached.
+`https://github.com/dinozaoro/aahaarloop/releases/latest/download/aahaarloop.apk`.
+Every release uploads a stable `aahaarloop.apk` asset alongside its versioned
+APK, so scanning the code downloads the APK directly instead of opening the
+GitHub release page.
 
 ### Regenerating
 
@@ -71,10 +71,10 @@ releases. Regenerate only if the repository moves or the install page changes:
 ```sh
 npx --yes qrcode -t svg -o apps/mobile/assets/install-qr.svg \
   -d '#063223ff' -l '#ffffffff' -q 4 \
-  'https://github.com/dinozaoro/aahaarloop/releases/latest'
+  'https://github.com/dinozaoro/aahaarloop/releases/latest/download/aahaarloop.apk'
 npx --yes qrcode -t png -w 512 -o apps/mobile/assets/install-qr.png \
   -d '#063223ff' -l '#ffffffff' -q 4 \
-  'https://github.com/dinozaoro/aahaarloop/releases/latest'
+  'https://github.com/dinozaoro/aahaarloop/releases/latest/download/aahaarloop.apk'
 ```
 
 Check the result with any phone camera or a QR decoder before printing. The

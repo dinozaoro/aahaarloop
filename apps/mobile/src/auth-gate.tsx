@@ -3,8 +3,10 @@ import { env } from "@/config/env";
 import { useApp } from "@/context/app-context";
 import { colors, spacing } from "@/theme";
 import { useEffect, useState } from "react";
+import brandLogo from "../assets/images/aahaaroop.png";
 import {
   ActivityIndicator,
+  Image,
   Linking,
   ScrollView,
   StyleSheet,
@@ -41,7 +43,13 @@ function SignInScreen({
     <SafeAreaView style={localStyles.safeArea}>
       <ScrollView contentContainerStyle={localStyles.scrollContent}>
         <View style={appStyles.screen}>
-          <Text style={localStyles.brand}>AAHAARLOOP · BENGALURU</Text>
+          <Image
+            source={brandLogo}
+            style={localStyles.logo}
+            resizeMode="contain"
+            accessible
+            accessibilityLabel="AahaarLoop"
+          />
           <Heading size={34}>Good food moves better together.</Heading>
           <Text style={appStyles.body}>
             Sign in with Google to find nearby food, share surplus or coordinate
@@ -144,12 +152,7 @@ const localStyles = StyleSheet.create({
     backgroundColor: colors.page,
   },
   actions: { gap: spacing.md },
-  brand: {
-    color: colors.action,
-    fontSize: 12,
-    fontWeight: "900",
-    letterSpacing: 1.2,
-  },
+  logo: { width: 112, height: 112, alignSelf: "center" },
   error: { color: colors.accent, fontSize: 14, lineHeight: 20 },
   privacy: { color: colors.muted, fontSize: 13, lineHeight: 20 },
 });

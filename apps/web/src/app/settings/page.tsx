@@ -3,12 +3,17 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 import { WorkspaceShell } from "@/components/workspace-shell";
-import { resolveAndroidDownloadUrl } from "@/lib/links";
+import {
+  ANDROID_APK_DOWNLOAD_URL,
+  resolveAndroidDownloadUrl,
+} from "@/lib/links";
 
 export const metadata: Metadata = { title: "Settings" };
 
 export default function SettingsPage() {
-  const androidUrl = resolveAndroidDownloadUrl(process.env.NEXT_PUBLIC_ANDROID_APK_URL);
+  const androidUrl =
+    resolveAndroidDownloadUrl(process.env.NEXT_PUBLIC_ANDROID_APK_URL) ??
+    ANDROID_APK_DOWNLOAD_URL;
   return <WorkspaceShell><div className="settings-page">
     <div className="page-heading"><div><p className="page-kicker">Bengaluru</p><h1>Make AahaarLoop work for you.</h1><p>Account settings, communication and privacy in one place.</p></div></div>
     <div className="settings-grid">

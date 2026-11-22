@@ -4,6 +4,7 @@ import { test } from "node:test";
 import {
   isSelfAssignableRole,
   isUserRole,
+  organizationNameOrDefault,
   organizationTypeForRole,
   parseOnboardingRole,
   parseOrganizationMode,
@@ -50,6 +51,14 @@ test("organization names are trimmed and length-checked", () => {
   for (const bad of [null, "", "a", "x".repeat(121)]) {
     assert.throws(() => validateOrganizationName(bad));
   }
+});
+
+test("organization name can be skipped during onboarding", () => {
+  assert.equal(organizationNameOrDefault(""), "My organization");
+  assert.equal(organizationNameOrDefault("  "), "My organization");
+  assert.equal(organizationNameOrDefault(null), "My organization");
+  assert.equal(organizationNameOrDefault(" Hope Shelter "), "Hope Shelter");
+  assert.throws(() => organizationNameOrDefault("a"));
 });
 
 test("join slugs accept only lowercase hyphenated identifiers", () => {

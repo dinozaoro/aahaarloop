@@ -12,10 +12,10 @@ import { requireUser } from "@/lib/auth/guards";
 import {
   isSelfAssignableRole,
   organizationTypeForRole,
+  organizationNameOrDefault,
   parseOrganizationMode,
   uniqueOrganizationSlug,
   validateJoinSlug,
-  validateOrganizationName,
 } from "@/lib/auth/onboarding";
 import { getDb } from "@/lib/db";
 import { eq, sql } from "drizzle-orm";
@@ -44,7 +44,7 @@ export async function completeOnboarding(formData: FormData) {
   if (mode === "create") {
     let name: string;
     try {
-      name = validateOrganizationName(formData.get("orgName"));
+      name = organizationNameOrDefault(formData.get("orgName"));
     } catch {
       fail("invalid-name");
     }

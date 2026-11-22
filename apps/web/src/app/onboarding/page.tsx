@@ -61,8 +61,9 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
             <label><input type="radio" name="orgMode" value="join" /> Join an existing organization</label>
           </fieldset>
           <div className="onboarding-fields">
-            <label htmlFor="orgName">Organization name</label>
-            <input id="orgName" name="orgName" placeholder="Hope Shelter" minLength={2} maxLength={120} />
+            <label htmlFor="orgName">NGO / organization name <span>(optional)</span></label>
+            <input id="orgName" name="orgName" placeholder="Hope Shelter" minLength={2} maxLength={120} aria-describedby="org-name-hint" />
+            <small id="org-name-hint">If left blank, we’ll use “My organization”.</small>
             <label htmlFor="joinSlug">Organization slug <span>(for joining)</span></label>
             <input id="joinSlug" name="joinSlug" placeholder="hope-shelter" pattern="[a-z0-9]+(-[a-z0-9]+)*" />
             

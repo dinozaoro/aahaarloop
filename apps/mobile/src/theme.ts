@@ -20,11 +20,11 @@ export const spacing = {
   sm: 8,
   md: 12,
   lg: 16,
-  xl: 20,
-  xxl: 24,
+  xl: 24,
+  xxl: 32,
 } as const;
 
-export const radii = { sm: 5, md: 8, lg: 10, xl: 12 } as const;
+export const radii = { sm: 8, md: 12, lg: 16, xl: 20 } as const;
 
 export const fonts = {
   ui: Platform.select({ ios: "System", android: "sans-serif", default: "sans-serif" }),

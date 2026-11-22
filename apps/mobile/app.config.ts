@@ -4,8 +4,8 @@ declare const process: { env: Record<string, string | undefined> };
 
 const DEFAULT_API_URL = "http://10.0.2.2:3000";
 // Bump APP_VERSION for user-visible releases and VERSION_CODE for every APK.
-const APP_VERSION = "0.1.1";
-const VERSION_CODE = 2;
+const APP_VERSION = "0.1.2";
+const VERSION_CODE = 3;
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
@@ -21,7 +21,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     package: "com.aahaarloop.mobile",
     versionCode: VERSION_CODE,
     adaptiveIcon: {
-      backgroundColor: "#FFF7F0",
+      backgroundColor: "#FFFBED",
       foregroundImage: "./assets/images/android-icon-foreground.png",
       backgroundImage: "./assets/images/android-icon-background.png",
       monochromeImage: "./assets/images/android-icon-monochrome.png",
@@ -39,9 +39,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       "expo-splash-screen",
       {
-        backgroundColor: "#FFF7F0",
+        backgroundColor: "#FFFBED",
         image: "./assets/images/splash-icon.png",
-        imageWidth: 76,
+        imageWidth: 150,
       },
     ],
   ],
