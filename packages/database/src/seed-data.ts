@@ -17,6 +17,8 @@ export const DEMO_IDS = {
   donations: [id(41), id(42), id(43), id(44), id(45)] as const,
   claims: [id(51), id(52)] as const,
   needs: [id(61), id(62)] as const,
+  pickupTask: id(81),
+  pickupAssignment: id(82),
 } as const;
 
 export const DEMO_EMAILS = {
@@ -38,6 +40,8 @@ export interface SeedData {
   recipientNeeds: unknown[];
   claims: unknown[];
   claimItems: unknown[];
+  pickupTasks: unknown[];
+  pickupAssignments: unknown[];
   donationImages: unknown[];
   favorites: unknown[];
 }
@@ -95,7 +99,7 @@ export function buildSeedData(now: Date = new Date()): SeedData {
       {
         id: DEMO_IDS.donorUser,
         email: DEMO_EMAILS.donor,
-        name: "Demo Donor",
+        name: "Meera Rao",
         role: "donor",
         activeOrganizationId: DEMO_IDS.donorOrg,
         emailVerifiedAt: verifiedAt,
@@ -103,7 +107,7 @@ export function buildSeedData(now: Date = new Date()): SeedData {
       {
         id: DEMO_IDS.recipientUser,
         email: DEMO_EMAILS.recipient,
-        name: "Demo Recipient",
+        name: "Fatima Khan",
         role: "recipient",
         activeOrganizationId: DEMO_IDS.recipientOrg,
         emailVerifiedAt: verifiedAt,
@@ -111,7 +115,7 @@ export function buildSeedData(now: Date = new Date()): SeedData {
       {
         id: DEMO_IDS.volunteerUser,
         email: DEMO_EMAILS.volunteer,
-        name: "Demo Volunteer",
+        name: "Arun Kumar",
         role: "volunteer",
         activeOrganizationId: DEMO_IDS.volunteerOrg,
         emailVerifiedAt: verifiedAt,
@@ -119,7 +123,7 @@ export function buildSeedData(now: Date = new Date()): SeedData {
       {
         id: DEMO_IDS.adminUser,
         email: DEMO_EMAILS.admin,
-        name: "Demo Admin",
+        name: "Priya Menon",
         role: "admin",
         activeOrganizationId: DEMO_IDS.donorOrg,
         emailVerifiedAt: verifiedAt,
@@ -374,6 +378,30 @@ export function buildSeedData(now: Date = new Date()): SeedData {
         claimId: DEMO_IDS.claims[0],
         donationItemId: id(71),
         quantity: 12,
+      },
+    ],
+    pickupTasks: [
+      {
+        id: DEMO_IDS.pickupTask,
+        donationId: critical,
+        claimId: DEMO_IDS.claims[0],
+        status: "assigned",
+        windowStart: plusHours(now, 1),
+        windowEnd: plusHours(now, 2),
+        address: "12th Main, Indiranagar, Bengaluru",
+        latitude: "12.9719000",
+        longitude: "77.6412000",
+        capacityKg: 15,
+        notes: "Collect 12 sealed lunch boxes from the rear delivery door.",
+      },
+    ],
+    pickupAssignments: [
+      {
+        id: DEMO_IDS.pickupAssignment,
+        taskId: DEMO_IDS.pickupTask,
+        volunteerId: DEMO_IDS.volunteerUser,
+        status: "assigned",
+        assignedAt: now,
       },
     ],
     favorites: [{ userId: DEMO_IDS.recipientUser, donationId: low }],
