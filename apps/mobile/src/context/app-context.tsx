@@ -4,7 +4,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { env } from "@/config/env";
 import { ClaimRepository, DonationRepository, openAppDatabase, type LocalClaim, type LocalDonation } from "@/data";
 import type { ApiDonation, MobileAuthResult } from "@/lib/api";
-import { flushOfflineRequests, getQueueCounts, registerPushToken, getMobileAuthToken } from "@/lib/api";
+import { registerPushToken, getMobileAuthToken } from "@/lib/api";
+import { flushOfflineRequests, getQueueCounts } from "@/lib/offline";
 import { AccessibilityInfo } from "react-native";
 
 interface AppContextValue {
@@ -32,6 +33,7 @@ export function AppProvider({ children }: PropsWithChildren) {
   const [isOnline, setIsOnline] = useState(true);
   const [pendingCount, setPendingCount] = useState(0);
   const [cachedDonations, setCachedDonations] = useState<ApiDonation[]>([]);
+  const [claims, setClaims] = useState<AppContextValue["claims"]>([]);
   const [cachedUser, setCachedUser] = useState<{ id: string; role: Role; activeOrganizationId: string } | null>(null);
   const [preferencesHydrated, setPreferencesHydrated] = useState(false);
   const [mobileAuthToken, setMobileAuthToken] = useState<string | null>(null);
@@ -96,18 +98,20 @@ export function AppProvider({ children }: PropsWithChildren) {
     void loadLocalData();
     void refreshOffline();
     // Get mobile auth token for native API calls
-    try {
-      const authResult = await getMobileAuthToken();
-      setMobileAuthToken(authResult.user.id);
-      setCachedUser({
-        id: authResult.user.id,
-        role: authResult.user.role ? (authResult.user.role === "donor" ? "donor" : authResult.user.role === "recipient" ? "recipient" : "volunteer") : "recipient",
-        activeOrganizationId: authResult.user.activeOrganizationId || "",
-      });
-    } catch (err) {
-      // Auth token not available yet; the app can still function with offline/local data.
-      console.warn("Mobile auth token unavailable:", err);
-    }
+    void (async () => {
+      try {
+        const authResult = await getMobileAuthToken();
+        setMobileAuthToken(authResult.user.id);
+        setCachedUser({
+          id: authResult.user.id,
+          role: authResult.user.role ? (authResult.user.role === "donor" ? "donor" : authResult.user.role === "recipient" ? "recipient" : "volunteer") : "recipient",
+          activeOrganizationId: authResult.user.activeOrganizationId || "",
+        });
+      } catch (err) {
+        // Auth token not available yet; the app can still function with offline/local data.
+        console.warn("Mobile auth token unavailable:", err);
+      }
+    })();
     const timer = setInterval(() => void refreshOffline(), 30_000);
     return () => clearInterval(timer);
   }, [loadLocalData, getMobileAuthToken]);
@@ -142,3 +146,67 @@ export function AppProvider({ children }: PropsWithChildren) {
   }), [activeOrganizationId, cacheDonations, cachedDonations, claims, isOnline, pendingCount, refreshOffline, role, cachedUser]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+}
+
+function toApiDonation(donation: LocalDonation): ApiDonation {
+  return {
+    id: donation.id,
+    title: donation.title,
+    description: donation.description ?? undefined,
+    status: donation.status,
+    storage: donation.storage,
+    servingsTotal: donation.quantity,
+    servingsAvailable: donation.remainingQuantity,
+    pickupAddress: donation.address ?? undefined,
+    location: donation.latitude != null && donation.longitude != null ? { latitude: donation.latitude, longitude: donation.longitude } : undefined,
+    foodExpiryAt: donation.foodExpiryAt ?? undefined,
+    bestBeforeAt: donation.bestBeforeAt ?? undefined,
+    pickupDeadlineAt: donation.pickupDeadlineAt ?? undefined,
+  };
+}
+
+function toLocalDonation(donation: ApiDonation): LocalDonation {
+  return {
+    id: donation.id,
+    title: donation.title,
+    description: donation.description ?? null,
+    status: donation.status as LocalDonation["status"],
+    quantity: donation.servingsTotal ?? donation.servingsAvailable ?? 0,
+    remainingQuantity: donation.servingsAvailable ?? donation.servingsTotal ?? 0,
+    unit: "serving",
+    storage: (donation.storage === "chilled" || donation.storage === "frozen" ? donation.storage : "ambient"),
+    address: donation.pickupAddress ?? null,
+    latitude: donation.location?.latitude ?? null,
+    longitude: donation.location?.longitude ?? null,
+    foodExpiryAt: donation.foodExpiryAt ?? null,
+    bestBeforeAt: donation.bestBeforeAt ?? null,
+    pickupDeadlineAt: donation.pickupDeadlineAt ?? null,
+    updatedAt: donation.updatedAt ?? new Date().toISOString(),
+  };
+}
+
+async function persistClaim(claim: { id: string; donationId: string; servings: number; status: string }) {
+  try {
+    const db = await openAppDatabase();
+    await new ClaimRepository(db).upsert({
+      id: claim.id,
+      donationId: claim.donationId,
+      recipientId: "local-session",
+      status: claim.status as LocalClaim["status"],
+      quantity: claim.servings,
+      unit: "serving",
+      note: null,
+      expiresAt: null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+  } catch {
+    // A confirmed server claim remains visible in memory for this session.
+  }
+}
+
+export function useApp() {
+  const context = useContext(AppContext);
+  if (!context) throw new Error("useApp must be used inside AppProvider");
+  return context;
+}

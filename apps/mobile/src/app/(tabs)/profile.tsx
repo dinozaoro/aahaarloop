@@ -77,7 +77,7 @@ export default function ProfileScreen() {
               onPress={() => void registerPushTokenHandler()}
             />
             {pushTokenStatus === "success" && <Text style={{ color: colors.success }}>Push token registered successfully</Text>}
-            {pushTokenStatus === "error" && <Text style={{ color: colors.danger }}>Failed to register push token</Text>}
+            {pushTokenStatus === "error" && <Text style={{ color: colors.accent }}>Failed to register push token</Text>}
           </View>
         ) : null}
       </Card>
@@ -91,8 +91,7 @@ export default function ProfileScreen() {
           ) : (
             "Using local app state until mobile authentication is configured. " +
               "Sign in via the web app to enable full native API access."
-        )}
-        }
+          )}
         </Text>
       </Card>
 
