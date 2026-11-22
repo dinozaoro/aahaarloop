@@ -53,3 +53,19 @@
 .impact-story p {
   font-size: 15px !important;
 }
+
+/* Account and settings pages: bring supporting copy up to the size used on other pages. */
+.account-page p, .account-page span, .account-page small, .account-page strong,
+.account-page label, .account-page li, .account-page dt, .account-page dd,
+.account-page input, .account-page select, .account-page textarea,
+.account-page button, .account-page a, .account-page legend, .account-page figcaption,
+.account-page em {
+  font-size: 15px !important;
+}
+.settings-page p, .settings-page span, .settings-page small, .settings-page strong,
+.settings-page label, .settings-page li, .settings-page dt, .settings-page dd,
+.settings-page input, .settings-page select, .settings-page textarea,
+.settings-page button, .settings-page a, .settings-page legend, .settings-page figcaption,
+.settings-page em {
+  font-size: 15px !important;
+}
